@@ -8,50 +8,19 @@
     tools:context=".MainActivity">
 
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewpage"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:scrollbarDefaultDelayBeforeFade="400"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toTopOf="@+id/bv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBarLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+    </androidx.viewpager.widget.ViewPager>
 
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/activityToolbar"
-                style="@style/Theme.MaterialComponents.Light"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_scrollFlags="scroll"
-                app:menu="@menu/top_app_bar"
-                app:logo="@drawable/ic_cimowebshoplogo_24dp"
-                app:navigationIcon="@drawable/ic_arrow_back_black_24dp"
-                app:title="CIMO" />
-
-        </com.google.android.material.appbar.AppBarLayout>
-
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/viewpage"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbarDefaultDelayBeforeFade="400"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/appBarLayout"
-            app:layout_constraintStart_toStartOf="@id/appBarLayout"
-            app:layout_constraintTop_toBottomOf="@id/appBarLayout">
-
-        </androidx.viewpager.widget.ViewPager>
-
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bv"

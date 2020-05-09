@@ -1,10 +1,10 @@
 package com.example.cimoshop.ui.goodsclass.gallery;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,31 +12,35 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.listener.OnItemChildClickListener;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.chad.library.adapter.base.module.BaseLoadMoreModule;
 import com.example.cimoshop.R;
-import com.example.cimoshop.adapter.GalleryAdapter;
 import com.example.cimoshop.adapter.GalleryAdapter_BRVAH;
 import com.example.cimoshop.entity.Pixabay;
-import com.google.android.material.snackbar.Snackbar;
+import com.example.cimoshop.mytools.myTools;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.List;
 
 public class Gallery extends Fragment {
 
-    private static final String TAG = "Gallery Fragment";
+    //private static final String TAG = "Gallery Fragment";
 
     private GalleryViewModel mViewModel;
     private RecyclerView recyclerViewGallery;
     private SwipeRefreshLayout swipeRefreshLayout;
-    GalleryAdapter_BRVAH galleryAdapter;
+    private MaterialToolbar toolbar;
+    private AppBarLayout appBarLayout;
+    private GalleryAdapter_BRVAH galleryAdapter;
 
 
     @Override
@@ -46,7 +50,8 @@ public class Gallery extends Fragment {
         View root = inflater.inflate(R.layout.gallery_fragment, container, false);
         swipeRefreshLayout = root.findViewById(R.id.swipeGallery);
         recyclerViewGallery = root.findViewById(R.id.recyclerview_gallery);
-
+        toolbar = root.findViewById(R.id.GalleryToolbar);
+        appBarLayout = root.findViewById(R.id.appBarLayout);
         return root;
     }
 
@@ -54,10 +59,29 @@ public class Gallery extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        //监听appBarLayout是否在顶部，如果在，则swipeRefreshLayout可用
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (verticalOffset >= 0) {
+                    swipeRefreshLayout.setEnabled(true);
+                } else {
+                    swipeRefreshLayout.setEnabled(false);
+                }
+            }
+        });
+
+        //状态栏文字透明
+        myTools.makeStatusBarTransparent(getActivity());
+
+        //修复标题栏与状态栏重叠
+        myTools.fitTitleBar(getActivity(),toolbar);
+        myTools.setMIUI(getActivity(),false);
+
         //viewModel初始化
         mViewModel = new ViewModelProvider(this,new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())).get(GalleryViewModel.class);
 
-        //recyclerView Adapter初始化 使用过 BRVAH 框架
+        //recyclerView Adapter初始化 使用 BRVAH 框架
         //final GalleryAdapter galleryAdapter = new GalleryAdapter(new DIFFCALLBACK());
         galleryAdapter = new GalleryAdapter_BRVAH();
         galleryAdapter.setDiffCallback(new DIFFCALLBACK());
@@ -95,7 +119,13 @@ public class Gallery extends Fragment {
         galleryAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
-                //Snackbar.make(view,""+position,Snackbar.LENGTH_SHORT).show();
+
+                //将图片信息通过Parcelable传输到detail页面
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("CHECKED_PHOTO_ID", (Parcelable) adapter.getItem(position));
+                NavController navController = Navigation.findNavController(view);
+                navController.navigate(R.id.action_gallery_to_galleryDetail, bundle);
+
             }
         });
 
