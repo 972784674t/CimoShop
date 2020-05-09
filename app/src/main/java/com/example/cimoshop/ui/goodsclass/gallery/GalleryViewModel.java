@@ -4,19 +4,13 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Transformations;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.paging.LivePagedListBuilder;
-import androidx.paging.PagedList;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.example.cimoshop.api.VolleySingleton;
-import com.example.cimoshop.dataSource.PixabayDataSourceFactory;
 import com.example.cimoshop.entity.Pixabay;
 import com.google.gson.Gson;
 

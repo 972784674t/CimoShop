@@ -52,7 +52,7 @@ public class GalleryAdapter extends ListAdapter<Pixabay.HitsBean, GalleryViewHol
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("CHECKED_PHOTO_ID", getItem(holder.getAdapterPosition()));
                 NavController navController = Navigation.findNavController(v);
-                navController.navigate(R.id.action_gallery_to_galleryDetail, bundle);
+                //navController.navigate(R.id.action_gallery_to_galleryDetail, bundle);
             }
         });
         return holder;

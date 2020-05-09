@@ -36,7 +36,7 @@ public class PersonalCenter extends Fragment {
             @Override
             public void onClick(View v) {
                 NavController navController = Navigation.findNavController(v);
-                navController.navigate(R.id.action_personalCenter_to_loginFragment);
+                navController.navigate(R.id.action_homeFragment_to_loginFragment);
             }
         });
 

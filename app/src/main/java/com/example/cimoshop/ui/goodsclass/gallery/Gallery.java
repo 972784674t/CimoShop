@@ -52,6 +52,7 @@ public class Gallery extends Fragment {
         recyclerViewGallery = root.findViewById(R.id.recyclerview_gallery);
         toolbar = root.findViewById(R.id.GalleryToolbar);
         appBarLayout = root.findViewById(R.id.appBarLayout);
+
         return root;
     }
 
@@ -124,7 +125,7 @@ public class Gallery extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("CHECKED_PHOTO_ID", (Parcelable) adapter.getItem(position));
                 NavController navController = Navigation.findNavController(view);
-                navController.navigate(R.id.action_gallery_to_galleryDetail, bundle);
+                navController.navigate(R.id.action_homeFragment_to_galleryDetail2, bundle);
 
             }
         });

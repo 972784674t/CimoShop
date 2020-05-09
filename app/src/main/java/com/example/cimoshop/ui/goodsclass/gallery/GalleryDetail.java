@@ -16,7 +16,6 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -29,14 +28,8 @@ import com.example.cimoshop.entity.Pixabay;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.supercharge.shimmerlayout.ShimmerLayout;
-import jp.wasabeef.glide.transformations.CropCircleTransformation;
 import uk.co.senab.photoview.PhotoView;
 
 public class GalleryDetail extends Fragment {
@@ -55,8 +48,6 @@ public class GalleryDetail extends Fragment {
     private Chip size3;
     private MaterialButton buttonLike;
     private MaterialButton buttonFav;
-
-
 
     public static GalleryDetail newInstance() {
         return new GalleryDetail();
@@ -78,6 +69,7 @@ public class GalleryDetail extends Fragment {
         buttonLike = root.findViewById(R.id.buttonlike);
         buttonFav = root.findViewById(R.id.buttonfav);
         imgAddress = root.findViewById(R.id.imgaddress);
+
         return root;
 
     }

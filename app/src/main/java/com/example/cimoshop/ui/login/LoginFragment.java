@@ -46,7 +46,7 @@ public class LoginFragment extends Fragment {
                 if (binding.usernameEdit.getText().toString().equals("123456") && binding.passwordEdit.getText().toString().equals("123456")){
                     Snackbar.make(v, "登录成功", Snackbar.LENGTH_SHORT).show();
                     NavController navController = Navigation.findNavController(v);
-                    navController.navigate(R.id.action_loginFragment_to_personalCenter);
+                    navController.navigate(R.id.action_loginFragment_to_homeFragment);
                 } else {
                     Snackbar.make(v, "用户名或密码错误", Snackbar.LENGTH_SHORT).show();
                 }
