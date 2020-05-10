@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -93,8 +95,8 @@ public class Gallery extends Fragment {
         //viewModel初始化
         mViewModel = new ViewModelProvider(this,new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())).get(GalleryViewModel.class);
 
-        //recyclerView Adapter初始化 使用 BRVAH 框架
         //final GalleryAdapter galleryAdapter = new GalleryAdapter(new DIFFCALLBACK());
+        //recyclerView Adapter初始化 使用 BRVAH 框架
         galleryAdapter = new GalleryAdapter_BRVAH();
         galleryAdapter.setDiffCallback(new DIFFCALLBACK());
         galleryAdapter.setAnimationEnable(true);
@@ -137,7 +139,10 @@ public class Gallery extends Fragment {
                 bundle.putParcelable("CHECKED_PHOTO_ID", (Parcelable) adapter.getItem(position));
                 Intent intent = new Intent(getContext(), GalleryDetail.class);
                 intent.putExtras(bundle);
-                startActivity(intent);
+
+                //共享元素过度效果
+                ActivityOptionsCompat compat = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), view, "detail_img");
+                ActivityCompat.startActivity(getContext(), intent, compat.toBundle());
 
             }
         });

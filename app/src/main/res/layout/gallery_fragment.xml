@@ -37,6 +37,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview_gallery"
+            android:transitionName="detail_img"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 

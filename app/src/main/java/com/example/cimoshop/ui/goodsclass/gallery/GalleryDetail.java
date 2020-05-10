@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -91,8 +92,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
         shimmerLayout.setShimmerAngle(0);
         shimmerLayout.startShimmerAnimation();
 
-        //根据id获取图片数据
-
+        //从Parcelable获取图片数据
         final Pixabay.HitsBean hitsBean = getIntent().getExtras().getParcelable("CHECKED_PHOTO_ID");
 
         //传入图片URL，Glide初始化
@@ -114,6 +114,8 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
                     }
                 })
                 .into(photoView);    //装载图片
+
+
 
         //upserImg.setImageResource(hitsBean.getUserImageURL());
         upserName.setText("" + hitsBean.getUser());
@@ -145,7 +147,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
         bottomAppBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                onBackPressed();
             }
         });
 
@@ -232,5 +234,14 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
                 Toast.makeText(getApplication(), "成功分享到github", Toast.LENGTH_SHORT).show();
                 break;
         }
+    }
+
+    /**
+     *重写onBackPressed，配对进入动画
+     */
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        ActivityCompat.finishAfterTransition(this);
     }
 }
