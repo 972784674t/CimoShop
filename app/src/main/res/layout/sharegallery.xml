@@ -42,7 +42,7 @@
                 android:clickable="false"
                 android:gravity="center_vertical"
                 android:text="分享到抖音"
-                android:textSize="18sp" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -57,7 +57,7 @@
             <ImageView
                 android:id="@+id/imageView5"
                 android:layout_width="43dp"
-                android:layout_height="20dp"
+                android:layout_height="24dp"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:clickable="false"
@@ -71,7 +71,7 @@
                 android:clickable="false"
                 android:gravity="center_vertical"
                 android:text="分享到github"
-                android:textSize="18sp" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -85,7 +85,7 @@
 
             <ImageView
                 android:id="@+id/imageView6"
-                android:layout_width="45dp"
+                android:layout_width="44dp"
                 android:layout_height="31dp"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
@@ -100,7 +100,7 @@
                 android:clickable="false"
                 android:gravity="center_vertical"
                 android:text="分享到QQ空间"
-                android:textSize="18sp" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -130,7 +130,7 @@
                 android:clickable="false"
                 android:gravity="center_vertical"
                 android:text="分享到百度"
-                android:textSize="18sp" />
+                android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

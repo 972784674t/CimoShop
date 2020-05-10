@@ -54,7 +54,7 @@ public class HomeFragment extends Fragment {
 
         //修复标题栏与状态栏重叠
         //myTools.fitTitleBar(this,toolbar);
-        myTools.setMIUI(getActivity(),false);
+        myTools.setMIUI(getActivity(),true);
 
         initViewPage();
         initBottomNav();

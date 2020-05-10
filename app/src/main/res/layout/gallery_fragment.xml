@@ -21,10 +21,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_scrollFlags="scroll"
-            app:logo="@drawable/ic_cimowebshoplogo_24dp"
             app:menu="@menu/top_app_bar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat"
-            app:title=" CIMO" />
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:title="  CIMO" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

@@ -8,6 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
 
         <item name="colorPrimary">#212121</item>
+
+        <item name="android:textColorPrimary">#FFFFFF</item>
         <item name="colorPrimaryVariant">#000000</item>
         <item name="colorOnPrimary">#FFFFFF</item>
         <item name="colorSecondary">#2962FF</item>

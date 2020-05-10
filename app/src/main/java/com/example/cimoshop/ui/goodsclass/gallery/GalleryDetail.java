@@ -202,6 +202,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
     void share() {
         View view = LayoutInflater.from(this).inflate(R.layout.sharegallery, null);
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+
         bottomSheetDialog.setContentView(view);
         bottomSheetDialog.show();
         LinearLayout todouyin = view.findViewById(R.id.todouyin);

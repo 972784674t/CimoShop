@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="background">#FAFAFA</color>
+    <color name="while_t">#FFFFFF</color>
 </resources>

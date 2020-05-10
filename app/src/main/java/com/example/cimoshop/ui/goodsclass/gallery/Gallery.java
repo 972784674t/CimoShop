@@ -84,9 +84,11 @@ public class Gallery extends Fragment {
         //状态栏文字透明
         myTools.makeStatusBarTransparent(getActivity());
 
+
         //修复标题栏与状态栏重叠
         myTools.fitTitleBar(getActivity(),toolbar);
-        myTools.setMIUI(getActivity(),false);
+        myTools.setMIUI(getActivity(),true);
+
 
         //viewModel初始化
         mViewModel = new ViewModelProvider(this,new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())).get(GalleryViewModel.class);
