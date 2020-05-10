@@ -91,13 +91,13 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/uperimg"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline12"
+        android:layout_width="49dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/upername"
         app:layout_constraintEnd_toStartOf="@+id/guideline14"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline13"
-        app:layout_constraintTop_toTopOf="@+id/guideline11"
+        app:layout_constraintTop_toTopOf="@+id/guideline18"
         app:layout_constraintVertical_bias="0.6"
         tools:src="@tools:sample/avatars" />
 
@@ -105,13 +105,13 @@
         android:id="@+id/upername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
         android:text="TextView"
         app:layout_constraintBottom_toTopOf="@+id/guideline23"
         app:layout_constraintEnd_toStartOf="@+id/guideline14"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline13"
-        app:layout_constraintTop_toBottomOf="@+id/textView4"
+        app:layout_constraintHorizontal_bias="0.03"
+        app:layout_constraintStart_toEndOf="@+id/uperimg"
+        app:layout_constraintTop_toTopOf="@+id/guideline19"
+        app:layout_constraintVertical_bias="0.5"
         tools:text="CIMO" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -269,13 +269,12 @@
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
         android:text="相关信息"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/guideline18"
         app:layout_constraintStart_toStartOf="@+id/guideline13"
-        app:layout_constraintTop_toBottomOf="@+id/uperimg" />
+        app:layout_constraintTop_toTopOf="@+id/guideline11" />
 
     <TextView
         android:id="@+id/imgaddress"
@@ -301,26 +300,32 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
         <!-- Other components and views -->
 
         <com.google.android.material.bottomappbar.BottomAppBar
-            android:id="@+id/bar"
+            android:id="@+id/bottombar"
+            style="@style/Widget.MaterialComponents.BottomAppBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:fabCradleRoundedCornerRadius="20dp"
-            style="@style/Widget.MaterialComponents.BottomAppBar"
             android:layout_gravity="bottom"
-            app:navigationIcon="@drawable/ic_arrow_back_black_24dp"
-            app:menu="@menu/menu_bottom"/>
+            app:fabCradleRoundedCornerRadius="20dp"
+            app:menu="@menu/menu_bottom"
+            app:navigationIcon="@drawable/ic_arrow_back_black_24dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_add_shopping_cart_black_24dp"
-            app:layout_anchor="@id/bar" />
+            app:layout_anchor="@id/bottombar" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
