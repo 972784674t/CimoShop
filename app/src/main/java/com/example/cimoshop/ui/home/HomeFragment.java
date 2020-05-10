@@ -1,11 +1,13 @@
 package com.example.cimoshop.ui.home;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
@@ -23,6 +25,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomeFragment extends Fragment {
 
+    private static final String TAG = "HomeFragmentCIMO";
+
     private HomeViewModel homeViewModel;
 
     private ViewPager viewPager;
@@ -31,10 +35,19 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+
         homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         viewPager = root.findViewById(R.id.viewpage);
         bottomNavigationView = root.findViewById(R.id.bv);
+
+        return root;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(TAG,"onActivityCreated");
 
         //状态栏文字透明
         myTools.makeStatusBarTransparent(getActivity());
@@ -42,7 +55,6 @@ public class HomeFragment extends Fragment {
         //修复标题栏与状态栏重叠
         //myTools.fitTitleBar(this,toolbar);
         myTools.setMIUI(getActivity(),false);
-        //setStatusBarLightMode(this,true);
 
         initViewPage();
         initBottomNav();
@@ -50,7 +62,6 @@ public class HomeFragment extends Fragment {
         BadgeDrawable shopCat = bottomNavigationView.getOrCreateBadge(R.id.navigation_shopCat);
         shopCat.setNumber(5);
 
-        return root;
     }
 
     /**
@@ -101,6 +112,8 @@ public class HomeFragment extends Fragment {
 
             }
         });
+
+        viewPager.setOffscreenPageLimit(3);
     }
 
     /**

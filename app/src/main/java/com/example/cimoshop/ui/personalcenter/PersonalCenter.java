@@ -1,5 +1,6 @@
 package com.example.cimoshop.ui.personalcenter;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,49 +8,46 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
+
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 
 import com.example.cimoshop.R;
-import com.example.cimoshop.databinding.PersonalCenterFragmentBinding;
+import com.example.cimoshop.ui.login.Login;
+import com.google.android.material.button.MaterialButton;
+
 
 public class PersonalCenter extends Fragment {
-
-    private PersonalCenterViewModel mViewModel;
-    PersonalCenterFragmentBinding binding;
-
 
     public static PersonalCenter newInstance() {
         return new PersonalCenter();
     }
 
+    private MaterialButton button;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater,R.layout.personal_center_fragment,container,false);
-        //setHasOptionsMenu(true);
-        // final NavController navController = Navigation.findNavController(getActivity(), R.id.fragment);
-        binding.button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NavController navController = Navigation.findNavController(v);
-                navController.navigate(R.id.action_homeFragment_to_loginFragment);
-            }
-        });
+        View root = LayoutInflater.from(getContext()).inflate(R.layout.personal_center_fragment,container,false);
 
-
-        return binding.getRoot();
+        button = root.findViewById(R.id.button);
+        return root;
 
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(PersonalCenterViewModel.class);
+        PersonalCenterViewModel mViewModel = ViewModelProviders.of(this).get(PersonalCenterViewModel.class);
         // TODO: Use the ViewModel
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), Login.class);
+                startActivity(intent);
+            }
+        });
     }
 
 }

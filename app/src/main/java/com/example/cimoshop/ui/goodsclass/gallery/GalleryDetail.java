@@ -1,21 +1,14 @@
 package com.example.cimoshop.ui.goodsclass.gallery;
 
-import androidx.lifecycle.ViewModelProvider;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.text.Html;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -25,6 +18,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.cimoshop.R;
 import com.example.cimoshop.entity.Pixabay;
+import com.example.cimoshop.mytools.myTools;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 
@@ -32,11 +26,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import io.supercharge.shimmerlayout.ShimmerLayout;
 import uk.co.senab.photoview.PhotoView;
 
-public class GalleryDetail extends Fragment {
+public class GalleryDetail extends AppCompatActivity {
 
     private static final String TAG = "CIMO galleryDetail";
 
-    private GalleryDetailViewModel mViewModel;
     private ShimmerLayout shimmerLayout;
     private PhotoView photoView;
     private CircleImageView upserImg;
@@ -49,49 +42,42 @@ public class GalleryDetail extends Fragment {
     private MaterialButton buttonLike;
     private MaterialButton buttonFav;
 
-    public static GalleryDetail newInstance() {
-        return new GalleryDetail();
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_gallery_detail);
+
+        myTools.makeStatusBarTransparent(this);
+
+        shimmerLayout = findViewById(R.id.shimerDetialIMG);
+        photoView = findViewById(R.id.photoView);
+        upserImg = findViewById(R.id.uperimg);
+        upserName = findViewById(R.id.upername);
+        imgPrice = findViewById(R.id.imgPrice);
+        size1 = findViewById(R.id.size1);
+        size2 = findViewById(R.id.size2);
+        size3 = findViewById(R.id.size3);
+        buttonLike = findViewById(R.id.buttonlike);
+        buttonFav = findViewById(R.id.buttonfav);
+        imgAddress = findViewById(R.id.imgaddress);
+
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-
-        View root = inflater.inflate(R.layout.gallery_detail_fragment, container, false);
-        shimmerLayout = root.findViewById(R.id.shimerDetialIMG);
-        photoView = root.findViewById(R.id.photoView);
-        upserImg = root.findViewById(R.id.uperimg);
-        upserName = root.findViewById(R.id.upername);
-        imgPrice = root.findViewById(R.id.imgPrice);
-        size1 = root.findViewById(R.id.size1);
-        size2 = root.findViewById(R.id.size2);
-        size3 = root.findViewById(R.id.size3);
-        buttonLike = root.findViewById(R.id.buttonlike);
-        buttonFav = root.findViewById(R.id.buttonfav);
-        imgAddress = root.findViewById(R.id.imgaddress);
-
-        return root;
-
-    }
-
-    @SuppressLint("SetTextI18n")
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        mViewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())).get(GalleryDetailViewModel.class);
+    protected void onStart() {
+        super.onStart();
 
         shimmerLayout.setShimmerColor(0X55FFFFFF);
         shimmerLayout.setShimmerAngle(0);
         shimmerLayout.startShimmerAnimation();
 
         //根据id获取图片数据
-        assert getArguments() != null;
-        final Pixabay.HitsBean hitsBean = getArguments().getParcelable("CHECKED_PHOTO_ID");
+
+        final Pixabay.HitsBean hitsBean = getIntent().getExtras().getParcelable("CHECKED_PHOTO_ID");
 
         //传入图片URL，Glide初始化
         assert hitsBean != null;
-        Glide.with(requireContext()).load( hitsBean.getLargeImageURL() )
+        Glide.with(getApplicationContext()).load( hitsBean.getLargeImageURL() )
                 .placeholder(R.drawable.ic_cimowebshoplogo)  //占位图片初始化
                 .listener(new RequestListener<Drawable>() {
                     @Override
@@ -130,10 +116,9 @@ public class GalleryDetail extends Fragment {
             public void onClick(View v) {
                 Uri uri = Uri.parse(hitsBean.getPageURL());
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                getContext().startActivity(intent);
+                startActivity(intent);
             }
         });
 
     }
-
 }

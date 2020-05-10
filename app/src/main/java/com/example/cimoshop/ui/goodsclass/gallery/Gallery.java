@@ -1,7 +1,9 @@
 package com.example.cimoshop.ui.goodsclass.gallery;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +14,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -33,7 +33,7 @@ import java.util.List;
 
 public class Gallery extends Fragment {
 
-    //private static final String TAG = "Gallery Fragment";
+    private static final String TAG = "Gallery Fragment";
 
     private GalleryViewModel mViewModel;
     private RecyclerView recyclerViewGallery;
@@ -52,13 +52,22 @@ public class Gallery extends Fragment {
         recyclerViewGallery = root.findViewById(R.id.recyclerview_gallery);
         toolbar = root.findViewById(R.id.GalleryToolbar);
         appBarLayout = root.findViewById(R.id.appBarLayout);
-
+        Log.d(TAG,"onCreateView");
         return root;
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG,"onPause()");
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        Log.d(TAG,"onActivityCreated");
 
         //监听appBarLayout是否在顶部，如果在，则swipeRefreshLayout可用
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -124,8 +133,9 @@ public class Gallery extends Fragment {
                 //将图片信息通过Parcelable传输到detail页面
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("CHECKED_PHOTO_ID", (Parcelable) adapter.getItem(position));
-                NavController navController = Navigation.findNavController(view);
-                navController.navigate(R.id.action_homeFragment_to_galleryDetail2, bundle);
+                Intent intent = new Intent(getContext(), GalleryDetail.class);
+                intent.putExtras(bundle);
+                startActivity(intent);
 
             }
         });
@@ -134,7 +144,6 @@ public class Gallery extends Fragment {
         BaseLoadMoreModule loadMore = galleryAdapter.getLoadMoreModule();
         loadMore.setAutoLoadMore(true);
         loadMore.setEnableLoadMoreIfNotFullPage(false);
-
 
     }
 
