@@ -1,6 +1,5 @@
 package com.example.cimoshop.ui.goodsclass.gallery;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -26,16 +25,13 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.cimoshop.R;
 import com.example.cimoshop.entity.Pixabay;
-import com.example.cimoshop.mytools.myTools;
+import com.example.cimoshop.mytools.MyTools;
 import com.google.android.material.bottomappbar.BottomAppBar;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.dialog.MaterialDialogs;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.supercharge.shimmerlayout.ShimmerLayout;
@@ -66,7 +62,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
 
         setTheme(R.style.AppTheme);
 
-        myTools.makeStatusBarTransparent(this);
+        MyTools.makeStatusBarTransparent(this);
 
         shimmerLayout = findViewById(R.id.shimerDetialIMG);
         photoView = findViewById(R.id.photoView);
@@ -97,7 +93,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
 
         //传入图片URL，Glide初始化
         assert hitsBean != null;
-        Glide.with(getApplicationContext()).load(hitsBean.getLargeImageURL())
+        Glide.with(getApplicationContext()).load(hitsBean.getWebformatURL())
                 .placeholder(R.drawable.ic_cimowebshoplogo)  //占位图片初始化
                 .listener(new RequestListener<Drawable>() {
                     @Override

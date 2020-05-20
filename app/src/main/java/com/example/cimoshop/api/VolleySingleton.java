@@ -9,22 +9,30 @@ import com.android.volley.toolbox.Volley;
 
 /**
  * Volley单例模式
+ * @author 谭海山
  */
 public class VolleySingleton {
 
-    //私有化属性
+    /**
+     * 私有化属性
+     */
     @SuppressLint("StaticFieldLeak")
     private static VolleySingleton INSTANCE;
     private RequestQueue requestQueue;
     private Context mContext;
 
-    //私有化构造
+    /**
+     * 私有化构造方法
+     */
     private VolleySingleton(Context context) {
         this.mContext = context;
         requestQueue = getRequestQueue();
     }
 
-    //提供获得请求队列的方法
+    /**
+     * 提供获得请求队列的方法
+     * @return 请求队列
+     */
     private RequestQueue getRequestQueue(){
         if(requestQueue == null){
             requestQueue= Volley.newRequestQueue(mContext);
@@ -32,8 +40,12 @@ public class VolleySingleton {
         return requestQueue;
     }
 
-    //单例模式
-    public static synchronized VolleySingleton getINSTANCE(Context context){
+    /**
+     * VolleySingleton
+     * @param context Context
+     * @return  INSTANCE
+     */
+    public static synchronized VolleySingleton getInstance(Context context){
         if( INSTANCE == null ){
             INSTANCE = new VolleySingleton(context);
         }

@@ -16,10 +16,14 @@ import androidx.lifecycle.ViewModelProviders;
 import com.example.cimoshop.R;
 
 
+/**
+ * @author 谭海山
+ */
 public class ShopCatFragment extends Fragment {
 
     private ShopCatViewModel shopCatViewModel;
 
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         shopCatViewModel =

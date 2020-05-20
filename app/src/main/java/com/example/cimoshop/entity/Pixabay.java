@@ -5,6 +5,9 @@ import android.os.Parcelable;
 
 import java.util.List;
 
+/**
+ * @author 谭海山
+ */
 public class Pixabay implements Parcelable {
 
     /**

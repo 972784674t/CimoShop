@@ -12,6 +12,9 @@ import com.example.cimoshop.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 
+/**
+ * @author 谭海山
+ */
 public class Login extends AppCompatActivity {
 
     EditText username;

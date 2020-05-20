@@ -1,4 +1,4 @@
-package com.example.cimoshop.dataSource;
+package com.example.cimoshop.datasource;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
@@ -6,6 +6,9 @@ import androidx.annotation.NonNull;
 import androidx.paging.DataSource;
 import com.example.cimoshop.entity.Pixabay;
 
+/**
+ * @author 谭海山
+ */
 public class PixabayDataSourceFactory extends DataSource.Factory<Integer, Pixabay.HitsBean> {
 
     private Context context;

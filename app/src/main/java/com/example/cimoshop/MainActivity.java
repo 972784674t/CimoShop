@@ -7,6 +7,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Window;
 
+/**
+ * @author 谭海山
+ */
 public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.M)

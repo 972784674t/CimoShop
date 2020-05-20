@@ -1,6 +1,7 @@
 package com.example.cimoshop.adapter;
 
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -20,7 +21,12 @@ import com.example.cimoshop.entity.Pixabay;
 
 import io.supercharge.shimmerlayout.ShimmerLayout;
 
+/**
+ * @author 谭海山
+ */
 public class GalleryAdapter_BRVAH extends BaseQuickAdapter<Pixabay.HitsBean, BaseViewHolder> implements LoadMoreModule {
+
+    private static final String TAG = "cimoBRVAH";
 
     public GalleryAdapter_BRVAH() {
         super(R.layout.gallery_item);
@@ -38,9 +44,9 @@ public class GalleryAdapter_BRVAH extends BaseQuickAdapter<Pixabay.HitsBean, Bas
         shimmerLayout.startShimmerAnimation();
 
         //Glide初始化图片
-        Glide.with(baseViewHolder.itemView).load(hitsBean
-                .getWebformatURL())           //使用WebformatURL
-                .placeholder(R.drawable.ic_crop_original_black_24dp)  //站位图片初始化
+        Log.d(TAG,""+hitsBean.toString());
+        Glide.with(baseViewHolder.itemView).load(hitsBean.getWebformatURL())
+                .placeholder(R.drawable.ic_crop_original_black_24dp)
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -54,7 +60,8 @@ public class GalleryAdapter_BRVAH extends BaseQuickAdapter<Pixabay.HitsBean, Bas
                         return false;
                     }
                 })
-                .into(imageGalleryItem);    //转载图片
+                //装载图片
+                .into(imageGalleryItem);
 
     }
 }

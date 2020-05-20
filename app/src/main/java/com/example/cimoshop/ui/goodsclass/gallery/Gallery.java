@@ -23,11 +23,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
+import com.chad.library.adapter.base.listener.OnLoadMoreListener;
 import com.chad.library.adapter.base.module.BaseLoadMoreModule;
 import com.example.cimoshop.R;
 import com.example.cimoshop.adapter.GalleryAdapter_BRVAH;
 import com.example.cimoshop.entity.Pixabay;
-import com.example.cimoshop.mytools.myTools;
+import com.example.cimoshop.mytools.MyTools;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 
@@ -44,17 +45,21 @@ public class Gallery extends Fragment {
     private AppBarLayout appBarLayout;
     private GalleryAdapter_BRVAH galleryAdapter;
 
+    //加载更多事件处理
+    private BaseLoadMoreModule loadMore;
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        Log.d(TAG,"onCreateView");
 
         View root = inflater.inflate(R.layout.gallery_fragment, container, false);
         swipeRefreshLayout = root.findViewById(R.id.swipeGallery);
         recyclerViewGallery = root.findViewById(R.id.recyclerview_gallery);
         toolbar = root.findViewById(R.id.GalleryToolbar);
         appBarLayout = root.findViewById(R.id.appBarLayout);
-        Log.d(TAG,"onCreateView");
+
         return root;
     }
 
@@ -68,7 +73,6 @@ public class Gallery extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         Log.d(TAG,"onActivityCreated");
 
         //监听appBarLayout是否在顶部，如果在，则swipeRefreshLayout可用
@@ -84,13 +88,11 @@ public class Gallery extends Fragment {
         });
 
         //状态栏文字透明
-        myTools.makeStatusBarTransparent(getActivity());
-
+        MyTools.makeStatusBarTransparent(getActivity());
 
         //修复标题栏与状态栏重叠
-        myTools.fitTitleBar(getActivity(),toolbar);
-        myTools.setMIUI(getActivity(),true);
-
+        MyTools.fitTitleBar(getActivity(),toolbar);
+        MyTools.setMIUI(getActivity(),true);
 
         //viewModel初始化
         mViewModel = new ViewModelProvider(this,new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())).get(GalleryViewModel.class);
@@ -101,6 +103,8 @@ public class Gallery extends Fragment {
         galleryAdapter.setDiffCallback(new DIFFCALLBACK());
         galleryAdapter.setAnimationEnable(true);
         galleryAdapter.setAnimationFirstOnly(false);
+
+        loadMore = galleryAdapter.getLoadMoreModule();
 
         //交错布局
         recyclerViewGallery.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
@@ -116,16 +120,17 @@ public class Gallery extends Fragment {
             }
         });
 
+
         //如果_hitsBean为空，则获取数据
-        if(mViewModel._hitsBean.getValue() == null ){
-            mViewModel.fetchData();
+        if( mViewModel._hitsBean.getValue() == null ){
+            mViewModel.resetQuery();
         }
 
         //下拉刷新
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mViewModel.fetchData();
+                mViewModel.resetQuery();
             }
         });
 
@@ -147,26 +152,29 @@ public class Gallery extends Fragment {
             }
         });
 
-        //加载更多事件处理
-        BaseLoadMoreModule loadMore = galleryAdapter.getLoadMoreModule();
-        loadMore.setAutoLoadMore(true);
-        loadMore.setEnableLoadMoreIfNotFullPage(false);
+        loadMore.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+
+            }
+        });
+
 
     }
 
     /**
-     * 指定DiffUtil类，实现动态图库效果
+     * 指定DiffUtil类，判断item是否相同
      */
     static class DIFFCALLBACK extends DiffUtil.ItemCallback<Pixabay.HitsBean>{
 
         @Override
         public boolean areItemsTheSame(@NonNull Pixabay.HitsBean oldItem, @NonNull Pixabay.HitsBean newItem) {
-            return oldItem == newItem;
+            return oldItem.getId() == newItem.getId();
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull Pixabay.HitsBean oldItem, @NonNull Pixabay.HitsBean newItem) {
-            return oldItem.getId() == newItem.getId();
+            return oldItem.equals(newItem) ;
         }
     }
 

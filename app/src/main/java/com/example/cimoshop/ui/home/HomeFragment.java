@@ -15,7 +15,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.cimoshop.R;
-import com.example.cimoshop.mytools.myTools;
+import com.example.cimoshop.mytools.MyTools;
 import com.example.cimoshop.ui.goodsclass.gallery.Gallery;
 import com.example.cimoshop.ui.personalcenter.PersonalCenter;
 import com.example.cimoshop.ui.shopcat.ShopCatFragment;
@@ -23,6 +23,9 @@ import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 
+/**
+ * @author 谭海山
+ */
 public class HomeFragment extends Fragment {
 
     private static final String TAG = "HomeFragmentCIMO";
@@ -33,6 +36,7 @@ public class HomeFragment extends Fragment {
     private BottomNavigationView bottomNavigationView;
 
 
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -50,11 +54,11 @@ public class HomeFragment extends Fragment {
         Log.d(TAG,"onActivityCreated");
 
         //状态栏文字透明
-        myTools.makeStatusBarTransparent(getActivity());
+        MyTools.makeStatusBarTransparent(getActivity());
 
         //修复标题栏与状态栏重叠
         //myTools.fitTitleBar(this,toolbar);
-        myTools.setMIUI(getActivity(),true);
+        MyTools.setMIUI(getActivity(),true);
 
         initViewPage();
         initBottomNav();
@@ -72,7 +76,7 @@ public class HomeFragment extends Fragment {
         viewPager.setAdapter(new FragmentStatePagerAdapter(getActivity().getSupportFragmentManager()) {
             @NonNull
             @Override
-            public Fragment getItem(int position) {
+            public Fragment getItem( int position ) {
                 Fragment fragment = null;
                 switch ( position ){
                     case 0:
@@ -83,6 +87,8 @@ public class HomeFragment extends Fragment {
                         break;
                     case 2:
                         fragment =  new PersonalCenter();
+                        break;
+                    default:
                         break;
                 }
                 assert fragment != null;
@@ -133,6 +139,8 @@ public class HomeFragment extends Fragment {
                         break;
                     case R.id.navigation_personalCenter:
                         viewPager.setCurrentItem(2);
+                        break;
+                    default:
                         break;
                 }
                 return false;

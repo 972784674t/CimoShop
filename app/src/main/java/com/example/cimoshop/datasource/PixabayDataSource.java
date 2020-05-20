@@ -1,4 +1,4 @@
-package com.example.cimoshop.dataSource;
+package com.example.cimoshop.datasource;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,14 +18,21 @@ import com.google.gson.Gson;
 
 import java.util.List;
 
+/**
+ * @author 谭海山
+ */
 public class PixabayDataSource extends PageKeyedDataSource<Integer, Pixabay.HitsBean> {
 
     private static final String TAG = "CIMO PAGING";
 
-    //数据源加载状态广播
+    /**
+     * 数据源加载状态广播
+     */
     private static final String DATA_SOURCE_LOADING_STATUS = "DATA_SOURCE_LOADING_STATUS";
 
-    //广播intent
+    /**
+     * 数据加载状态广播Intent
+     */
     private Intent loadingStatusIntent = new Intent(DATA_SOURCE_LOADING_STATUS);
 
     private Context context;
@@ -83,7 +90,7 @@ public class PixabayDataSource extends PageKeyedDataSource<Integer, Pixabay.Hits
                     }
                 }
         );
-        VolleySingleton.getINSTANCE(this.context).addToRequestQueue(stringRequest);
+        VolleySingleton.getInstance(this.context).addToRequestQueue(stringRequest);
     }
 
     /**
@@ -132,7 +139,7 @@ public class PixabayDataSource extends PageKeyedDataSource<Integer, Pixabay.Hits
                     }
                 }
         );
-        VolleySingleton.getINSTANCE(this.context).addToRequestQueue(stringRequest);
+        VolleySingleton.getInstance(this.context).addToRequestQueue(stringRequest);
     }
 
     @Override
