@@ -20,7 +20,7 @@ public class Pixabay implements Parcelable {
     private List<HitsBean> hits;
 
 
-    protected Pixabay(Parcel in) {
+    private Pixabay(Parcel in) {
         total = in.readInt();
         totalHits = in.readInt();
     }

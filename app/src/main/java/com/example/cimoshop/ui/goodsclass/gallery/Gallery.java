@@ -48,7 +48,6 @@ public class Gallery extends Fragment {
     //加载更多事件处理
     private BaseLoadMoreModule loadMore;
 
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {

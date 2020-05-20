@@ -93,8 +93,11 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
 
         //传入图片URL，Glide初始化
         assert hitsBean != null;
-        Glide.with(getApplicationContext()).load(hitsBean.getWebformatURL())
-                .placeholder(R.drawable.ic_cimowebshoplogo)  //占位图片初始化
+        Glide.with(getApplicationContext())
+                //加载的URL
+                .load(hitsBean.getWebformatURL())
+                //占位图片初始化
+                .placeholder(R.drawable.ic_cimowebshoplogo)
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -110,8 +113,6 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
                     }
                 })
                 .into(photoView);    //装载图片
-
-
 
         //upserImg.setImageResource(hitsBean.getUserImageURL());
         upserName.setText("" + hitsBean.getUser());

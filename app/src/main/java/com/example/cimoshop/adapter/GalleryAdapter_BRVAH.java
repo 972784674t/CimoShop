@@ -45,7 +45,10 @@ public class GalleryAdapter_BRVAH extends BaseQuickAdapter<Pixabay.HitsBean, Bas
 
         //Glide初始化图片
         Log.d(TAG,""+hitsBean.toString());
-        Glide.with(baseViewHolder.itemView).load(hitsBean.getWebformatURL())
+        Glide.with(baseViewHolder.itemView)
+                //加载的URL
+                .load(hitsBean.getWebformatURL())
+                //占位图初始化
                 .placeholder(R.drawable.ic_crop_original_black_24dp)
                 .listener(new RequestListener<Drawable>() {
                     @Override
