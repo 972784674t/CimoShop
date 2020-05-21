@@ -77,7 +77,7 @@ public class Pixabay implements Parcelable {
          * id  图片ID
          * pageURL  图片页面网址
          * type  photo
-         * tags  标签 （ rose, flower, petal ）
+         * tags  标签
          * previewURL  预览网址
          * previewWidth
          * previewHeight

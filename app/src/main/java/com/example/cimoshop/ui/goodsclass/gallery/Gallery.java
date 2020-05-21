@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,22 +22,35 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
+import com.android.volley.ParseError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.diff.BrvahAsyncDiffer;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.chad.library.adapter.base.listener.OnLoadMoreListener;
 import com.chad.library.adapter.base.module.BaseLoadMoreModule;
 import com.example.cimoshop.R;
 import com.example.cimoshop.adapter.GalleryAdapter_BRVAH;
+import com.example.cimoshop.api.VolleySingleton;
 import com.example.cimoshop.entity.Pixabay;
 import com.example.cimoshop.mytools.MyTools;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.gson.Gson;
 
 import java.util.List;
 
 public class Gallery extends Fragment {
 
-    private static final String TAG = "Gallery Fragment";
+    private static final String TAG = "CIMOGalleryFragment";
 
     private GalleryViewModel mViewModel;
     private RecyclerView recyclerViewGallery;
@@ -47,6 +61,15 @@ public class Gallery extends Fragment {
 
     //加载更多事件处理
     private BaseLoadMoreModule loadMore;
+
+    //当前页数
+    int CurrentPage = 1;
+
+    //总页数
+    int totalPage = 1;
+
+    //单次请求的图片数
+    int perPage = 50;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -61,7 +84,6 @@ public class Gallery extends Fragment {
 
         return root;
     }
-
 
     @Override
     public void onPause() {
@@ -103,26 +125,30 @@ public class Gallery extends Fragment {
         galleryAdapter.setAnimationEnable(true);
         galleryAdapter.setAnimationFirstOnly(false);
 
+        //加载更多对象，来自于BRVAH
         loadMore = galleryAdapter.getLoadMoreModule();
 
-        //交错布局
+        //交错布局，2列，纵向
         recyclerViewGallery.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
         recyclerViewGallery.setAdapter(galleryAdapter);
 
         //_hitsBean观察者，如果_hitsBean发生变化则更新recycleView
-        mViewModel._hitsBean.observe(getViewLifecycleOwner(), new Observer<List<Pixabay.HitsBean>>() {
+        mViewModel.hitsBean.observe(getViewLifecycleOwner(), new Observer<List<Pixabay.HitsBean>>() {
             @Override
             public void onChanged(List<Pixabay.HitsBean> hitsBeans) {
                 //galleryAdapter.submitList(hitsBeans);
                 galleryAdapter.setDiffNewData(hitsBeans);
                 swipeRefreshLayout.setRefreshing(false);
+                //数据发生变化时，重新获取总页数
+                totalPage = mViewModel.getTotalPage();
             }
         });
 
-
         //如果_hitsBean为空，则获取数据
-        if( mViewModel._hitsBean.getValue() == null ){
+        if( mViewModel.hitsBean.getValue() == null ){
             mViewModel.resetQuery();
+            //重新获取页数
+            CurrentPage = mViewModel.getCurrentPage() + 1;
         }
 
         //下拉刷新
@@ -130,10 +156,12 @@ public class Gallery extends Fragment {
             @Override
             public void onRefresh() {
                 mViewModel.resetQuery();
+                //重新获取页数
+                CurrentPage = mViewModel.getCurrentPage() + 1;
             }
         });
 
-        //Item点击事件
+        //Item点击事件,进入详细页面
         galleryAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
@@ -151,14 +179,76 @@ public class Gallery extends Fragment {
             }
         });
 
+        //当数据不满一页是不自动加载更多
+        loadMore.setEnableLoadMoreIfNotFullPage(false);
+        //当recycleView滑动到底部时执行此监听
         loadMore.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
-
+                loadMoreGallery();
             }
         });
 
+    }
 
+    /**
+     * 加载更多数据
+     */
+    void loadMoreGallery(){
+        String key = mViewModel.getKey();
+        Log.d(TAG,"加载更多 -> currentPage："+CurrentPage+"\tkey："+key+"\ttotalPage："+totalPage);
+        if( CurrentPage > totalPage ){
+            loadMore.loadMoreEnd();
+            return;
+        }
+        StringRequest stringRequest = new StringRequest(
+                Request.Method.GET,
+                "https://pixabay.com/api/?key=16322793-d4bcfe56af2f14816d6549dee&lang=zh&lang=en&q="+key+"&per_page="+perPage+"&page="+CurrentPage,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Gson gson = new Gson();
+                        List<Pixabay.HitsBean> list = gson.fromJson(response, Pixabay.class).getHits();
+                        totalPage = (gson.fromJson(response, Pixabay.class).getTotalHits()) / perPage + 1;
+                        //追加数据，用addAll()
+                        mViewModel.hitsBean.getValue().addAll(list);
+                        loadMore.loadMoreComplete();
+                        CurrentPage++;
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG,"loadMore: "+error.getClass());
+                        switch ( error.getClass().toString() ){
+                            case "class com.android.volley.NoConnectionError":
+                                Toast.makeText(getContext(),
+                                        "Oops. 网络连接出错了！",
+                                        Toast.LENGTH_LONG).show();
+                                break;
+                            case "class com.android.volley.ClientError":
+                                Toast.makeText(getContext(),
+                                        "Oops. 服务器出错了!",
+                                        Toast.LENGTH_LONG).show();
+                                break;
+                            case "class com.android.volley.ParseError":
+                                Toast.makeText(getContext(),
+                                        "Oops. 数据解析出错了!",
+                                        Toast.LENGTH_LONG).show();
+                                break;
+                            case "class com.android.volley.TimeoutError":
+                                Toast.makeText(getContext(),
+                                        "Oops. 请求超时了!",
+                                        Toast.LENGTH_LONG).show();
+                                break;
+                            default:
+                                break;
+                        }
+                        loadMore.loadMoreFail();
+                    }
+                }
+        );
+        VolleySingleton.getInstance(getContext()).addToRequestQueue(stringRequest);
     }
 
     /**

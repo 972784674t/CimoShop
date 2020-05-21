@@ -15,6 +15,7 @@ import java.lang.reflect.Method;
 
 /**
  * 工具类
+ * 用于对状态栏和标题栏的一些适应性操作
  * @author 谭海山
  */
 public class MyTools {
@@ -44,6 +45,12 @@ public class MyTools {
         }
     }
 
+    /**
+     * 针对小米系统的状态栏适应性操作
+     * @param activity
+     * @param dark
+     * @return
+     */
     public static boolean MIUISetStatusBarLightMode(Activity activity, boolean dark) {
         boolean result = false;
         Window window = activity.getWindow();

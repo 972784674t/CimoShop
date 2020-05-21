@@ -1,13 +1,20 @@
 package com.example.cimoshop.ui.goodsclass.gallery;
 import android.app.Application;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.example.cimoshop.api.VolleySingleton;
@@ -17,9 +24,12 @@ import com.google.gson.Gson;
 import java.util.List;
 
 
+/**
+ * @author 谭海山
+ */
 public class GalleryViewModel extends AndroidViewModel {
 
-    private static final String TAG = "GalleryViewModel";
+    private static final String TAG = "CIMOGalleryViewModel";
 
     //搜索关键字key
     private String[] queryKey = new String[]{"animal","natural","universe","Space","sea","Scenery","city"};
@@ -27,11 +37,25 @@ public class GalleryViewModel extends AndroidViewModel {
     //当前页数初始化
     private int currentPage = 1;
 
+    public int getCurrentPage(){
+        return currentPage;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+
+
     //总页数初始化
     private int totalPage = 1;
 
+    public int getTotalPage(){
+        return totalPage;
+    }
+
     //下拉刷新时随机获取key
-    int index = (int) (Math.random() * queryKey.length);
+    private int index = (int) (Math.random() * queryKey.length);
     private String key = queryKey[index];
 
     //是否下拉刷新
@@ -46,47 +70,43 @@ public class GalleryViewModel extends AndroidViewModel {
     //是否已经没数据
     static boolean ISEND = false;
 
-    //加载状态
-    static boolean LOADINGSTATUS = true;
+    //加载结果
+    static String LOADING_RESULT = "s";
 
-    MutableLiveData<List<Pixabay.HitsBean>> _hitsBean = new MutableLiveData<>();
+    //数据源
+    MutableLiveData<List<Pixabay.HitsBean>> hitsBean = new MutableLiveData<>();
 
     public GalleryViewModel(@NonNull Application application) {
         super(application);
     }
 
-    String getUrl(){
-        return "https://pixabay.com/api/?key=16322793-d4bcfe56af2f14816d6549dee&lang=zh&lang=en&q="+key+"&per_page="+perPage+"&page="+currentPage;
-    }
-
-    String getNewKey(){
+    /**
+     * 获取新的关键字
+     * @return  新的Key
+     */
+    public String getNewKey(){
         int index = (int) (Math.random() * queryKey.length);
         return queryKey[index];
     }
 
     /**
-     * 下拉刷新时，重置查询
+     * 链接API
+     * @return 带有API的URL
+     */
+    private String getUrl(){
+        return "https://pixabay.com/api/?key=16322793-d4bcfe56af2f14816d6549dee&lang=zh&lang=en&q="+key+"&per_page="+perPage+"&page="+currentPage;
+    }
+
+    /**
+     * 下拉刷新时，重置查询条件
      */
     void resetQuery(){
         currentPage = 1;
         totalPage = 1;
         isNewQuery = true;
         key = getNewKey();
-        fetchData();
-    }
+        ISEND = false;
 
-    /**
-     * 加载更多
-     */
-    public void fetchData(){
-        if ( isLoading ){
-            return ;
-        }
-        if ( currentPage > totalPage ){
-            ISEND = true;
-            return ;
-        }
-        isLoading = true;
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
                 getUrl(),
@@ -96,30 +116,41 @@ public class GalleryViewModel extends AndroidViewModel {
                         Gson gson = new Gson();
                         List<Pixabay.HitsBean> list = gson.fromJson(response, Pixabay.class).getHits();
                         totalPage = (gson.fromJson(response, Pixabay.class).getTotalHits()) / perPage + 1;
-                        //如果是刷新的请求
-                        if ( isNewQuery ){
-                            Log.d(TAG,"下拉刷新ing");
-                            _hitsBean.postValue(list);
-                        } else {
-                            Log.d(TAG,"加载跟多ing");
-                            _hitsBean.getValue().addAll(list);
-                        }
-                        isLoading = false;
-                        LOADINGSTATUS  = true;
-                        //下次调用不是NewQuery
-                        isNewQuery = false;
-                        currentPage++;
+                        Log.d(TAG,"下拉刷新 -> currentPage："+currentPage+"\tkey："+key+"\ttotalPage："+totalPage);
+                        //刷新的请求，用postValue()
+                        hitsBean.postValue(list);
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG,"loadInitial: "+error);
-                        LOADINGSTATUS = false;
-                        isLoading = false;
+                        Log.d(TAG, "loadMore: " + error.getClass());
+                        switch (error.getClass().toString()) {
+                            case "class com.android.volley.NoConnectionError":
+                                Toast.makeText(getApplication(),
+                                        "Oops. 网络连接出错了！",
+                                        Toast.LENGTH_LONG).show();
+                                break;
+                            case "class com.android.volley.ClientError":
+                                Toast.makeText(getApplication(),
+                                        "Oops. 服务器出错了!",
+                                        Toast.LENGTH_LONG).show();
+                                break;
+                            case "class com.android.volley.ParseError":
+                                Toast.makeText(getApplication(),
+                                        "Oops. 数据解析出错了!",
+                                        Toast.LENGTH_LONG).show();
+                                break;
+                            case "class com.android.volley.TimeoutError":
+                                Toast.makeText(getApplication(),
+                                        "Oops. 请求超时了!",
+                                        Toast.LENGTH_LONG).show();
+                                break;
+                            default:
+                                break;
+                        }
                     }
-                }
-        );
+                });
         VolleySingleton.getInstance(getApplication()).addToRequestQueue(stringRequest);
     }
 

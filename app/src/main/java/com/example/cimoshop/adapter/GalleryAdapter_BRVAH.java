@@ -44,7 +44,6 @@ public class GalleryAdapter_BRVAH extends BaseQuickAdapter<Pixabay.HitsBean, Bas
         shimmerLayout.startShimmerAnimation();
 
         //Glide初始化图片
-        Log.d(TAG,""+hitsBean.toString());
         Glide.with(baseViewHolder.itemView)
                 //加载的URL
                 .load(hitsBean.getWebformatURL())
