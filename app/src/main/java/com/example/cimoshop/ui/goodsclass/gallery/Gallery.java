@@ -1,5 +1,6 @@
 package com.example.cimoshop.ui.goodsclass.gallery;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -8,8 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
-import android.view.animation.AnticipateOvershootInterpolator;
-import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.Toast;
@@ -23,23 +22,15 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkError;
-import com.android.volley.NoConnectionError;
-import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.ServerError;
-import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.diff.BrvahAsyncDiffer;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.chad.library.adapter.base.listener.OnLoadMoreListener;
 import com.chad.library.adapter.base.module.BaseLoadMoreModule;
@@ -55,6 +46,10 @@ import com.google.gson.Gson;
 
 import java.util.List;
 
+/**
+ * 图库展示类
+ * @author 谭海山
+ */
 public class Gallery extends Fragment {
 
     private static final String TAG = "CIMOGalleryFragment";
@@ -67,44 +62,36 @@ public class Gallery extends Fragment {
     private GalleryAdapter_BRVAH galleryAdapter;
     private FloatingActionButton toTheTopBtn;
 
-    //加载更多事件处理
+    //加载更多事件处理类
     private BaseLoadMoreModule loadMore;
 
     //当前页数
-    int CurrentPage = 1;
+    private int currentPage = 1;
 
     //总页数
-    int totalPage = 1;
+    private int totalPage = 1;
 
     //单次请求的图片数
-    int perPage = 50;
+    private int perPage = 50;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         Log.d(TAG,"onCreateView");
-
         View root = inflater.inflate(R.layout.gallery_fragment, container, false);
+        initView(root);
+        return root;
+    }
+
+    private void initView(View root){
         swipeRefreshLayout = root.findViewById(R.id.swipeGallery);
         recyclerViewGallery = root.findViewById(R.id.recyclerview_gallery);
         toolbar = root.findViewById(R.id.GalleryToolbar);
         appBarLayout = root.findViewById(R.id.appBarLayout);
         toTheTopBtn = root.findViewById(R.id.ToTheTopBtn);
         toTheTopBtn.setVisibility(View.GONE);
-        return root;
-    }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.d(TAG,"onPause()");
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Log.d(TAG,"onActivityCreated");
-
+        //点击返回顶部按钮时滑动到顶部
         toTheTopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,6 +111,19 @@ public class Gallery extends Fragment {
             }
         });
 
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG,"onPause()");
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(TAG,"onActivityCreated");
+
         //状态栏文字透明
         MyTools.makeStatusBarTransparent(getActivity());
 
@@ -134,10 +134,9 @@ public class Gallery extends Fragment {
         //viewModel初始化
         mViewModel = new ViewModelProvider(this,new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())).get(GalleryViewModel.class);
 
-        //final GalleryAdapter galleryAdapter = new GalleryAdapter(new DIFFCALLBACK());
         //recyclerView Adapter初始化 使用 BRVAH 框架
         galleryAdapter = new GalleryAdapter_BRVAH();
-        galleryAdapter.setDiffCallback(new DIFFCALLBACK());
+        galleryAdapter.setDiffCallback(new MyDiffCallback());
         galleryAdapter.setAnimationEnable(true);
         galleryAdapter.setAnimationFirstOnly(false);
 
@@ -146,7 +145,6 @@ public class Gallery extends Fragment {
 
         //交错布局，2列，纵向
         recyclerViewGallery.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
-        //recyclerViewGallery.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewGallery.setAdapter(galleryAdapter);
         //定制ScrollListener
         recyclerViewGallery.addOnScrollListener(new MyRecyclerViewScrollListener());
@@ -155,7 +153,6 @@ public class Gallery extends Fragment {
         mViewModel.hitsBean.observe(getViewLifecycleOwner(), new Observer<List<Pixabay.HitsBean>>() {
             @Override
             public void onChanged(List<Pixabay.HitsBean> hitsBeans) {
-                //galleryAdapter.submitList(hitsBeans);
                 galleryAdapter.setDiffNewData(hitsBeans);
                 swipeRefreshLayout.setRefreshing(false);
                 //数据发生变化时，重新获取总页数
@@ -167,7 +164,7 @@ public class Gallery extends Fragment {
         if( mViewModel.hitsBean.getValue() == null ){
             mViewModel.resetQuery();
             //重新获取页数
-            CurrentPage = mViewModel.getCurrentPage() + 1;
+            currentPage = mViewModel.getCurrentPage() + 1;
         }
 
         //下拉刷新
@@ -177,8 +174,7 @@ public class Gallery extends Fragment {
                 mViewModel.resetQuery();
                 toTheTopBtn.setVisibility(View.GONE);
                 //重新获取页数
-                CurrentPage = mViewModel.getCurrentPage() + 1;
-
+                currentPage = mViewModel.getCurrentPage() + 1;
             }
         });
 
@@ -186,17 +182,14 @@ public class Gallery extends Fragment {
         galleryAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
-
                 //将图片信息通过Parcelable传输到detail页面
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("CHECKED_PHOTO_ID", (Parcelable) adapter.getItem(position));
                 Intent intent = new Intent(getContext(), GalleryDetail.class);
                 intent.putExtras(bundle);
-
                 //共享元素过度效果
                 ActivityOptionsCompat compat = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), view, "detail_img");
                 ActivityCompat.startActivity(getContext(), intent, compat.toBundle());
-
             }
         });
 
@@ -215,16 +208,16 @@ public class Gallery extends Fragment {
     /**
      * 加载更多数据
      */
-    void loadMoreGallery(){
+    private void loadMoreGallery(){
         String key = mViewModel.getKey();
-        Log.d(TAG,"加载更多 -> currentPage："+CurrentPage+"\tkey："+key+"\ttotalPage："+totalPage);
-        if( CurrentPage > totalPage ){
+        Log.d(TAG,"加载更多 -> currentPage："+ currentPage +"\tkey："+key+"\ttotalPage："+totalPage);
+        if( currentPage > totalPage ){
             loadMore.loadMoreEnd();
             return;
         }
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
-                "https://pixabay.com/api/?key=16322793-d4bcfe56af2f14816d6549dee&lang=zh&lang=en&q="+key+"&per_page="+perPage+"&page="+CurrentPage,
+                "https://pixabay.com/api/?key=16322793-d4bcfe56af2f14816d6549dee&lang=zh&lang=en&q="+key+"&per_page="+perPage+"&page="+ currentPage,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -234,7 +227,7 @@ public class Gallery extends Fragment {
                         //追加数据，用addAll()
                         mViewModel.hitsBean.getValue().addAll(list);
                         loadMore.loadMoreComplete();
-                        CurrentPage++;
+                        currentPage++;
                     }
                 },
                 new Response.ErrorListener() {
@@ -275,13 +268,14 @@ public class Gallery extends Fragment {
     /**
      * 指定DiffUtil类，判断item是否相同
      */
-    static class DIFFCALLBACK extends DiffUtil.ItemCallback<Pixabay.HitsBean>{
+    static class MyDiffCallback extends DiffUtil.ItemCallback<Pixabay.HitsBean>{
 
         @Override
         public boolean areItemsTheSame(@NonNull Pixabay.HitsBean oldItem, @NonNull Pixabay.HitsBean newItem) {
             return oldItem.getId() == newItem.getId();
         }
 
+        @SuppressLint("DiffUtilEquals")
         @Override
         public boolean areContentsTheSame(@NonNull Pixabay.HitsBean oldItem, @NonNull Pixabay.HitsBean newItem) {
             return oldItem.equals(newItem) ;
@@ -294,7 +288,7 @@ public class Gallery extends Fragment {
      */
     private class MyRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
         @Override
-        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+        public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
             super.onScrollStateChanged(recyclerView, newState);
 
             //定制返回顶部按钮出现动画
