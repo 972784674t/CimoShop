@@ -7,6 +7,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnticipateOvershootInterpolator;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.OvershootInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,6 +23,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -44,6 +50,7 @@ import com.example.cimoshop.entity.Pixabay;
 import com.example.cimoshop.mytools.MyTools;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 
 import java.util.List;
@@ -58,6 +65,7 @@ public class Gallery extends Fragment {
     private MaterialToolbar toolbar;
     private AppBarLayout appBarLayout;
     private GalleryAdapter_BRVAH galleryAdapter;
+    private FloatingActionButton toTheTopBtn;
 
     //加载更多事件处理
     private BaseLoadMoreModule loadMore;
@@ -81,7 +89,8 @@ public class Gallery extends Fragment {
         recyclerViewGallery = root.findViewById(R.id.recyclerview_gallery);
         toolbar = root.findViewById(R.id.GalleryToolbar);
         appBarLayout = root.findViewById(R.id.appBarLayout);
-
+        toTheTopBtn = root.findViewById(R.id.ToTheTopBtn);
+        toTheTopBtn.setVisibility(View.GONE);
         return root;
     }
 
@@ -95,6 +104,13 @@ public class Gallery extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG,"onActivityCreated");
+
+        toTheTopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recyclerViewGallery.smoothScrollToPosition(0);
+            }
+        });
 
         //监听appBarLayout是否在顶部，如果在，则swipeRefreshLayout可用
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -130,7 +146,10 @@ public class Gallery extends Fragment {
 
         //交错布局，2列，纵向
         recyclerViewGallery.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
+        //recyclerViewGallery.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewGallery.setAdapter(galleryAdapter);
+        //定制ScrollListener
+        recyclerViewGallery.addOnScrollListener(new MyRecyclerViewScrollListener());
 
         //_hitsBean观察者，如果_hitsBean发生变化则更新recycleView
         mViewModel.hitsBean.observe(getViewLifecycleOwner(), new Observer<List<Pixabay.HitsBean>>() {
@@ -156,8 +175,10 @@ public class Gallery extends Fragment {
             @Override
             public void onRefresh() {
                 mViewModel.resetQuery();
+                toTheTopBtn.setVisibility(View.GONE);
                 //重新获取页数
                 CurrentPage = mViewModel.getCurrentPage() + 1;
+
             }
         });
 
@@ -179,7 +200,7 @@ public class Gallery extends Fragment {
             }
         });
 
-        //当数据不满一页是不自动加载更多
+        //当数据不满一页不自动加载更多
         loadMore.setEnableLoadMoreIfNotFullPage(false);
         //当recycleView滑动到底部时执行此监听
         loadMore.setOnLoadMoreListener(new OnLoadMoreListener() {
@@ -264,6 +285,49 @@ public class Gallery extends Fragment {
         @Override
         public boolean areContentsTheSame(@NonNull Pixabay.HitsBean oldItem, @NonNull Pixabay.HitsBean newItem) {
             return oldItem.equals(newItem) ;
+        }
+    }
+
+    /**
+     * 重新OnScrollListener类
+     * 当页面在第一屏和滑动时，不显示返回顶部按钮
+     */
+    private class MyRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+
+            //定制返回顶部按钮出现动画
+            TranslateAnimation mShowAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
+                    Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+                    -1.0f, Animation.RELATIVE_TO_SELF, 0.0f);
+            mShowAction.setInterpolator(new OvershootInterpolator());
+            mShowAction.setDuration(500);
+
+            //定制返回顶部按钮消失动画
+            TranslateAnimation mHiddenAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF,
+                    0.0f, Animation.RELATIVE_TO_SELF, 0.0f,
+                    Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+                    -1.0f);
+            mHiddenAction.setDuration(500);
+
+            StaggeredGridLayoutManager manager = (StaggeredGridLayoutManager) recyclerView.getLayoutManager();
+            int[] firstVisibleItemPosition = manager.findFirstVisibleItemPositions(null);
+            // 当不滚动时
+            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                // 判断是否滚动超过一屏
+                if (firstVisibleItemPosition[0] == 0) {
+//                    toTheTopBtn.startAnimation(mHiddenAction);
+                    toTheTopBtn.setVisibility(View.INVISIBLE);
+                } else {
+                    toTheTopBtn.startAnimation(mShowAction);
+                    toTheTopBtn.setVisibility(View.VISIBLE);
+                }
+
+            } else if (newState == RecyclerView.SCROLL_STATE_DRAGGING ) {//拖动中
+                toTheTopBtn.startAnimation(mHiddenAction);
+                toTheTopBtn.setVisibility(View.GONE);
+            }
         }
     }
 
