@@ -13,7 +13,7 @@ public class ShopCatViewModel extends ViewModel {
 
     public ShopCatViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is shopcat fragment");
+        mText.setValue("当前购物车空空如也哦");
     }
 
     public LiveData<String> getText() {

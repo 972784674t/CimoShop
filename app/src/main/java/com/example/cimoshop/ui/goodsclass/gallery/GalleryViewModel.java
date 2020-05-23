@@ -45,8 +45,6 @@ public class GalleryViewModel extends AndroidViewModel {
         return key;
     }
 
-
-
     //总页数初始化
     private int totalPage = 1;
 
@@ -76,8 +74,12 @@ public class GalleryViewModel extends AndroidViewModel {
     //数据源
     MutableLiveData<List<Pixabay.HitsBean>> hitsBean = new MutableLiveData<>();
 
+    private MutableLiveData<String> Pageinit;
+
     public GalleryViewModel(@NonNull Application application) {
         super(application);
+        Pageinit = new MutableLiveData<>();
+        Pageinit.setValue("This is home fragment");
     }
 
     /**

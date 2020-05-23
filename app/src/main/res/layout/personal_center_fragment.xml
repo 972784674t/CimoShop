@@ -7,6 +7,16 @@
     android:layout_height="match_parent"
     tools:context=".ui.personalcenter.PersonalCenter">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/personalCenterToobar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/materialPry"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_arrow_back_black_24dp" />
+
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="0dp"
@@ -152,7 +162,7 @@
         app:layout_constraintGuide_percent="0.92" />
 
     <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
+        android:id="@+id/personalcentertabLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -175,15 +185,13 @@
             android:text="我的仓库" />
     </com.google.android.material.tabs.TabLayout>
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/personalCenterToobar"
-        android:layout_width="409dp"
-        android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/personalviewpage2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_arrow_back_black_24dp" />
+        app:layout_constraintTop_toBottomOf="@+id/personalcentertabLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

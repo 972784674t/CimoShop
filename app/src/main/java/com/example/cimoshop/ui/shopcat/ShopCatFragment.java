@@ -14,6 +14,8 @@ import androidx.lifecycle.ViewModelProviders;
 
 
 import com.example.cimoshop.R;
+import com.example.cimoshop.mytools.MyTools;
+import com.google.android.material.appbar.MaterialToolbar;
 
 
 /**
@@ -22,20 +24,31 @@ import com.example.cimoshop.R;
 public class ShopCatFragment extends Fragment {
 
     private ShopCatViewModel shopCatViewModel;
+    private MaterialToolbar toolbar;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        shopCatViewModel =
-                ViewModelProviders.of(this).get(ShopCatViewModel.class);
+        shopCatViewModel = ViewModelProviders.of(this).get(ShopCatViewModel.class);
         View root = inflater.inflate(R.layout.fragment_shopcat, container, false);
+
         final TextView textView = root.findViewById(R.id.text_notifications);
+
         shopCatViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
             }
         });
+
+        toolbar = root.findViewById(R.id.shopCatToobar);
+
+        //状态栏文字透明
+        MyTools.makeStatusBarTransparent(getActivity());
+
+        //修复标题栏与状态栏重叠
+        MyTools.fitTitleBar(getActivity(),toolbar);
+
         return root;
     }
 }

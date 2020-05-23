@@ -22,6 +22,8 @@ import com.example.cimoshop.ui.shopcat.ShopCatFragment;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.ArrayList;
+
 
 /**
  * @author 谭海山
@@ -29,8 +31,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class HomeFragment extends Fragment {
 
     private static final String TAG = "HomeFragmentCIMO";
-
-    private HomeViewModel homeViewModel;
 
     private ViewPager viewPager;
     private BottomNavigationView bottomNavigationView;
@@ -40,7 +40,7 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
+        HomeViewModel homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         viewPager = root.findViewById(R.id.viewpage);
         bottomNavigationView = root.findViewById(R.id.bv);
@@ -57,7 +57,6 @@ public class HomeFragment extends Fragment {
         MyTools.makeStatusBarTransparent(getActivity());
 
         //修复标题栏与状态栏重叠
-        //myTools.fitTitleBar(this,toolbar);
         MyTools.setMIUI(getActivity(),true);
 
         initViewPage();
@@ -73,31 +72,22 @@ public class HomeFragment extends Fragment {
      */
     private void initViewPage() {
 
+        //fragment数据源
+        final ArrayList<Fragment> fragmentList = new ArrayList<>();
+        fragmentList.add(new Gallery());
+        fragmentList.add(new ShopCatFragment());
+        fragmentList.add(new PersonalCenter());
+
         viewPager.setAdapter(new FragmentStatePagerAdapter(getActivity().getSupportFragmentManager()) {
             @NonNull
             @Override
             public Fragment getItem( int position ) {
-                Fragment fragment = null;
-                switch ( position ){
-                    case 0:
-                        fragment = new Gallery();
-                        break;
-                    case 1:
-                        fragment =  new ShopCatFragment();
-                        break;
-                    case 2:
-                        fragment =  new PersonalCenter();
-                        break;
-                    default:
-                        break;
-                }
-                assert fragment != null;
-                return fragment;
+                return fragmentList.get(position);
             }
 
             @Override
             public int getCount() {
-                return 3;
+                return fragmentList.size();
             }
         });
 
@@ -119,7 +109,8 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        viewPager.setOffscreenPageLimit(3);
+        //预加载界面
+        viewPager.setOffscreenPageLimit(fragmentList.size()-1);
     }
 
     /**

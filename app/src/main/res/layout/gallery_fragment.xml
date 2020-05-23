@@ -26,9 +26,9 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_scrollFlags="scroll"
+                app:layout_scrollFlags="scroll|enterAlways"
                 app:menu="@menu/top_app_bar"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:popupTheme="@style/myToobarTheme"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:title="  CIMO" />
 

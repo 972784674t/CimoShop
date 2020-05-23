@@ -95,7 +95,7 @@ public class Gallery extends Fragment {
         toTheTopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                recyclerViewGallery.smoothScrollToPosition(0);
+                recyclerViewGallery.scrollToPosition(0);
             }
         });
 
