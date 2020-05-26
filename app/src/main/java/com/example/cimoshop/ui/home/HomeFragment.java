@@ -35,7 +35,6 @@ public class HomeFragment extends Fragment {
     private ViewPager viewPager;
     private BottomNavigationView bottomNavigationView;
 
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {

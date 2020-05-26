@@ -15,6 +15,8 @@ import androidx.viewpager.widget.ViewPager;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 工具类
@@ -240,6 +242,32 @@ public class MyTools {
                 view.setAlpha(0);
             }
         }
+    }
+
+    /**
+     * 将字符串转换成map
+     * @param responseEntity map字符串
+     * @return  map对象
+     */
+    public static Map<String,String> getMap(String responseEntity) {
+
+        Map<String, String> map = new HashMap<>();
+
+        // 以&来解析字符串
+        String[] result = responseEntity.split("\\&");
+
+        for (String str : result) {
+            // 以=来解析字符串
+            String[] split = str.split("=");
+            // 将字符串存入map中
+            if (split.length == 1) {
+                map.put(split[0], null);
+            } else {
+                map.put(split[0], split[1]);
+            }
+
+        }
+        return map;
     }
 
 
