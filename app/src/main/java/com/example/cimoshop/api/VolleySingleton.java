@@ -30,6 +30,18 @@ public class VolleySingleton {
     }
 
     /**
+     * VolleySingleton
+     * @param context Context
+     * @return  一个volley实例
+     */
+    public static synchronized VolleySingleton getInstance(Context context){
+        if( INSTANCE == null ){
+            INSTANCE = new VolleySingleton(context);
+        }
+        return INSTANCE;
+    }
+
+    /**
      * 提供获得请求队列的方法
      * @return 请求队列
      */
@@ -38,18 +50,6 @@ public class VolleySingleton {
             requestQueue= Volley.newRequestQueue(mContext);
         }
         return requestQueue;
-    }
-
-    /**
-     * VolleySingleton
-     * @param context Context
-     * @return  INSTANCE
-     */
-    public static synchronized VolleySingleton getInstance(Context context){
-        if( INSTANCE == null ){
-            INSTANCE = new VolleySingleton(context);
-        }
-        return INSTANCE;
     }
 
     public <T> void  addToRequestQueue(Request<T> req){

@@ -2,6 +2,7 @@ package com.example.cimoshop.ui.personalcenter;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,14 +11,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.transition.FragmentTransitionSupport;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.cimoshop.MainActivity;
 import com.example.cimoshop.R;
-import com.example.cimoshop.mytools.MyTools;
+import com.example.cimoshop.utils.MyTools;
 import com.example.cimoshop.ui.login.Login;
 import com.example.cimoshop.ui.personalcenter.favorites.MyFavorites;
 import com.example.cimoshop.ui.personalcenter.mywarehouse.MyWareHouse;
@@ -28,12 +28,13 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author 谭海山
  */
 public class PersonalCenter extends Fragment {
+
+    private static final String TAG = "cimoPersonalcenter";
 
     public static PersonalCenter newInstance() {
         return new PersonalCenter();
@@ -61,6 +62,14 @@ public class PersonalCenter extends Fragment {
         initViewpage2();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if ( 2 == requestCode ) {
+            String token = data.getStringExtra("token");
+            Log.d(TAG,token);
+        }
+    }
     /**
      * 控件初始化
      * @param root layout布局
@@ -78,8 +87,11 @@ public class PersonalCenter extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getContext(), Login.class);
-                startActivity(intent);
+//                Intent intent = new Intent(getContext(), Login.class);
+//                startActivity(intent);
+                Intent intent = new Intent();
+                intent.setClass(getContext(),Login.class);
+                startActivityForResult(intent,2);
             }
         });
 

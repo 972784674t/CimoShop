@@ -1,6 +1,7 @@
 package com.example.cimoshop.ui.login;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,9 +25,11 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.example.cimoshop.MainActivity;
 import com.example.cimoshop.R;
 import com.example.cimoshop.api.VolleySingleton;
-import com.example.cimoshop.mytools.MyTools;
+import com.example.cimoshop.utils.MyTools;
+import com.example.cimoshop.utils.SharedPrefsTools;
 import com.google.android.material.button.MaterialButton;
 
 /**
@@ -60,12 +63,13 @@ public class Login extends AppCompatActivity {
     WebView logonWebView;
     ProgressBar logonWebViewProgressBar;
     TextView logonWebProgress;
+    boolean webViewProgressFlag = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_login);
+
         initView();
 
     }
@@ -142,12 +146,16 @@ public class Login extends AppCompatActivity {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
-                //显示加载中提示
-                logonWebProgress.setVisibility(View.VISIBLE);
-                logonWebProgress.setText("正在前往Github："+newProgress+"%");
-                logonWebViewProgressBar.setVisibility(View.VISIBLE);
-                logonWebViewProgressBar.setProgress(newProgress);
-                if ( newProgress > 90){
+
+                if ( webViewProgressFlag ){
+                    logonWebProgress.setVisibility(View.VISIBLE);
+                    logonWebViewProgressBar.setVisibility(View.VISIBLE);
+                    //显示加载中提示
+                    logonWebProgress.setText("正在前往Github："+newProgress+"%");
+                    logonWebViewProgressBar.setProgress(newProgress);
+                }
+                webViewProgressFlag = false;
+                if ( 80 < newProgress ){
                     //加载中提示消失
                     logonWebProgress.setVisibility(View.GONE);
                     logonWebViewProgressBar.setVisibility(View.GONE);
@@ -196,15 +204,24 @@ public class Login extends AppCompatActivity {
                     public void onResponse(String response) {
                         githubResponse = response;
                         Log.d(TAG, "result：" + githubResponse);
+
                         githubToken = MyTools.getMap(githubResponse).get("access_token");
                         Log.d(TAG, "token：" + githubToken);
+
                         Toast.makeText(getApplicationContext(), "github授权成功", Toast.LENGTH_SHORT).show();
+                        //将token存入Sharepreferences
+                        SharedPrefsTools.getInstance(getApplication()).saveToken("github",githubToken);
+                        Intent intent = new Intent();
+                        intent.putExtra("token",githubToken);
+                        setResult(2, intent);
+                        finish();
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.d(TAG, "loadMore: " + error.getClass());
+                        Log.d(TAG,"error："+ error);
                         Toast.makeText(getApplicationContext(), "github授权失败", Toast.LENGTH_SHORT).show();
                         switch (error.getClass().toString()) {
                             case "class com.android.volley.NoConnectionError":
@@ -224,6 +241,7 @@ public class Login extends AppCompatActivity {
                                         Toast.LENGTH_LONG).show();
                                 break;
                             case "class com.android.volley.TimeoutError":
+
                                 Toast.makeText(getApplication(),
                                         "Oops. 请求超时了!",
                                         Toast.LENGTH_LONG).show();
@@ -240,6 +258,7 @@ public class Login extends AppCompatActivity {
      * 清空webView为下次登录做准备
      */
     private void clearWebView() {
+        webViewProgressFlag = true;
         if (logonWebView != null) {
             //清除表单数据
             logonWebView.clearFormData();

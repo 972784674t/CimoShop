@@ -38,7 +38,7 @@ import com.example.cimoshop.R;
 import com.example.cimoshop.adapter.GalleryAdapter_BRVAH;
 import com.example.cimoshop.api.VolleySingleton;
 import com.example.cimoshop.entity.Pixabay;
-import com.example.cimoshop.mytools.MyTools;
+import com.example.cimoshop.utils.MyTools;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;

@@ -25,7 +25,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.cimoshop.R;
 import com.example.cimoshop.entity.Pixabay;
-import com.example.cimoshop.mytools.MyTools;
+import com.example.cimoshop.utils.MyTools;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;

@@ -15,7 +15,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.cimoshop.R;
-import com.example.cimoshop.mytools.MyTools;
+import com.example.cimoshop.utils.MyTools;
 import com.example.cimoshop.ui.goodsclass.gallery.Gallery;
 import com.example.cimoshop.ui.personalcenter.PersonalCenter;
 import com.example.cimoshop.ui.shopcat.ShopCatFragment;

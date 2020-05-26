@@ -1,4 +1,4 @@
-package com.example.cimoshop.mytools;
+package com.example.cimoshop.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

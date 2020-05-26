@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 
 import com.example.cimoshop.R;
-import com.example.cimoshop.mytools.MyTools;
+import com.example.cimoshop.utils.MyTools;
 import com.google.android.material.appbar.MaterialToolbar;
 
 
