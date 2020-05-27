@@ -66,5 +66,18 @@ public class SharedPrefsTools {
         editor.apply();
     }
 
+    /**
+     * 从sharepreferences获取用户信息
+     * @return GithubAccount UserInfo
+     */
+    public GithubAccount getUserInfo(){
+        GithubAccount githubAccount = new GithubAccount();
+        githubAccount.setName(shp.getString("userName","请先登录哦"));
+        githubAccount.setPublic_repos(Integer.parseInt(shp.getString("pictures","0")));
+        githubAccount.setFollowers(Integer.parseInt(shp.getString("followers","0")));
+        githubAccount.setFollowing(Integer.parseInt(shp.getString("following","0")));
+        return githubAccount;
+    }
+
 
 }
