@@ -1,5 +1,6 @@
 package com.example.cimoshop.ui.goodsclass.gallery;
 import android.app.Application;
+import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -103,6 +104,7 @@ public class GalleryViewModel extends AndroidViewModel {
      * 下拉刷新时，重置查询条件
      */
     void resetQuery(){
+
         currentPage = 1;
         totalPage = 1;
         isNewQuery = true;
@@ -127,30 +129,7 @@ public class GalleryViewModel extends AndroidViewModel {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.d(TAG, "loadMore: " + error.getClass());
-                        switch (error.getClass().toString()) {
-                            case "class com.android.volley.NoConnectionError":
-                                Toast.makeText(getApplication(),
-                                        "Oops. 网络连接出错了！",
-                                        Toast.LENGTH_LONG).show();
-                                break;
-                            case "class com.android.volley.ClientError":
-                                Toast.makeText(getApplication(),
-                                        "Oops. 服务器出错了!",
-                                        Toast.LENGTH_LONG).show();
-                                break;
-                            case "class com.android.volley.ParseError":
-                                Toast.makeText(getApplication(),
-                                        "Oops. 数据解析出错了!",
-                                        Toast.LENGTH_LONG).show();
-                                break;
-                            case "class com.android.volley.TimeoutError":
-                                Toast.makeText(getApplication(),
-                                        "Oops. 请求超时了!",
-                                        Toast.LENGTH_LONG).show();
-                                break;
-                            default:
-                                break;
-                        }
+                        VolleySingleton.errorMessage(error, getApplication().getApplicationContext());
                     }
                 });
         VolleySingleton.getInstance(getApplication()).addToRequestQueue(stringRequest);

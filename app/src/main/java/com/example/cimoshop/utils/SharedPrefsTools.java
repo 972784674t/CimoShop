@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.example.cimoshop.account.GithubAccount;
+
 /**
  * @author 谭海山
  */
@@ -48,9 +50,21 @@ public class SharedPrefsTools {
      * @return 对应的token
      */
     public String getToken(String accountType){
-        return shp.getString(accountType+"token","null");
+        return shp.getString(accountType+"token","EmptyToken");
     }
 
+    /**
+     * 保存github账号信息到 sharepreferences中
+     * @param githubAccount github账号信息
+     */
+    public void saveUserInfo(GithubAccount githubAccount){
+        SharedPreferences.Editor editor = shp.edit();
+        editor.putString("userName",githubAccount.getName());
+        editor.putString("pictures",String.valueOf(githubAccount.getPublic_repos()));
+        editor.putString("followers",String.valueOf(githubAccount.getFollowers()));
+        editor.putString("following",String.valueOf(githubAccount.getFollowing()));
+        editor.apply();
+    }
 
 
 }

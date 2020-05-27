@@ -146,6 +146,7 @@ public class Gallery extends Fragment {
         //交错布局，2列，纵向
         recyclerViewGallery.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
         recyclerViewGallery.setAdapter(galleryAdapter);
+
         //定制ScrollListener
         recyclerViewGallery.addOnScrollListener(new MyRecyclerViewScrollListener());
 
@@ -226,7 +227,9 @@ public class Gallery extends Fragment {
                         totalPage = (gson.fromJson(response, Pixabay.class).getTotalHits()) / perPage + 1;
                         //追加数据，用addAll()
                         mViewModel.hitsBean.getValue().addAll(list);
+                        //加载更多设置：完成
                         loadMore.loadMoreComplete();
+                        //当前页+1
                         currentPage++;
                     }
                 },
@@ -234,30 +237,8 @@ public class Gallery extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.d(TAG,"loadMore: "+error.getClass());
-                        switch ( error.getClass().toString() ){
-                            case "class com.android.volley.NoConnectionError":
-                                Toast.makeText(getContext(),
-                                        "Oops. 网络连接出错了！",
-                                        Toast.LENGTH_LONG).show();
-                                break;
-                            case "class com.android.volley.ClientError":
-                                Toast.makeText(getContext(),
-                                        "Oops. 服务器出错了!",
-                                        Toast.LENGTH_LONG).show();
-                                break;
-                            case "class com.android.volley.ParseError":
-                                Toast.makeText(getContext(),
-                                        "Oops. 数据解析出错了!",
-                                        Toast.LENGTH_LONG).show();
-                                break;
-                            case "class com.android.volley.TimeoutError":
-                                Toast.makeText(getContext(),
-                                        "Oops. 请求超时了!",
-                                        Toast.LENGTH_LONG).show();
-                                break;
-                            default:
-                                break;
-                        }
+                        VolleySingleton.errorMessage(error,getContext());
+                        //加载跟多设置：失败
                         loadMore.loadMoreFail();
                     }
                 }
@@ -283,7 +264,7 @@ public class Gallery extends Fragment {
     }
 
     /**
-     * 重新OnScrollListener类
+     * 重写 OnScrollListener类
      * 当页面在第一屏和滑动时，不显示返回顶部按钮
      */
     private class MyRecyclerViewScrollListener extends RecyclerView.OnScrollListener {

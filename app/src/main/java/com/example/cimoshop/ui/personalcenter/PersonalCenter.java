@@ -1,11 +1,13 @@
 package com.example.cimoshop.ui.personalcenter;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,8 +17,14 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.example.cimoshop.MainActivity;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.example.cimoshop.R;
+import com.example.cimoshop.account.GithubAccount;
+import com.example.cimoshop.api.GithubApi;
+import com.example.cimoshop.api.VolleySingleton;
 import com.example.cimoshop.utils.MyTools;
 import com.example.cimoshop.ui.login.Login;
 import com.example.cimoshop.ui.personalcenter.favorites.MyFavorites;
@@ -26,8 +34,11 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author 谭海山
@@ -52,6 +63,7 @@ public class PersonalCenter extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View root = LayoutInflater.from(getContext()).inflate(R.layout.personal_center_fragment,container,false);
         initView(root);
+
         return root;
     }
 
@@ -62,14 +74,6 @@ public class PersonalCenter extends Fragment {
         initViewpage2();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if ( 2 == requestCode ) {
-            String token = data.getStringExtra("token");
-            Log.d(TAG,token);
-        }
-    }
     /**
      * 控件初始化
      * @param root layout布局
@@ -87,8 +91,6 @@ public class PersonalCenter extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent = new Intent(getContext(), Login.class);
-//                startActivity(intent);
                 Intent intent = new Intent();
                 intent.setClass(getContext(),Login.class);
                 startActivityForResult(intent,2);
@@ -101,6 +103,7 @@ public class PersonalCenter extends Fragment {
      * viewpage2初始化
      */
     private void initViewpage2() {
+
         final ArrayList<Fragment> fragmentList = new ArrayList<>();
         fragmentList.add(MyWorks.newInstance());
         fragmentList.add(MyFavorites.newInstance());
@@ -127,5 +130,33 @@ public class PersonalCenter extends Fragment {
             }
         }).attach();
     }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch ( resultCode ){
+            case 1:
+                Toast.makeText(getContext(),"取消登录",Toast.LENGTH_SHORT).show();
+                break;
+            case 2:
+                String token = data.getStringExtra("token");
+                Log.d(TAG,"token："+token);
+
+                GithubApi.getInstance(getActivity().getApplication()).saveGithubUserInfoByToken(getContext(),token);
+
+                break;
+            default:
+                break;
+        }
+    }
+
+
+
+
+
+
+
 
 }

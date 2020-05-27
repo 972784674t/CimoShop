@@ -2,10 +2,14 @@ package com.example.cimoshop.ui.login;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Layout;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
@@ -20,6 +24,7 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -31,6 +36,9 @@ import com.example.cimoshop.api.VolleySingleton;
 import com.example.cimoshop.utils.MyTools;
 import com.example.cimoshop.utils.SharedPrefsTools;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import java.util.zip.Inflater;
 
 /**
  * @author 谭海山
@@ -55,6 +63,7 @@ public class Login extends AppCompatActivity {
      */
     private String githubToken;
 
+    ConstraintLayout constraintLayout;
     EditText username;
     EditText password;
     MaterialButton loginBtn;
@@ -63,7 +72,6 @@ public class Login extends AppCompatActivity {
     WebView logonWebView;
     ProgressBar logonWebViewProgressBar;
     TextView logonWebProgress;
-    boolean webViewProgressFlag = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +86,7 @@ public class Login extends AppCompatActivity {
      * 控件初始化
      */
     private void initView() {
+        constraintLayout = findViewById(R.id.logopage);
         loginBtn = findViewById(R.id.loginbtn);
         username = findViewById(R.id.usernameEdit);
         password = findViewById(R.id.passwordEdit);
@@ -146,21 +155,19 @@ public class Login extends AppCompatActivity {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
-
-                if ( webViewProgressFlag ){
-                    logonWebProgress.setVisibility(View.VISIBLE);
-                    logonWebViewProgressBar.setVisibility(View.VISIBLE);
-                    //显示加载中提示
-                    logonWebProgress.setText("正在前往Github："+newProgress+"%");
-                    logonWebViewProgressBar.setProgress(newProgress);
-                }
-                webViewProgressFlag = false;
-                if ( 80 < newProgress ){
+                Log.d(TAG,"WebView : newProgress - >"+newProgress);
+                logonWebProgress.setVisibility(View.VISIBLE);
+                logonWebViewProgressBar.setVisibility(View.VISIBLE);
+                //显示加载中提示
+                logonWebProgress.setText("正在前往Github：" + newProgress + "%");
+                logonWebViewProgressBar.setProgress(newProgress);
+                if ( 80 < newProgress ) {
                     //加载中提示消失
-                    logonWebProgress.setVisibility(View.GONE);
-                    logonWebViewProgressBar.setVisibility(View.GONE);
+                    constraintLayout.removeView(logonWebProgress);
+                    constraintLayout.removeView(logonWebViewProgressBar);
                 }
             }
+
         });
 
         //网页加载后的操作
@@ -170,10 +177,13 @@ public class Login extends AppCompatActivity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
 
+                //获取浏览器Url
                 githubCallbackUrl = request.getUrl().toString();
                 Log.d(TAG, githubCallbackUrl);
+
                 //如果加载的url为下面路径则拦截
-                if (githubCallbackUrl.contains("http://incimo.xyz:8080/cimowebshop/GithubLogingCallBack")) {
+                if ( githubCallbackUrl.contains("http://incimo.xyz:8080/cimowebshop/GithubLogingCallBack") ) {
+                    //通过拦截的url获取token
                     getGithubToken();
                     Toast.makeText(getApplicationContext(), "登录github成功,正在获取授权", Toast.LENGTH_SHORT).show();
                     //隐藏webView
@@ -193,7 +203,7 @@ public class Login extends AppCompatActivity {
 
 
     /**
-     * 获取github的token
+     * 获取code后，从服务器inicmo.xyz获取github的token
      */
     void getGithubToken() {
         StringRequest stringRequest = new StringRequest(
@@ -209,8 +219,11 @@ public class Login extends AppCompatActivity {
                         Log.d(TAG, "token：" + githubToken);
 
                         Toast.makeText(getApplicationContext(), "github授权成功", Toast.LENGTH_SHORT).show();
+
                         //将token存入Sharepreferences
                         SharedPrefsTools.getInstance(getApplication()).saveToken("github",githubToken);
+
+                        //返回token到LogonActivity
                         Intent intent = new Intent();
                         intent.putExtra("token",githubToken);
                         setResult(2, intent);
@@ -220,35 +233,9 @@ public class Login extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG, "loadMore: " + error.getClass());
                         Log.d(TAG,"error："+ error);
                         Toast.makeText(getApplicationContext(), "github授权失败", Toast.LENGTH_SHORT).show();
-                        switch (error.getClass().toString()) {
-                            case "class com.android.volley.NoConnectionError":
-                                Log.d(TAG, "onErrorResponse: " + error);
-                                Toast.makeText(getApplication(),
-                                        "Oops. 网络连接出错了！",
-                                        Toast.LENGTH_LONG).show();
-                                break;
-                            case "class com.android.volley.ClientError":
-                                Toast.makeText(getApplication(),
-                                        "Oops. 服务器出错了!",
-                                        Toast.LENGTH_LONG).show();
-                                break;
-                            case "class com.android.volley.ParseError":
-                                Toast.makeText(getApplication(),
-                                        "Oops. 数据解析出错了!",
-                                        Toast.LENGTH_LONG).show();
-                                break;
-                            case "class com.android.volley.TimeoutError":
-
-                                Toast.makeText(getApplication(),
-                                        "Oops. 请求超时了!",
-                                        Toast.LENGTH_LONG).show();
-                                break;
-                            default:
-                                break;
-                        }
+                        VolleySingleton.errorMessage(error,getApplication().getApplicationContext());
                     }
                 });
         VolleySingleton.getInstance(getApplication()).addToRequestQueue(stringRequest);
@@ -258,7 +245,7 @@ public class Login extends AppCompatActivity {
      * 清空webView为下次登录做准备
      */
     private void clearWebView() {
-        webViewProgressFlag = true;
+
         if (logonWebView != null) {
             //清除表单数据
             logonWebView.clearFormData();
@@ -277,6 +264,17 @@ public class Login extends AppCompatActivity {
         logonWebView.getSettings().setJavaScriptEnabled(false);
         //清除缓存
         logonWebView.clearCache(true);
+    }
+
+    @Override
+    public void onBackPressed() {
+        //数据是使用Intent返回
+        Intent intent = new Intent();
+        //把返回数据存入Intent
+        intent.putExtra("info","null");
+        //设置返回数据
+        setResult(1, intent);
+        finish();
     }
 
 
