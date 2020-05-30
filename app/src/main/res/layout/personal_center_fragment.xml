@@ -17,7 +17,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_arrow_back_black_24dp" />
+         />
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -135,7 +135,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
-                android:text="登录之后才有数据哦"
+                android:text="尽人事   听天命"
                 android:textSize="10sp"
                 app:layout_constraintStart_toStartOf="@+id/pcuserName"
                 app:layout_constraintTop_toBottomOf="@+id/pcuserName" />

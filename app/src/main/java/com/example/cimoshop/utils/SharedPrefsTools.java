@@ -81,5 +81,19 @@ public class SharedPrefsTools {
         return githubAccount;
     }
 
+    /**
+     * 退出登录，将清空shp中保存的用户信息
+     */
+    public void logout(){
+        SharedPreferences.Editor editor = shp.edit();
+        editor.putString("userName","请先登录哦");
+        editor.putString("pictures","0");
+        editor.putString("followers","0");
+        editor.putString("following","0");
+        editor.putString("avatar_url","null");
+        editor.putString("githubtoken","null");
+        editor.apply();
+    }
+
 
 }

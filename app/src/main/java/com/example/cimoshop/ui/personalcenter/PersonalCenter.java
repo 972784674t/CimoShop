@@ -1,11 +1,13 @@
 package com.example.cimoshop.ui.personalcenter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -14,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.paging.PageKeyedDataSource;
@@ -25,6 +28,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
+import com.example.cimoshop.MainActivity;
 import com.example.cimoshop.R;
 import com.example.cimoshop.account.GithubAccount;
 import com.example.cimoshop.api.GithubApi;
@@ -39,6 +43,7 @@ import com.example.cimoshop.utils.SharedPrefsTools;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.gson.Gson;
@@ -60,7 +65,7 @@ public class PersonalCenter extends Fragment {
         return new PersonalCenter();
     }
 
-    private static final String[] TAB_LABEL = {"我的作品","我的喜欢","我的仓库"};
+    private static final String[] TAB_LABEL = {"我的作品", "我的喜欢", "我的仓库"};
 
     //token是否存在
     private String isToken;
@@ -79,7 +84,7 @@ public class PersonalCenter extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View root = LayoutInflater.from(getContext()).inflate(R.layout.personal_center_fragment,container,false);
+        View root = LayoutInflater.from(getContext()).inflate(R.layout.personal_center_fragment, container, false);
         initView(root);
 
         return root;
@@ -94,6 +99,7 @@ public class PersonalCenter extends Fragment {
 
     /**
      * 控件初始化
+     *
      * @param root layout布局
      */
     private void initView(View root) {
@@ -105,27 +111,60 @@ public class PersonalCenter extends Fragment {
         pcuseravatar = root.findViewById(R.id.pcuseravatar);
         pcuserName = root.findViewById(R.id.pcuserName);
         pcuserFollowers = root.findViewById(R.id.pcuserfollwers);
-        pcuserFollowing= root.findViewById(R.id.pcuserfollowing);
+        pcuserFollowing = root.findViewById(R.id.pcuserfollowing);
         pcuserPictures = root.findViewById(R.id.pcuserpictures);
         pcuserSourceText = root.findViewById(R.id.pcusersource);
         //状态栏文字透明
         MyTools.makeStatusBarTransparent(getActivity());
         //修复标题栏与状态栏重叠
-        MyTools.fitTitleBar(getActivity(),toolbar);
+        MyTools.fitTitleBar(getActivity(), toolbar);
 
         isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
-        Log.d(TAG,"isToken："+isToken);
+        Log.d(TAG, "isToken：" + isToken);
 
-        if (!isToken.isEmpty()){
+        if (!isToken.isEmpty()) {
             initUserAccount();
         }
+
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.logout:
+                        new MaterialAlertDialogBuilder(getContext())
+                                .setTitle("确定要退出登录吗")
+                                .setMessage("退出登录后需要重新输入账号信息哦")
+                                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        SharedPrefsTools.getInstance(getActivity().getApplication()).logout();
+                                        Toast.makeText(getContext(), "退出登录", Toast.LENGTH_LONG).show();
+                                        pcuserSourceText.setText("又是愉快的一天");
+                                        initUserAccount();
+                                        pcuseravatar.setImageResource(R.drawable.empty_icon);
+                                    }
+                                })
+                                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                }).show();
+
+                        break;
+                    default:
+                        break;
+                }
+                return false;
+            }
+        });
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.setClass(getContext(),Login.class);
-                startActivityForResult(intent,2);
+                intent.setClass(getContext(), Login.class);
+                startActivityForResult(intent, 2);
             }
         });
 
@@ -141,7 +180,7 @@ public class PersonalCenter extends Fragment {
         fragmentList.add(MyFavorites.newInstance());
         fragmentList.add(MyWareHouse.newInstance());
 
-        viewPager2.setAdapter(new FragmentStateAdapter(getParentFragmentManager(),getLifecycle()) {
+        viewPager2.setAdapter(new FragmentStateAdapter(getParentFragmentManager(), getLifecycle()) {
             @NonNull
             @Override
             public Fragment createFragment(int position) {
@@ -168,16 +207,16 @@ public class PersonalCenter extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch ( resultCode ){
+        switch (resultCode) {
             case 1:
-                Toast.makeText(getContext(),"取消登录",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "取消登录", Toast.LENGTH_SHORT).show();
                 break;
             case 2:
-                String token = data.getStringExtra("token");
-                Log.d(TAG,"token："+token);
+                //String token = data.getStringExtra("token");
+                String token = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
+                Log.d(TAG, "PersonalCenter token -> " + token);
                 //登录成功后执行保存token操作
-                GithubApi.getInstance(getActivity().getApplication()).saveGithubUserInfoByToken(getContext(),token);
-                initUserAccount();
+                saveGithubUserInfoByToken(getContext(),token);
                 break;
             default:
                 break;
@@ -188,55 +227,95 @@ public class PersonalCenter extends Fragment {
      * 初始化用户中心界面
      * 先判断token是否存在，如果不存在则说明没有登录
      */
-    private void initUserAccount(){
+    private void initUserAccount() {
 
         GithubAccount githubAccount = SharedPrefsTools.getInstance(getActivity().getApplication()).getUserInfo();
-        Log.d(TAG,"个人中心shp获取结果 -> githubAccount："+githubAccount.toString());
+        Log.d(TAG, "个人中心shp获取结果 -> githubAccount：" + githubAccount.toString());
 
-        Log.d(TAG,"Avatar_url："+githubAccount.getAvatar_url());
-        if ( !githubAccount.getAvatar_url().equals("null") ){
+        Log.d(TAG, "Avatar_url：" + githubAccount.getAvatar_url());
+        if (!githubAccount.getAvatar_url().equals("null")) {
             Glide.with(getContext()).load(githubAccount.getAvatar_url())
                     .placeholder(R.mipmap.empty_icon)
                     .override(500, 500)
                     .into(pcuseravatar);
-        }
-        pcuserName.setText(""+githubAccount.getName());
-        pcuserPictures.setText(""+githubAccount.getPublic_repos());
-        pcuserFollowing.setText(""+githubAccount.getFollowing());
-        pcuserFollowers.setText(""+githubAccount.getFollowers());
-        pcuserSourceText.setText("这些数据来自于Github");
+            pcuserSourceText.setText("这些数据来自于Github");
 
-        //更换头像
-        pcuseravatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                View view = LayoutInflater.from(getContext()).inflate(R.layout.selectpicturebottomdialog, null);
-                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
-                bottomSheetDialog.setContentView(view);
-                bottomSheetDialog.show();
-                //用过相机
-                view.findViewById(R.id.toCarmen).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        PictureSelectorTools.getInstance().getImageFromTakePic(getActivity(),pcuseravatar);
-                    }
-                });
-                //通过图库
-                view.findViewById(R.id.toGralley).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        PictureSelectorTools.getInstance().getImageFormGallery(getActivity(),pcuseravatar);
-                    }
-                });
-            }
-        });
+            //更换头像
+            pcuseravatar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    View view = LayoutInflater.from(getContext()).inflate(R.layout.selectpicturebottomdialog, null);
+                    BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
+                    bottomSheetDialog.setContentView(view);
+                    bottomSheetDialog.show();
+                    //用过相机
+                    view.findViewById(R.id.toCarmen).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            PictureSelectorTools.getInstance().getImageFromTakePic(getActivity(), pcuseravatar);
+                        }
+                    });
+                    //通过图库
+                    view.findViewById(R.id.toGralley).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            PictureSelectorTools.getInstance().getImageFormGallery(getActivity(), pcuseravatar);
+
+                        }
+                    });
+                }
+            });
+
+        }
+        pcuserName.setText("" + githubAccount.getName());
+        pcuserPictures.setText("" + githubAccount.getPublic_repos());
+        pcuserFollowing.setText("" + githubAccount.getFollowing());
+        pcuserFollowers.setText("" + githubAccount.getFollowers());
+
+
     }
 
-
-
-
-
-
+    /**
+     * 将token加入请求头Authorization中，获取github用户信息
+     * @param context context
+     */
+    public void saveGithubUserInfoByToken(final Context context, final String token){
+        Toast.makeText(context, "正在从Github获取用户信息，请稍等...", Toast.LENGTH_SHORT).show();
+        String baseUrl = "https://api.github.com/user";
+        StringRequest stringRequest = new StringRequest(
+                Request.Method.GET,
+                baseUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Toast.makeText(context, "用户信息获取成功", Toast.LENGTH_SHORT).show();
+                        Gson gson = new Gson();
+                        GithubAccount githubAccount = gson.fromJson(response, GithubAccount.class);
+                        Log.d(TAG, "用户信息(githubAccount)：" + githubAccount);
+                        SharedPrefsTools.getInstance(getActivity().getApplication()).saveUserInfo(githubAccount);
+                        initUserAccount();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        if( token == null ) {
+                            Log.d(TAG, "error：" + error);
+                            Toast.makeText(context, "github授权失败", Toast.LENGTH_SHORT).show();
+                            VolleySingleton.errorMessage(error, context);
+                        }
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap<String,String> headers = new HashMap<>();
+                headers.put("Authorization","token "+SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github"));
+                Log.d(TAG,headers.get("Authorization"));
+                return headers;
+            }
+        };
+        VolleySingleton.getInstance(context).addToRequestQueue(stringRequest);
+    }
 
 
 }

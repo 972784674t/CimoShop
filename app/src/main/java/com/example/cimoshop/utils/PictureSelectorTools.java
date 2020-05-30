@@ -78,6 +78,8 @@ public class PictureSelectorTools {
                 .showCropGrid(false)
                 // 预览图片时 是否增强左右滑动图片体验(图片滑动一半即可看到上一张是否选中) true or false
                 .isPreviewEggs(true)
+                //是否开启点击声音
+                .isOpenClickSound(true)
                 // 是否传入已选图片
                 .selectionMode(PictureConfig.MULTIPLE)
                 .forResult(new OnResultCallbackListener<LocalMedia>() {
