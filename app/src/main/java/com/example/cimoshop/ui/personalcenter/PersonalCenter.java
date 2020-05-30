@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.paging.PageKeyedDataSource;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -33,8 +34,10 @@ import com.example.cimoshop.ui.login.Login;
 import com.example.cimoshop.ui.personalcenter.favorites.MyFavorites;
 import com.example.cimoshop.ui.personalcenter.mywarehouse.MyWareHouse;
 import com.example.cimoshop.ui.personalcenter.myworks.MyWorks;
+import com.example.cimoshop.utils.PictureSelectorTools;
 import com.example.cimoshop.utils.SharedPrefsTools;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -202,6 +205,31 @@ public class PersonalCenter extends Fragment {
         pcuserFollowing.setText(""+githubAccount.getFollowing());
         pcuserFollowers.setText(""+githubAccount.getFollowers());
         pcuserSourceText.setText("这些数据来自于Github");
+
+        //更换头像
+        pcuseravatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View view = LayoutInflater.from(getContext()).inflate(R.layout.selectpicturebottomdialog, null);
+                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
+                bottomSheetDialog.setContentView(view);
+                bottomSheetDialog.show();
+                //用过相机
+                view.findViewById(R.id.toCarmen).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        PictureSelectorTools.getInstance().getImageFromTakePic(getActivity(),pcuseravatar);
+                    }
+                });
+                //通过图库
+                view.findViewById(R.id.toGralley).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        PictureSelectorTools.getInstance().getImageFormGallery(getActivity(),pcuseravatar);
+                    }
+                });
+            }
+        });
     }
 
 

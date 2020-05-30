@@ -199,15 +199,18 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
      * 分享操作
      */
     void share() {
+
         View view = LayoutInflater.from(this).inflate(R.layout.sharegallery, null);
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
 
         bottomSheetDialog.setContentView(view);
         bottomSheetDialog.show();
+
         LinearLayout todouyin = view.findViewById(R.id.todouyin);
         LinearLayout tobaidu = view.findViewById(R.id.tobaidu);
         LinearLayout toqqzoom = view.findViewById(R.id.toqqzoom);
         LinearLayout togithub = view.findViewById(R.id.togithub);
+
         tobaidu.setOnClickListener(this);
         toqqzoom.setOnClickListener(this);
         togithub.setOnClickListener(this);
