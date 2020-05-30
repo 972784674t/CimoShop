@@ -36,26 +36,45 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+
+    //material材质设计语言
     implementation 'com.google.android.material:material:1.2.0-alpha06'
 
-    //navigation
+    //jetpack navigation
     implementation 'androidx.navigation:navigation-fragment:2.3.0-alpha06'
     implementation 'androidx.navigation:navigation-ui:2.3.0-alpha06'
     implementation 'androidx.navigation:navigation-runtime:2.3.0-alpha06'
 
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
-    implementation 'com.android.volley:volley:1.1.1'
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'io.supercharge:shimmerlayout:2.1.0'
-    implementation 'com.github.chrisbanes.photoview:library:1.2.4'
-    implementation 'jp.wasabeef:glide-transformations:2.0.0'
-    implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'androidx.paging:paging-runtime:2.1.2'
     implementation 'androidx.lifecycle:lifecycle-runtime:2.3.0-alpha02'
 
+    //======= 第三方 ======
+
+    //photoView 图片操作
+    implementation 'com.github.chrisbanes.photoview:library:1.2.4'
+
+    //BaseRecyclerViewAdapterHelper recycleView框架
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.2'
 
+    //PictureSelector 图片选择器
+    //implementation 'com.github.LuckSiege.PictureSelector:picture_library:v2.5.6'
+
+    //http请求
+    implementation 'com.android.volley:volley:1.1.1'
+
+    //滑动刷新
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
+
+    //圆形头像
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+
+    //图片加载中动画
+    implementation 'io.supercharge:shimmerlayout:2.1.0'
+
+    //图片加载库 Glide
+    implementation 'jp.wasabeef:glide-transformations:2.0.0'
 
 }

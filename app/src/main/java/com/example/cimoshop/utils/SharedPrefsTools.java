@@ -50,7 +50,7 @@ public class SharedPrefsTools {
      * @return 对应的token
      */
     public String getToken(String accountType){
-        return shp.getString(accountType+"token","EmptyToken");
+        return shp.getString(accountType+"token","null");
     }
 
     /**
@@ -63,6 +63,7 @@ public class SharedPrefsTools {
         editor.putString("pictures",String.valueOf(githubAccount.getPublic_repos()));
         editor.putString("followers",String.valueOf(githubAccount.getFollowers()));
         editor.putString("following",String.valueOf(githubAccount.getFollowing()));
+        editor.putString("avatar_url",githubAccount.getAvatar_url());
         editor.apply();
     }
 
@@ -76,6 +77,7 @@ public class SharedPrefsTools {
         githubAccount.setPublic_repos(Integer.parseInt(shp.getString("pictures","0")));
         githubAccount.setFollowers(Integer.parseInt(shp.getString("followers","0")));
         githubAccount.setFollowing(Integer.parseInt(shp.getString("following","0")));
+        githubAccount.setAvatar_url(shp.getString("avatar_url","null"));
         return githubAccount;
     }
 

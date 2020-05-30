@@ -51,7 +51,7 @@ public class GithubApi {
     /**
      * 从Sharepreferences中获取 github token
      */
-    private String getToken(){
+    public String getToken(){
         TOKEN = SharedPrefsTools.getInstance(application).getToken("github");
         return TOKEN;
     }
@@ -86,11 +86,11 @@ public class GithubApi {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG, "error token: " + token);
-                        Log.d(TAG,"error："+ error);
-                        Toast.makeText(context, "github授权失败", Toast.LENGTH_SHORT).show();
-
-                        VolleySingleton.errorMessage(error,context);
+                        if( token == null ) {
+                            Log.d(TAG, "error：" + error);
+                            Toast.makeText(context, "github授权失败", Toast.LENGTH_SHORT).show();
+                            VolleySingleton.errorMessage(error, context);
+                        }
                     }
                 }){
             @Override

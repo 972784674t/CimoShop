@@ -2,11 +2,13 @@ package com.example.cimoshop.ui.personalcenter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,6 +23,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.bumptech.glide.Glide;
 import com.example.cimoshop.R;
 import com.example.cimoshop.account.GithubAccount;
 import com.example.cimoshop.api.GithubApi;
@@ -30,6 +33,7 @@ import com.example.cimoshop.ui.login.Login;
 import com.example.cimoshop.ui.personalcenter.favorites.MyFavorites;
 import com.example.cimoshop.ui.personalcenter.mywarehouse.MyWareHouse;
 import com.example.cimoshop.ui.personalcenter.myworks.MyWorks;
+import com.example.cimoshop.utils.SharedPrefsTools;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
@@ -39,6 +43,8 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * @author 谭海山
@@ -53,10 +59,19 @@ public class PersonalCenter extends Fragment {
 
     private static final String[] TAB_LABEL = {"我的作品","我的喜欢","我的仓库"};
 
+    //token是否存在
+    private String isToken;
+
     private MaterialButton button;
     private MaterialToolbar toolbar;
     private ViewPager2 viewPager2;
     private TabLayout tabLayout;
+    private TextView pcuserName;
+    private TextView pcuserPictures;
+    private TextView pcuserFollowers;
+    private TextView pcuserFollowing;
+    private TextView pcuserSourceText;
+    private CircleImageView pcuseravatar;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -79,14 +94,28 @@ public class PersonalCenter extends Fragment {
      * @param root layout布局
      */
     private void initView(View root) {
+
         toolbar = root.findViewById(R.id.personalCenterToobar);
         tabLayout = root.findViewById(R.id.personalcentertabLayout);
         viewPager2 = root.findViewById(R.id.personalviewpage2);
         button = root.findViewById(R.id.button);
+        pcuseravatar = root.findViewById(R.id.pcuseravatar);
+        pcuserName = root.findViewById(R.id.pcuserName);
+        pcuserFollowers = root.findViewById(R.id.pcuserfollwers);
+        pcuserFollowing= root.findViewById(R.id.pcuserfollowing);
+        pcuserPictures = root.findViewById(R.id.pcuserpictures);
+        pcuserSourceText = root.findViewById(R.id.pcusersource);
         //状态栏文字透明
         MyTools.makeStatusBarTransparent(getActivity());
         //修复标题栏与状态栏重叠
         MyTools.fitTitleBar(getActivity(),toolbar);
+
+        isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
+        Log.d(TAG,"isToken："+isToken);
+
+        if (!isToken.isEmpty()){
+            initUserAccount();
+        }
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,13 +172,36 @@ public class PersonalCenter extends Fragment {
             case 2:
                 String token = data.getStringExtra("token");
                 Log.d(TAG,"token："+token);
-
+                //登录成功后执行保存token操作
                 GithubApi.getInstance(getActivity().getApplication()).saveGithubUserInfoByToken(getContext(),token);
-
+                initUserAccount();
                 break;
             default:
                 break;
         }
+    }
+
+    /**
+     * 初始化用户中心界面
+     * 先判断token是否存在，如果不存在则说明没有登录
+     */
+    private void initUserAccount(){
+
+        GithubAccount githubAccount = SharedPrefsTools.getInstance(getActivity().getApplication()).getUserInfo();
+        Log.d(TAG,"个人中心shp获取结果 -> githubAccount："+githubAccount.toString());
+
+        Log.d(TAG,"Avatar_url："+githubAccount.getAvatar_url());
+        if ( !githubAccount.getAvatar_url().equals("null") ){
+            Glide.with(getContext()).load(githubAccount.getAvatar_url())
+                    .placeholder(R.mipmap.empty_icon)
+                    .override(500, 500)
+                    .into(pcuseravatar);
+        }
+        pcuserName.setText(""+githubAccount.getName());
+        pcuserPictures.setText(""+githubAccount.getPublic_repos());
+        pcuserFollowing.setText(""+githubAccount.getFollowing());
+        pcuserFollowers.setText(""+githubAccount.getFollowers());
+        pcuserSourceText.setText("这些数据来自于Github");
     }
 
 
