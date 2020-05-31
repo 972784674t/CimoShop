@@ -267,12 +267,10 @@ public class PersonalCenter extends Fragment {
             });
 
         }
-        pcuserName.setText("" + githubAccount.getName());
+        pcuserName.setText("" + githubAccount.getLogin());
         pcuserPictures.setText("" + githubAccount.getPublic_repos());
         pcuserFollowing.setText("" + githubAccount.getFollowing());
         pcuserFollowers.setText("" + githubAccount.getFollowers());
-
-
     }
 
     /**

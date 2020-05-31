@@ -59,7 +59,7 @@ public class SharedPrefsTools {
      */
     public void saveUserInfo(GithubAccount githubAccount){
         SharedPreferences.Editor editor = shp.edit();
-        editor.putString("userName",githubAccount.getName());
+        editor.putString("userName",githubAccount.getLogin());
         editor.putString("pictures",String.valueOf(githubAccount.getPublic_repos()));
         editor.putString("followers",String.valueOf(githubAccount.getFollowers()));
         editor.putString("following",String.valueOf(githubAccount.getFollowing()));
@@ -73,7 +73,7 @@ public class SharedPrefsTools {
      */
     public GithubAccount getUserInfo(){
         GithubAccount githubAccount = new GithubAccount();
-        githubAccount.setName(shp.getString("userName","请先登录哦"));
+        githubAccount.setLogin(shp.getString("userName","请先登录哦"));
         githubAccount.setPublic_repos(Integer.parseInt(shp.getString("pictures","0")));
         githubAccount.setFollowers(Integer.parseInt(shp.getString("followers","0")));
         githubAccount.setFollowing(Integer.parseInt(shp.getString("following","0")));

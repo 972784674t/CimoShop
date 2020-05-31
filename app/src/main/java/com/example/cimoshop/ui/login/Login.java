@@ -185,7 +185,7 @@ public class Login extends AppCompatActivity {
                 if ( githubCallbackUrl.contains("http://incimo.xyz:8080/cimowebshop/GithubLogingCallBack") ) {
                     //通过拦截的url获取token
                     getGithubToken();
-                    Toast.makeText(getApplicationContext(), "登录github成功,正在获取授权", Toast.LENGTH_SHORT).show();
+
                     //隐藏webView
                     logonWebView.setVisibility(View.GONE);
                     loginBtn.setVisibility(View.VISIBLE);
@@ -206,6 +206,7 @@ public class Login extends AppCompatActivity {
      * 获取code后，从服务器inicmo.xyz获取github的token
      */
     void getGithubToken() {
+        Toast.makeText(getApplicationContext(), "登录github成功,正在获取授权", Toast.LENGTH_SHORT).show();
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
                 githubCallbackUrl,
@@ -218,10 +219,9 @@ public class Login extends AppCompatActivity {
                         githubToken = MyTools.getMap(githubResponse).get("access_token");
                         Log.d(TAG, "token：" + githubToken);
 
-                        Toast.makeText(getApplicationContext(), "github授权成功", Toast.LENGTH_SHORT).show();
-
                         //将token存入Sharepreferences
                         SharedPrefsTools.getInstance(getApplication()).saveToken("github",githubToken);
+                        Toast.makeText(getApplicationContext(), "github授权成功", Toast.LENGTH_SHORT).show();
 
                         //返回token到LogonActivity
                         Intent intent = new Intent();
