@@ -5,14 +5,24 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+
+import com.example.cimoshop.db.DataBaseHelper;
+import com.example.cimoshop.db.UserDAO;
+import com.example.cimoshop.entity.User;
 
 /**
  * @author 谭海山
  */
 public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = "cimoshopMainActivity";
+
+    public static final String DATABASE_NAME = "db_cimoShop";
+    public static final int DATABASE_VERSION = 1;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -20,7 +30,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         checkPermission();
-        //getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+        DataBaseHelper dataBaseHelper = new DataBaseHelper(this,DATABASE_NAME,null,DATABASE_VERSION);
+        SQLiteDatabase db = dataBaseHelper.getWritableDatabase();
+        User user = new User();
+        UserDAO.getInstance(db).insertUser(user);
+        User user1 = UserDAO.getInstance(db).findUserByUserName("cimo");
+        Log.d(TAG,user1.toString());
     }
 
     /**
