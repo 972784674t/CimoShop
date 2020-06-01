@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class GalleryViewModel extends AndroidViewModel {
 
-    private static final String TAG = "CIMOGalleryViewModel";
+    private static final String TAG = "cimoGallery";
 
     //搜索关键字key
     private String[] queryKey = new String[]{"animal","natural","universe","Space","sea","Scenery","city"};
@@ -120,7 +120,7 @@ public class GalleryViewModel extends AndroidViewModel {
                         Gson gson = new Gson();
                         List<Pixabay.HitsBean> list = gson.fromJson(response, Pixabay.class).getHits();
                         totalPage = (gson.fromJson(response, Pixabay.class).getTotalHits()) / perPage + 1;
-                        Log.d(TAG,"下拉刷新 -> currentPage："+currentPage+"\tkey："+key+"\ttotalPage："+totalPage);
+                        Log.d(TAG,"下拉刷新 -> currentPage："+currentPage+"\ttotalPage："+totalPage+"\tkey："+key);
                         //刷新的请求，用postValue()
                         hitsBean.postValue(list);
                     }

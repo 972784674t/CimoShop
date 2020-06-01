@@ -52,7 +52,7 @@ import java.util.List;
  */
 public class Gallery extends Fragment {
 
-    private static final String TAG = "CIMOGalleryFragment";
+    private static final String TAG = "cimoGallery";
 
     private GalleryViewModel mViewModel;
     private RecyclerView recyclerViewGallery;
@@ -65,10 +65,10 @@ public class Gallery extends Fragment {
     //加载更多事件处理类
     private BaseLoadMoreModule loadMore;
 
-    //当前页数
+    //暂存当前页数
     private int currentPage = 1;
 
-    //总页数
+    //暂存总页数
     private int totalPage = 1;
 
     //单次请求的图片数
@@ -176,6 +176,7 @@ public class Gallery extends Fragment {
                 toTheTopBtn.setVisibility(View.GONE);
                 //重新获取页数
                 currentPage = mViewModel.getCurrentPage() + 1;
+                loadMore.loadMoreComplete();
             }
         });
 
@@ -211,7 +212,7 @@ public class Gallery extends Fragment {
      */
     private void loadMoreGallery(){
         String key = mViewModel.getKey();
-        Log.d(TAG,"加载更多 -> currentPage："+ currentPage +"\tkey："+key+"\ttotalPage："+totalPage);
+        Log.d(TAG,"加载更多 -> currentPage："+ currentPage+"\ttotalPage："+totalPage +"\tkey："+key);
         if( currentPage > totalPage ){
             loadMore.loadMoreEnd();
             return;
