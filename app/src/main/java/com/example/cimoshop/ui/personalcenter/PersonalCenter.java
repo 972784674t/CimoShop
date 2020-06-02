@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -94,6 +95,7 @@ public class PersonalCenter extends Fragment {
 
     /**
      * 控件初始化
+     *
      * @param root layout布局
      */
     private void initView(View root) {
@@ -116,7 +118,7 @@ public class PersonalCenter extends Fragment {
         isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
         Log.d(TAG, "isToken：" + isToken);
         initUserAccountUI();
-        if ( !isToken.equals("null")) {
+        if (!isToken.equals("null")) {
 
             toolbar.inflateMenu(R.menu.personalcentermenu);
             logonbtn.setVisibility(View.GONE);
@@ -219,7 +221,7 @@ public class PersonalCenter extends Fragment {
                 String token = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
                 Log.d(TAG, "PersonalCenter token -> " + token);
                 //登录成功后执行保存token操作
-                saveGithubUserInfoByToken(getContext(),token);
+                saveGithubUserInfoByToken(getContext(), token);
                 break;
             default:
                 break;
@@ -277,10 +279,11 @@ public class PersonalCenter extends Fragment {
 
     /**
      * 将token加入请求头Authorization中，获取github用户信息，并保存到本地shp文件和数据库中
+     *
      * @param context context
      */
-    public void saveGithubUserInfoByToken(final Context context, final String token){
-        logonbtn.setVisibility(View.VISIBLE);
+    public void saveGithubUserInfoByToken(final Context context, final String token) {
+
         Toast.makeText(context, "正在从Github获取用户信息，请稍等...", Toast.LENGTH_SHORT).show();
         String baseUrl = "https://api.github.com/user";
         StringRequest stringRequest = new StringRequest(
@@ -289,8 +292,11 @@ public class PersonalCenter extends Fragment {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Toast.makeText(context, "用户信息获取成功", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "response" + response);
 
+                        Toast.makeText(context, "用户信息获取成功", Toast.LENGTH_SHORT).show();
+                        logonbtn.setVisibility(View.GONE);
+                        toolbar.inflateMenu(R.menu.personalcentermenu);
                         //将返回的用户信息保存到shp文件
                         Gson gson = new Gson();
                         GithubAccount githubAccount = gson.fromJson(response, GithubAccount.class);
@@ -301,32 +307,36 @@ public class PersonalCenter extends Fragment {
                         //将用户信息保存到数据库
                         User user = new User();
                         user.setUserName(githubAccount.getLogin());
-                        if (  UserDAO.getInstance(getContext()).insertUser(user) ) {
-                            Log.d(TAG,"将用户"+user.getUserName()+"加入数据库成功");
+                        if (UserDAO.getInstance(getContext()).insertUser(user)) {
+                            Log.d(TAG, "将用户" + user.getUserName() + "加入数据库成功");
                         } else {
-                            Log.d(TAG,"将用户"+user.getUserName()+"加入数据库失败");
+                            Log.d(TAG, "将用户" + user.getUserName() + "加入数据库失败");
                         }
-
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        if( token == null ) {
+                        Toast.makeText(context, "Oops!服务器开了点小差，重新登录试试", Toast.LENGTH_SHORT).show();
+                        if (token == null) {
                             Log.d(TAG, "error：" + error);
                             Toast.makeText(context, "github授权失败", Toast.LENGTH_SHORT).show();
                             VolleySingleton.errorMessage(error, context);
                         }
                     }
-                }){
+                }) {
             @Override
             public Map<String, String> getHeaders() {
-                HashMap<String,String> headers = new HashMap<>();
-                headers.put("Authorization","token "+SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github"));
-                Log.d(TAG,headers.get("Authorization"));
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "token " + SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github"));
+                Log.d(TAG, headers.get("Authorization"));
                 return headers;
             }
         };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                1000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(context).addToRequestQueue(stringRequest);
     }
 

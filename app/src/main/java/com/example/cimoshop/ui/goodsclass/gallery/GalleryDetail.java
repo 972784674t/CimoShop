@@ -158,7 +158,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(IS_LOGON){
+                if( IS_LOGON ){
                     isAddtoCat();
                 } else {
                     Toast.makeText(getApplicationContext(),"请先登录哦",Toast.LENGTH_SHORT).show();
@@ -187,7 +187,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
 
     /**
      * 初始化收藏图片操作
-     * @param item  MenuItem
+     * @param item MenuItem
      * @param hitsBean hitsBean
      */
     private void initFavoriteImage(MenuItem item, Pixabay.HitsBean hitsBean) {
@@ -217,6 +217,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
      * 是否加入购物车
      */
     void isAddtoCat() {
+
         new MaterialAlertDialogBuilder(this)
                 .setTitle("CIMO")
                 .setMessage("确认将该图片加入购物车吗")
