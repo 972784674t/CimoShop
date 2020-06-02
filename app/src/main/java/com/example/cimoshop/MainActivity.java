@@ -14,6 +14,8 @@ import com.example.cimoshop.db.DataBaseHelper;
 import com.example.cimoshop.db.UserDAO;
 import com.example.cimoshop.entity.User;
 
+import java.util.ArrayList;
+
 /**
  * @author 谭海山
  */
@@ -27,7 +29,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         checkPermission();
-        Log.d(TAG,"数据库用户ID："+UserDAO.getInstance(this).findUserByUserName("972784674t").getUserId());
+        ArrayList<String> list = UserDAO.getInstance(this).getUserFavoriteImageList(UserDAO.getInstance(this).findUserByUserName("972784674t").getUserId());
+        Log.d(TAG,"数据库用户ID："+list);
     }
 
     /**

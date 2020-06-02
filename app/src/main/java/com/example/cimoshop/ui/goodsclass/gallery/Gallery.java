@@ -136,7 +136,9 @@ public class Gallery extends Fragment {
         //recyclerView Adapter初始化 使用 BRVAH 框架
         galleryAdapter = new GalleryAdapter_BRVAH();
         galleryAdapter.setDiffCallback(new MyDiffCallback());
+        //开启滑动动画
         galleryAdapter.setAnimationEnable(true);
+        //动画只执行一次
         galleryAdapter.setAnimationFirstOnly(false);
 
         //加载更多对象，来自于BRVAH

@@ -10,6 +10,8 @@ import android.util.Log;
 import com.example.cimoshop.entity.User;
 import com.example.cimoshop.utils.SharedPrefsTools;
 
+import java.util.ArrayList;
+
 /**
  * @author 谭海山
  */
@@ -104,6 +106,21 @@ public class UserDAO {
             flag = true ;
         }
         return flag;
+    }
+
+    /**
+     * 通过用户id获取收藏列表
+     * @param userId 用户id
+     * @return 收藏列表
+     */
+    public ArrayList<String> getUserFavoriteImageList(int userId){
+        ArrayList<String> list = new ArrayList<>();
+        String sql = "select * from userFavorites where id = ?";
+        Cursor cursor = db.rawQuery(sql, new  String[]{String.valueOf(userId)});
+        while ( cursor.moveToNext() ){
+            list.add(cursor.getString(cursor.getColumnIndex("userFavoriteUrl")));
+        }
+        return list;
     }
 
 }

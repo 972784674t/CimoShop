@@ -58,10 +58,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class PersonalCenter extends Fragment {
 
     private static final String TAG = "cimoPersonalcenter";
-    private static final String[] TAB_LABEL = {"我的作品", "我的喜欢", "我的仓库"};
+    private static final String[] TAB_LABEL = {"我的作品", "我的喜欢", "已经购买"};
     //token是否存在
     private String isToken;
-    private MaterialButton button;
+    private MaterialButton logonbtn;
     private MaterialToolbar toolbar;
     private ViewPager2 viewPager2;
     private TabLayout tabLayout;
@@ -101,7 +101,7 @@ public class PersonalCenter extends Fragment {
         toolbar = root.findViewById(R.id.personalCenterToobar);
         tabLayout = root.findViewById(R.id.personalcentertabLayout);
         viewPager2 = root.findViewById(R.id.personalviewpage2);
-        button = root.findViewById(R.id.button);
+        logonbtn = root.findViewById(R.id.logonbtn);
         pcuseravatar = root.findViewById(R.id.pcuseravatar);
         pcuserName = root.findViewById(R.id.pcuserName);
         pcuserFollowers = root.findViewById(R.id.pcuserfollwers);
@@ -115,10 +115,13 @@ public class PersonalCenter extends Fragment {
 
         isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
         Log.d(TAG, "isToken：" + isToken);
+        initUserAccountUI();
+        if ( !isToken.equals("null")) {
 
-        if (!isToken.isEmpty()) {
-            initUserAccountUI();
+            toolbar.inflateMenu(R.menu.personalcentermenu);
+            logonbtn.setVisibility(View.GONE);
         }
+
 
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
@@ -134,7 +137,7 @@ public class PersonalCenter extends Fragment {
             }
         });
 
-        button.setOnClickListener(new View.OnClickListener() {
+        logonbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
@@ -160,6 +163,7 @@ public class PersonalCenter extends Fragment {
                         pcuserSourceText.setText("又是愉快的一天");
                         initUserAccountUI();
                         pcuseravatar.setImageResource(R.drawable.empty_icon);
+                        logonbtn.setVisibility(View.VISIBLE);
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -168,6 +172,7 @@ public class PersonalCenter extends Fragment {
 
                     }
                 }).show();
+
     }
 
     /**
@@ -192,7 +197,6 @@ public class PersonalCenter extends Fragment {
                 return fragmentList.size();
             }
         });
-
         //关联并应用ViewPage2和Tab
         new TabLayoutMediator(tabLayout, viewPager2, new TabLayoutMediator.TabConfigurationStrategy() {
             @Override
@@ -212,7 +216,6 @@ public class PersonalCenter extends Fragment {
                 Toast.makeText(getContext(), "取消登录", Toast.LENGTH_SHORT).show();
                 break;
             case 2:
-                //String token = data.getStringExtra("token");
                 String token = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
                 Log.d(TAG, "PersonalCenter token -> " + token);
                 //登录成功后执行保存token操作
@@ -277,6 +280,7 @@ public class PersonalCenter extends Fragment {
      * @param context context
      */
     public void saveGithubUserInfoByToken(final Context context, final String token){
+        logonbtn.setVisibility(View.VISIBLE);
         Toast.makeText(context, "正在从Github获取用户信息，请稍等...", Toast.LENGTH_SHORT).show();
         String baseUrl = "https://api.github.com/user";
         StringRequest stringRequest = new StringRequest(
