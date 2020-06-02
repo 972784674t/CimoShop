@@ -3,7 +3,6 @@ package com.example.cimoshop.ui.personalcenter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,7 +18,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.paging.PageKeyedDataSource;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -28,12 +26,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
-import com.example.cimoshop.MainActivity;
 import com.example.cimoshop.R;
 import com.example.cimoshop.account.GithubAccount;
-import com.example.cimoshop.api.GithubApi;
 import com.example.cimoshop.api.VolleySingleton;
-import com.example.cimoshop.utils.MyTools;
+import com.example.cimoshop.db.UserDAO;
+import com.example.cimoshop.entity.User;
+import com.example.cimoshop.utils.UITools;
 import com.example.cimoshop.ui.login.Login;
 import com.example.cimoshop.ui.personalcenter.favorites.MyFavorites;
 import com.example.cimoshop.ui.personalcenter.mywarehouse.MyWareHouse;
@@ -60,16 +58,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class PersonalCenter extends Fragment {
 
     private static final String TAG = "cimoPersonalcenter";
-
-    public static PersonalCenter newInstance() {
-        return new PersonalCenter();
-    }
-
     private static final String[] TAB_LABEL = {"我的作品", "我的喜欢", "我的仓库"};
-
     //token是否存在
     private String isToken;
-
     private MaterialButton button;
     private MaterialToolbar toolbar;
     private ViewPager2 viewPager2;
@@ -80,6 +71,10 @@ public class PersonalCenter extends Fragment {
     private TextView pcuserFollowing;
     private TextView pcuserSourceText;
     private CircleImageView pcuseravatar;
+
+    public static PersonalCenter newInstance() {
+        return new PersonalCenter();
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -99,7 +94,6 @@ public class PersonalCenter extends Fragment {
 
     /**
      * 控件初始化
-     *
      * @param root layout布局
      */
     private void initView(View root) {
@@ -115,15 +109,15 @@ public class PersonalCenter extends Fragment {
         pcuserPictures = root.findViewById(R.id.pcuserpictures);
         pcuserSourceText = root.findViewById(R.id.pcusersource);
         //状态栏文字透明
-        MyTools.makeStatusBarTransparent(getActivity());
+        UITools.makeStatusBarTransparent(getActivity());
         //修复标题栏与状态栏重叠
-        MyTools.fitTitleBar(getActivity(), toolbar);
+        UITools.fitTitleBar(getActivity(), toolbar);
 
         isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
         Log.d(TAG, "isToken：" + isToken);
 
         if (!isToken.isEmpty()) {
-            initUserAccount();
+            initUserAccountUI();
         }
 
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -131,26 +125,7 @@ public class PersonalCenter extends Fragment {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.logout:
-                        new MaterialAlertDialogBuilder(getContext())
-                                .setTitle("确定要退出登录吗")
-                                .setMessage("退出登录后需要重新输入账号信息哦")
-                                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        SharedPrefsTools.getInstance(getActivity().getApplication()).logout();
-                                        Toast.makeText(getContext(), "退出登录", Toast.LENGTH_LONG).show();
-                                        pcuserSourceText.setText("又是愉快的一天");
-                                        initUserAccount();
-                                        pcuseravatar.setImageResource(R.drawable.empty_icon);
-                                    }
-                                })
-                                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-
-                                    }
-                                }).show();
-
+                        initLogout();
                         break;
                     default:
                         break;
@@ -168,6 +143,31 @@ public class PersonalCenter extends Fragment {
             }
         });
 
+    }
+
+    /**
+     * 初始化退出登录
+     */
+    private void initLogout() {
+        new MaterialAlertDialogBuilder(getContext())
+                .setTitle("确定要退出登录吗")
+                .setMessage("退出登录后需要重新输入账号信息哦")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SharedPrefsTools.getInstance(getActivity().getApplication()).logout();
+                        Toast.makeText(getContext(), "退出登录", Toast.LENGTH_LONG).show();
+                        pcuserSourceText.setText("又是愉快的一天");
+                        initUserAccountUI();
+                        pcuseravatar.setImageResource(R.drawable.empty_icon);
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).show();
     }
 
     /**
@@ -227,7 +227,7 @@ public class PersonalCenter extends Fragment {
      * 初始化用户中心界面
      * 先判断token是否存在，如果不存在则说明没有登录
      */
-    private void initUserAccount() {
+    private void initUserAccountUI() {
 
         GithubAccount githubAccount = SharedPrefsTools.getInstance(getActivity().getApplication()).getUserInfo();
         Log.d(TAG, "个人中心shp获取结果 -> githubAccount：" + githubAccount.toString());
@@ -260,7 +260,6 @@ public class PersonalCenter extends Fragment {
                         @Override
                         public void onClick(View v) {
                             PictureSelectorTools.getInstance().getImageFormGallery(getActivity(), pcuseravatar);
-
                         }
                     });
                 }
@@ -274,7 +273,7 @@ public class PersonalCenter extends Fragment {
     }
 
     /**
-     * 将token加入请求头Authorization中，获取github用户信息
+     * 将token加入请求头Authorization中，获取github用户信息，并保存到本地shp文件和数据库中
      * @param context context
      */
     public void saveGithubUserInfoByToken(final Context context, final String token){
@@ -287,11 +286,23 @@ public class PersonalCenter extends Fragment {
                     @Override
                     public void onResponse(String response) {
                         Toast.makeText(context, "用户信息获取成功", Toast.LENGTH_SHORT).show();
+
+                        //将返回的用户信息保存到shp文件
                         Gson gson = new Gson();
                         GithubAccount githubAccount = gson.fromJson(response, GithubAccount.class);
                         Log.d(TAG, "用户信息(githubAccount)：" + githubAccount);
                         SharedPrefsTools.getInstance(getActivity().getApplication()).saveUserInfo(githubAccount);
-                        initUserAccount();
+                        initUserAccountUI();
+
+                        //将用户信息保存到数据库
+                        User user = new User();
+                        user.setUserName(githubAccount.getLogin());
+                        if (  UserDAO.getInstance(getContext()).insertUser(user) ) {
+                            Log.d(TAG,"将用户"+user.getUserName()+"加入数据库成功");
+                        } else {
+                            Log.d(TAG,"将用户"+user.getUserName()+"加入数据库失败");
+                        }
+
                     }
                 },
                 new Response.ErrorListener() {

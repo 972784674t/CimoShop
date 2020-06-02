@@ -15,7 +15,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.cimoshop.R;
-import com.example.cimoshop.utils.MyTools;
+import com.example.cimoshop.utils.UITools;
 import com.example.cimoshop.ui.goodsclass.gallery.Gallery;
 import com.example.cimoshop.ui.personalcenter.PersonalCenter;
 import com.example.cimoshop.ui.shopcat.ShopCatFragment;
@@ -53,10 +53,10 @@ public class HomeFragment extends Fragment {
         Log.d(TAG,"onActivityCreated");
 
         //状态栏文字透明
-        MyTools.makeStatusBarTransparent(getActivity());
+        UITools.makeStatusBarTransparent(getActivity());
 
         //修复标题栏与状态栏重叠
-        MyTools.setMIUI(getActivity(),true);
+        UITools.setMIUI(getActivity(),true);
 
         initViewPage();
         initBottomNav();
@@ -77,7 +77,7 @@ public class HomeFragment extends Fragment {
         fragmentList.add(new ShopCatFragment());
         fragmentList.add(new PersonalCenter());
 
-        viewPager.setAdapter(new FragmentStatePagerAdapter(getActivity().getSupportFragmentManager()) {
+        viewPager.setAdapter(new FragmentStatePagerAdapter(getChildFragmentManager()) {
             @NonNull
             @Override
             public Fragment getItem( int position ) {

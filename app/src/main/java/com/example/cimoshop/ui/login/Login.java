@@ -2,14 +2,10 @@ package com.example.cimoshop.ui.login;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Layout;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
@@ -30,15 +26,11 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.example.cimoshop.MainActivity;
 import com.example.cimoshop.R;
 import com.example.cimoshop.api.VolleySingleton;
-import com.example.cimoshop.utils.MyTools;
+import com.example.cimoshop.utils.UITools;
 import com.example.cimoshop.utils.SharedPrefsTools;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
-import java.util.zip.Inflater;
 
 /**
  * @author 谭海山
@@ -95,8 +87,8 @@ public class Login extends AppCompatActivity {
         logonWebView = findViewById(R.id.loginWebView);
         logonWebViewProgressBar = findViewById(R.id.logonWebVeiwProgressbar);
         logonWebProgress = findViewById(R.id.logonWebProgress);
-        MyTools.makeStatusBarTransparent(this);
-        MyTools.MIUISetStatusBarLightMode(this, true);
+        UITools.makeStatusBarTransparent(this);
+        UITools.MIUISetStatusBarLightMode(this, true);
     }
 
     @Override
@@ -216,7 +208,7 @@ public class Login extends AppCompatActivity {
                         githubResponse = response;
                         Log.d(TAG, "result：" + githubResponse);
 
-                        githubToken = MyTools.getMap(githubResponse).get("access_token");
+                        githubToken = UITools.getMap(githubResponse).get("access_token");
                         Log.d(TAG, "token：" + githubToken);
 
                         //将token存入Sharepreferences

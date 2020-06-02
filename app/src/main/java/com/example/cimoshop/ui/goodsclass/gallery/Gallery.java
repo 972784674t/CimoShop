@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.TranslateAnimation;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,7 +37,7 @@ import com.example.cimoshop.R;
 import com.example.cimoshop.adapter.GalleryAdapter_BRVAH;
 import com.example.cimoshop.api.VolleySingleton;
 import com.example.cimoshop.entity.Pixabay;
-import com.example.cimoshop.utils.MyTools;
+import com.example.cimoshop.utils.UITools;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -125,11 +124,11 @@ public class Gallery extends Fragment {
         Log.d(TAG,"onActivityCreated");
 
         //状态栏文字透明
-        MyTools.makeStatusBarTransparent(getActivity());
+        UITools.makeStatusBarTransparent(getActivity());
 
         //修复标题栏与状态栏重叠
-        MyTools.fitTitleBar(getActivity(),toolbar);
-        MyTools.setMIUI(getActivity(),true);
+        UITools.fitTitleBar(getActivity(),toolbar);
+        UITools.setMIUI(getActivity(),true);
 
         //viewModel初始化
         mViewModel = new ViewModelProvider(this,new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())).get(GalleryViewModel.class);

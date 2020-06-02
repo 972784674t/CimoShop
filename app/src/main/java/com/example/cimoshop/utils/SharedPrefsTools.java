@@ -15,7 +15,7 @@ public class SharedPrefsTools {
      * 私有化Sharepreferences对象
      */
     private static SharedPrefsTools INSTANCE;
-    private static SharedPreferences shp ;
+    private static SharedPreferences shp;
     private Application application;
     private SharedPrefsTools(Application application) {
         this.application = application;

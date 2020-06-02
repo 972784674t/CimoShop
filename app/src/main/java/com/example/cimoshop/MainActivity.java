@@ -21,21 +21,13 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "cimoshopMainActivity";
 
-    public static final String DATABASE_NAME = "db_cimoShop";
-    public static final int DATABASE_VERSION = 1;
-
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         checkPermission();
-        DataBaseHelper dataBaseHelper = new DataBaseHelper(this,DATABASE_NAME,null,DATABASE_VERSION);
-        SQLiteDatabase db = dataBaseHelper.getWritableDatabase();
-        User user = new User();
-        UserDAO.getInstance(db).insertUser(user);
-        User user1 = UserDAO.getInstance(db).findUserByUserName("cimo");
-        Log.d(TAG,user1.toString());
+        Log.d(TAG,"数据库用户ID："+UserDAO.getInstance(this).findUserByUserName("972784674t").getUserId());
     }
 
     /**

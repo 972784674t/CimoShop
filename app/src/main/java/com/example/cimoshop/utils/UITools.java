@@ -23,7 +23,7 @@ import java.util.Map;
  * 用于对状态栏和标题栏的一些适应性操作
  * @author 谭海山
  */
-public class MyTools {
+public class UITools {
 
     private Window window;
 

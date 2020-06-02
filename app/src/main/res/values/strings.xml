@@ -14,17 +14,17 @@
 
     <!--  初始化userFavorites表  -->
     <string name="initTable_userFavorites">
-        create table userFavorites(id INTEGER PRIMARY KEY AUTOINCREMENT,userFavoriteUrl varchar(255))
+        create table userFavorites(id INTEGER,userFavoriteUrl varchar(255) UNIQUE)
     </string>
 
     <!--  初始化userShopCar表  -->
     <string name="initTable_userShopCar">
-        create table userShopCar(id INTEGER PRIMARY KEY AUTOINCREMENT,shopCarItemUrl varchar(50))
+        create table userShopCar(id INTEGER,shopCarItemUrl varchar(50))
     </string>
 
     <!--  初始化userWareHouses表  -->
     <string name="initTable_userWareHouses">
-        create table userWareHouses(id INTEGER PRIMARY KEY AUTOINCREMENT,wareHouseItemUrl varchar(50))
+        create table userWareHouses(id INTEGER,wareHouseItemUrl varchar(50))
     </string>
 
 </resources>

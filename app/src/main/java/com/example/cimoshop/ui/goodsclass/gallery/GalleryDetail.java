@@ -24,8 +24,10 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.cimoshop.R;
+import com.example.cimoshop.db.UserDAO;
 import com.example.cimoshop.entity.Pixabay;
-import com.example.cimoshop.utils.MyTools;
+import com.example.cimoshop.utils.SharedPrefsTools;
+import com.example.cimoshop.utils.UITools;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
@@ -40,6 +42,8 @@ import uk.co.senab.photoview.PhotoView;
 public class GalleryDetail extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "CIMO galleryDetail";
+
+    private static boolean IS_LOGON = false;
 
     private ShimmerLayout shimmerLayout;
     private PhotoView photoView;
@@ -62,7 +66,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
 
         setTheme(R.style.AppTheme);
 
-        MyTools.makeStatusBarTransparent(this);
+        UITools.makeStatusBarTransparent(this);
 
         shimmerLayout = findViewById(R.id.shimerDetialIMG);
         photoView = findViewById(R.id.photoView);
@@ -83,6 +87,8 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onStart() {
         super.onStart();
+
+        IS_LOGON = (SharedPrefsTools.getInstance(getApplication()).getToken("github") == "null")?false:true;
 
         shimmerLayout.setShimmerColor(0X55FFFFFF);
         shimmerLayout.setShimmerAngle(0);
@@ -152,8 +158,13 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isAddtoCat();
+                if(IS_LOGON){
+                    isAddtoCat();
+                } else {
+                    Toast.makeText(getApplicationContext(),"请先登录哦",Toast.LENGTH_SHORT).show();
+                }
             }
+
         });
 
         //bottomAppBar menu点击事件处理
@@ -162,11 +173,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.fav:
-                        if (item.getIcon().getConstantState() == getDrawable(R.drawable.ic_favorite).getConstantState()) {
-                            item.setIcon(R.drawable.ic_favorite_border_black_24dp);
-                        } else {
-                            item.setIcon(R.drawable.ic_favorite);
-                        }
+                        initFavoriteImage(item, hitsBean);
                         break;
                     case R.id.share:
                         share();
@@ -179,19 +186,52 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
     }
 
     /**
+     * 初始化收藏图片操作
+     * @param item  MenuItem
+     * @param hitsBean hitsBean
+     */
+    private void initFavoriteImage(MenuItem item, Pixabay.HitsBean hitsBean) {
+        if (IS_LOGON == false){
+            Toast.makeText(getApplicationContext(),"您还没有登录哦",Toast.LENGTH_SHORT).show();
+        } else {
+            if (item.getIcon().getConstantState() == getDrawable(R.drawable.ic_favorite).getConstantState()) {
+                item.setIcon(R.drawable.ic_favorite_border_black_24dp);
+                if ( UserDAO.getInstance(getApplicationContext()).delUserFavoriteImage(hitsBean.getWebformatURL()) ){
+                    Toast.makeText(getApplicationContext(),"取消收藏成功",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(),"取消收藏失败",Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                item.setIcon(R.drawable.ic_favorite);
+                String userName = SharedPrefsTools.getInstance(getApplication()).getUserInfo().getLogin();
+                if( UserDAO.getInstance(getApplicationContext()).insertUserFavoriteImage(userName,hitsBean.getWebformatURL()) ){
+                    Toast.makeText(getApplicationContext(),"收藏成功",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(),"收藏失败",Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    /**
      * 是否加入购物车
      */
     void isAddtoCat() {
         new MaterialAlertDialogBuilder(this)
                 .setTitle("CIMO")
                 .setMessage("确认将该图片加入购物车吗")
-                .setNegativeButton("确定", new DialogInterface.OnClickListener() {
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(getApplication(), "加入购物车成功", Toast.LENGTH_SHORT).show();
                     }
                 })
-                .setPositiveButton("取消", null)
                 .show();
     }
 

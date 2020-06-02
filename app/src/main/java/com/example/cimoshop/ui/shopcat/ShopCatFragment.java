@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 
 import com.example.cimoshop.R;
-import com.example.cimoshop.utils.MyTools;
+import com.example.cimoshop.utils.UITools;
 import com.google.android.material.appbar.MaterialToolbar;
 
 
@@ -44,10 +44,10 @@ public class ShopCatFragment extends Fragment {
         toolbar = root.findViewById(R.id.shopCatToobar);
 
         //状态栏文字透明
-        MyTools.makeStatusBarTransparent(getActivity());
+        UITools.makeStatusBarTransparent(getActivity());
 
         //修复标题栏与状态栏重叠
-        MyTools.fitTitleBar(getActivity(),toolbar);
+        UITools.fitTitleBar(getActivity(),toolbar);
 
         return root;
     }
