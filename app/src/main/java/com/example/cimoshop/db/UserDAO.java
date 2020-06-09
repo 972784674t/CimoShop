@@ -178,19 +178,20 @@ public class UserDAO {
 
     /**
      * 通过用户id获取购物车列表
-     * @param userId  用户id
+     * @param userName 用户名
      * @return 购物车列表
      */
-    public List<UserShopCar> getShopCarList(int userId){
+    public ArrayList<UserShopCar> getShopCarList(String userName){
         ArrayList<UserShopCar> list = new ArrayList<>();
+        int uid = findUserByUserName(userName).getUserId();
         String sql = "select * from userShopCar where id = ?";
-        Cursor cursor = db.rawQuery(sql, new  String[]{String.valueOf(userId)});
+        Cursor cursor = db.rawQuery(sql, new  String[]{""+uid});
         while ( cursor.moveToNext() ){
             UserShopCar userShopCar = new UserShopCar();
             userShopCar.setUserId( cursor.getInt(cursor.getColumnIndex("id")));
-            userShopCar.setShopCarItemUrl( cursor.getString(cursor.getColumnIndex("ShopCarItemUrl")));
-            userShopCar.setSize( cursor.getString(cursor.getColumnIndex("size")));
-            userShopCar.setPrice( cursor.getString(cursor.getColumnIndex("Price")));
+            userShopCar.setShopCarItemUrl( cursor.getString(cursor.getColumnIndex("shopCarItemUrl")));
+            userShopCar.setSize( cursor.getString(cursor.getColumnIndex("imageSize")));
+            userShopCar.setPrice( cursor.getString(cursor.getColumnIndex("price")));
             list.add(userShopCar);
         }
         return list;

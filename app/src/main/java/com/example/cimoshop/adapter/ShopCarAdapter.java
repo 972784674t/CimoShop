@@ -12,6 +12,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.module.DraggableModule;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.example.cimoshop.R;
 import com.example.cimoshop.entity.UserShopCar;
@@ -22,7 +23,7 @@ import io.supercharge.shimmerlayout.ShimmerLayout;
  * @author 谭海山
  * 购物车recycleView适配器
  */
-public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolder> {
+public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolder> implements DraggableModule {
 
     public ShopCarAdapter() { super(R.layout.shopcaritem); }
 
@@ -32,15 +33,18 @@ public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolde
         ImageView shopImage;
         TextView shopPrice;
         TextView shopSize;
+        TextView shopImageBuyer;
         ShimmerLayout shimmerLayout;
 
         shopImage = baseViewHolder.getView(R.id.shopcaritemimg);
         shopPrice = baseViewHolder.getView(R.id.shopcaritemprice);
         shopSize = baseViewHolder.getView(R.id.shopcaritemsize);
+        shopImageBuyer = baseViewHolder.getView(R.id.buyer);
         shimmerLayout = baseViewHolder.getView(R.id.shopCarItemShimmerLayout);
 
-        shopPrice.setText(userShopCar.getPrice());
-        shopSize.setText(userShopCar.getSize());
+        shopPrice.setText("¥ "+userShopCar.getPrice());
+        shopSize.setText("尺寸："+userShopCar.getSize());
+        shopImageBuyer.setText("购买人ID："+userShopCar.getUserId());
 
         shimmerLayout.setShimmerColor(0X55FFFFFF);
         shimmerLayout.setShimmerAngle(0);

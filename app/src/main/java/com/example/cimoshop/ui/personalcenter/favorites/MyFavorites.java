@@ -82,8 +82,8 @@ public class MyFavorites extends Fragment {
     }
 
     /**
-     * 初始化空列表
-     * @return 空列表 view
+     * 初始化空列表视图
+     * @return 空列表视图 view
      */
     private View initEmptyView() {
         View emptyView = getLayoutInflater().inflate(R.layout.emptyview, null);

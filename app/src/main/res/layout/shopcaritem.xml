@@ -6,6 +6,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginTop="1dp"
+    android:layout_marginBottom="1dp"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent">
@@ -19,13 +21,14 @@
             android:id="@+id/shopCarItemShimmerLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/shopcaritemimg"
-                android:layout_width="125dp"
+                android:layout_width="90dp"
                 android:layout_height="68dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
@@ -43,9 +46,9 @@
             android:id="@+id/shopcaritemprice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             android:text="TextView"
-            android:textSize="24sp"
+            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.07"
             app:layout_constraintStart_toEndOf="@+id/shopCarItemShimmerLayout"
@@ -56,12 +59,33 @@
             android:id="@+id/shopcaritemsize"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="9dp"
             android:text="TextView"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/shopcaritemprice"
             tools:text="652x56" />
+
+        <ImageView
+            android:id="@+id/imageView9"
+            android:layout_width="23dp"
+            android:layout_height="18dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@mipmap/drag_icon" />
+
+        <TextView
+            android:id="@+id/buyer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TextView"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@+id/shopcaritemsize"
+            app:layout_constraintStart_toStartOf="@+id/shopcaritemprice"
+            app:layout_constraintTop_toBottomOf="@+id/shopcaritemprice"
+            tools:text="购买者：incmo" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

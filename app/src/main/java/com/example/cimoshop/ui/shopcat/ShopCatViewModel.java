@@ -9,14 +9,4 @@ import androidx.lifecycle.ViewModel;
  */
 public class ShopCatViewModel extends ViewModel {
 
-    private MutableLiveData<String> mText;
-
-    public ShopCatViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("当前购物车空空如也哦");
-    }
-
-    public LiveData<String> getText() {
-        return mText;
-    }
 }
