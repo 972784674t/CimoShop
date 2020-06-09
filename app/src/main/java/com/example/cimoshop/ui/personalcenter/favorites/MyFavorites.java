@@ -45,8 +45,7 @@ public class MyFavorites extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.my_favorites_fragment, container, false);
         recyclerView = root.findViewById(R.id.favoriteimgrecycleview);
         favoriteImgList = UserDAO.getInstance(getContext()).getUserFavoriteImageList(UserDAO.getInstance(getContext()).findUserByUserName("972784674t").getUserId());
@@ -72,15 +71,25 @@ public class MyFavorites extends Fragment {
      * @param favoriteImgList 数据源
      */
     private void initFavoriteRecyclerView(ArrayList<String> favoriteImgList) {
+        Log.d(TAG, "initFavoriteRecyclerView: ");
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
         favoritesImageAdapter = new FavoritesImageAdapter();
-        View emptyView = getLayoutInflater().inflate(R.layout.emptyview,null);
-        TextView emptyTextView = emptyView.findViewById(R.id.emptytextView);
-        emptyTextView.setText("您还没有收藏任何图片哦");
+        View emptyView = initEmptyView();
         favoritesImageAdapter.setEmptyView(emptyView);
         favoritesImageAdapter.setDiffCallback(new MyDiffCallback());
         favoritesImageAdapter.setDiffNewData(favoriteImgList);
         recyclerView.setAdapter(favoritesImageAdapter);
+    }
+
+    /**
+     * 初始化空列表
+     * @return 空列表 view
+     */
+    private View initEmptyView() {
+        View emptyView = getLayoutInflater().inflate(R.layout.emptyview, null);
+        TextView emptyTextView = emptyView.findViewById(R.id.emptytextView);
+        emptyTextView.setText("您还没有收藏任何图片哦");
+        return emptyView;
     }
 
     /**

@@ -45,6 +45,9 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
 
     private static boolean IS_LOGON = false;
 
+    //当前用户名
+    private static String USER_NAME;
+
     private ShimmerLayout shimmerLayout;
     private PhotoView photoView;
     private CircleImageView upserImg;
@@ -89,6 +92,10 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
         super.onStart();
 
         IS_LOGON = (SharedPrefsTools.getInstance(getApplication()).getToken("github") == "null")?false:true;
+
+        if (IS_LOGON == true){
+            USER_NAME = SharedPrefsTools.getInstance(getApplication()).getUserInfo().getLogin();
+        }
 
         shimmerLayout.setShimmerColor(0X55FFFFFF);
         shimmerLayout.setShimmerAngle(0);
@@ -136,6 +143,22 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
         buttonFav.setText(hitsBean.getFavorites() + "  favorites");
         imgAddress.setText(Html.fromHtml("<u>" + "点击这里去详细地址" + "</u>"));
 
+        //如果已经点赞，则图标为红色
+        if (UserDAO.getInstance(getApplicationContext()).isFavoriteImage(USER_NAME,hitsBean.getWebformatURL())){
+            MenuItem item = bottomAppBar.getMenu().findItem(R.id.fav);
+            item.setIcon(R.drawable.ic_favorite);
+        }
+
+        initAllOnClick(hitsBean);
+
+    }
+
+    /**
+     * 初始化所有页面相关点击数据
+     * @param hitsBean 数据源
+     */
+    private void initAllOnClick(Pixabay.HitsBean hitsBean) {
+
         //去详细地址
         imgAddress.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -182,7 +205,6 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
                 return false;
             }
         });
-
     }
 
     /**
@@ -194,22 +216,23 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
         if (IS_LOGON == false){
             Toast.makeText(getApplicationContext(),"您还没有登录哦",Toast.LENGTH_SHORT).show();
         } else {
-            if (item.getIcon().getConstantState() == getDrawable(R.drawable.ic_favorite).getConstantState()) {
-                item.setIcon(R.drawable.ic_favorite_border_black_24dp);
-                if ( UserDAO.getInstance(getApplicationContext()).delUserFavoriteImage(hitsBean.getWebformatURL()) ){
-                    Toast.makeText(getApplicationContext(),"取消收藏成功",Toast.LENGTH_SHORT).show();
+                //根据图标状态判断是否点赞
+                if (item.getIcon().getConstantState() == getDrawable(R.drawable.ic_favorite).getConstantState()) {
+                    item.setIcon(R.drawable.ic_favorite_border_black_24dp);
+                    if ( UserDAO.getInstance(getApplicationContext()).delUserFavoriteImage(hitsBean.getWebformatURL()) ){
+                        Toast.makeText(getApplicationContext(),"取消收藏成功",Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(),"取消收藏失败",Toast.LENGTH_SHORT).show();
+                    }
                 } else {
-                    Toast.makeText(getApplicationContext(),"取消收藏失败",Toast.LENGTH_SHORT).show();
+                    item.setIcon(R.drawable.ic_favorite);
+                    if( UserDAO.getInstance(getApplicationContext()).insertUserFavoriteImage(USER_NAME,hitsBean.getWebformatURL()) ){
+                        Toast.makeText(getApplicationContext(),"收藏成功",Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(),"收藏失败",Toast.LENGTH_SHORT).show();
+                    }
                 }
-            } else {
-                item.setIcon(R.drawable.ic_favorite);
-                String userName = SharedPrefsTools.getInstance(getApplication()).getUserInfo().getLogin();
-                if( UserDAO.getInstance(getApplicationContext()).insertUserFavoriteImage(userName,hitsBean.getWebformatURL()) ){
-                    Toast.makeText(getApplicationContext(),"收藏成功",Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getApplicationContext(),"收藏失败",Toast.LENGTH_SHORT).show();
-                }
-            }
+
         }
     }
 

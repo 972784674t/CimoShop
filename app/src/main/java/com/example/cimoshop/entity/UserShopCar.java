@@ -5,11 +5,17 @@ import androidx.annotation.NonNull;
 /**
  * @author 谭海山
  */
-class UserShopCar {
+public class UserShopCar {
 
     private int userId;
 
+    private String userName;
+
     private String shopCarItemUrl;
+
+    private String size;
+
+    private String price;
 
     public int getUserId() {
         return userId;
@@ -17,6 +23,14 @@ class UserShopCar {
 
     public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getShopCarItemUrl() {
@@ -27,12 +41,29 @@ class UserShopCar {
         this.shopCarItemUrl = shopCarItemUrl;
     }
 
-    @NonNull
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
     @Override
     public String toString() {
         return "UserShopCar{" +
                 "userId=" + userId +
                 ", shopCarItemUrl='" + shopCarItemUrl + '\'' +
+                ", size='" + size + '\'' +
+                ", price='" + price + '\'' +
                 '}';
     }
 

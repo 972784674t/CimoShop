@@ -4,13 +4,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.util.Log;
-
 import com.example.cimoshop.entity.User;
-import com.example.cimoshop.utils.SharedPrefsTools;
+import com.example.cimoshop.entity.UserShopCar;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author 谭海山
@@ -23,8 +22,12 @@ public class UserDAO {
 
     private static final int DATABASE_VERSION = 1;
 
+    /**
+     * 数据库表
+     */
     private static final String USER_INFO = "userInfo";
     private static final String USER_FAVORITES = "userFavorites";
+    private static final String USER_SHOP_CAR = "userShopCar";
 
     private SQLiteDatabase db;
 
@@ -109,6 +112,23 @@ public class UserDAO {
     }
 
     /**
+     * 是否已经点赞此图片
+     * @param userName 用户名
+     * @param imageUrl 图片url
+     * @return boolean
+     */
+    public boolean isFavoriteImage(String userName,String imageUrl){
+        boolean flag = false;
+        int uid = findUserByUserName(userName).getUserId();
+        String sql = "select * from userFavorites where id=? and userFavoriteUrl=?";
+        Cursor cursor = db.rawQuery(sql, new  String[]{""+uid,imageUrl});
+        if ( cursor.moveToNext() ){
+            flag = true;
+        }
+        return flag;
+    }
+
+    /**
      * 通过用户id获取收藏列表
      * @param userId 用户id
      * @return 收藏列表
@@ -123,4 +143,56 @@ public class UserDAO {
         return list;
     }
 
+    /**
+     * 将图片加入到购物车
+     * @param userShopCar 带有相关信息的购物车item对象
+     * @return 是否成功
+     */
+    public boolean addImageToShopCar(UserShopCar userShopCar){
+        boolean flag = false;
+        int uid = findUserByUserName(userShopCar.getUserName()).getUserId();
+        ContentValues values = new ContentValues();
+        values.put("id",uid);
+        values.put("shopCarItemUrl",userShopCar.getShopCarItemUrl());
+        values.put("size",userShopCar.getSize());
+        values.put("price",userShopCar.getPrice());
+        if ( db.insert(USER_SHOP_CAR,null,values) != -1){
+            flag = true;
+        }
+        return flag;
+    }
+
+    /**
+     * 删除购物车中的图片
+     * @param imageUrl 图片链接
+     * @param price 图片尺寸
+     * @return  是否成功
+     */
+    public boolean delImageFromShopCar(String imageUrl,String price){
+        boolean flag = false;
+        if ( db.delete(USER_FAVORITES, "shopCarItemUrl=? and price=?",new String[]{imageUrl,price}) > 0 ){
+            flag = true ;
+        }
+        return flag;
+    }
+
+    /**
+     * 通过用户id获取购物车列表
+     * @param userId  用户id
+     * @return 购物车列表
+     */
+    public List<UserShopCar> getShopCarList(int userId){
+        ArrayList<UserShopCar> list = new ArrayList<>();
+        String sql = "select * from userShopCar where id = ?";
+        Cursor cursor = db.rawQuery(sql, new  String[]{String.valueOf(userId)});
+        while ( cursor.moveToNext() ){
+            UserShopCar userShopCar = new UserShopCar();
+            userShopCar.setUserId( cursor.getInt(cursor.getColumnIndex("id")));
+            userShopCar.setShopCarItemUrl( cursor.getString(cursor.getColumnIndex("ShopCarItemUrl")));
+            userShopCar.setSize( cursor.getString(cursor.getColumnIndex("size")));
+            userShopCar.setPrice( cursor.getString(cursor.getColumnIndex("Price")));
+            list.add(userShopCar);
+        }
+        return list;
+    }
 }

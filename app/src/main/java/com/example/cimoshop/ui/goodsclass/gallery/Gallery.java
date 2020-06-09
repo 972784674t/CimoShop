@@ -105,6 +105,7 @@ public class Gallery extends Fragment {
                 if (verticalOffset >= 0) {
                     swipeRefreshLayout.setEnabled(true);
                 } else {
+                    swipeRefreshLayout.setRefreshing(false);
                     swipeRefreshLayout.setEnabled(false);
                 }
             }
@@ -267,7 +268,7 @@ public class Gallery extends Fragment {
 
     /**
      * 重写 OnScrollListener类
-     * 当页面在第一屏和滑动时，不显示返回顶部按钮
+     * 为回到顶部按钮添加补间动画，当页面在第一屏和滑动时，不显示返回顶部按钮
      */
     private class MyRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
         @Override

@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 /**
  * @author 谭海山
  */
-class UserFavorites {
+public class UserFavorites {
 
     private int userId;
 

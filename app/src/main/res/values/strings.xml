@@ -19,7 +19,7 @@
 
     <!--  初始化userShopCar表  -->
     <string name="initTable_userShopCar">
-        create table userShopCar(id INTEGER,shopCarItemUrl varchar(50))
+        create table userShopCar(id INTEGER,shopCarItemUrl varchar(255),imageSize varchar(255),price varchar(255))
     </string>
 
     <!--  初始化userWareHouses表  -->
