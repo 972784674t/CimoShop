@@ -154,7 +154,7 @@ public class UserDAO {
         ContentValues values = new ContentValues();
         values.put("id",uid);
         values.put("shopCarItemUrl",userShopCar.getShopCarItemUrl());
-        values.put("size",userShopCar.getSize());
+        values.put("imageSize",userShopCar.getSize());
         values.put("price",userShopCar.getPrice());
         if ( db.insert(USER_SHOP_CAR,null,values) != -1){
             flag = true;

@@ -28,14 +28,18 @@ public class GalleryAdapter_BRVAH extends BaseQuickAdapter<Pixabay.HitsBean, Bas
 
     private static final String TAG = "cimoBRVAH";
 
+
+
     public GalleryAdapter_BRVAH() {
         super(R.layout.gallery_item);
     }
 
     @Override
     protected void convert(@NonNull BaseViewHolder baseViewHolder, Pixabay.HitsBean hitsBean) {
-        final ShimmerLayout shimmerLayout;
+
+        ShimmerLayout shimmerLayout;
         ImageView imageGalleryItem;
+
         shimmerLayout = baseViewHolder.getView(R.id.simmeritem);
         imageGalleryItem = baseViewHolder.getView(R.id.imageGalleryitem);
 

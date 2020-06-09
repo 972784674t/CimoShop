@@ -26,12 +26,14 @@ import com.bumptech.glide.request.target.Target;
 import com.example.cimoshop.R;
 import com.example.cimoshop.db.UserDAO;
 import com.example.cimoshop.entity.Pixabay;
+import com.example.cimoshop.entity.UserShopCar;
 import com.example.cimoshop.utils.SharedPrefsTools;
 import com.example.cimoshop.utils.UITools;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -61,6 +63,11 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
     private MaterialButton buttonFav;
     private BottomAppBar bottomAppBar;
     private FloatingActionButton floatingActionButton;
+    private ChipGroup imageSizeChipGroup;
+    //数据源
+    private Pixabay.HitsBean hitsBean;
+    //选择的图片尺寸
+    private String ImageSize = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +91,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
         imgAddress = findViewById(R.id.imgaddress);
         bottomAppBar = findViewById(R.id.bottombar);
         floatingActionButton = findViewById(R.id.fab);
+        imageSizeChipGroup = findViewById(R.id.imageSizeChipGroup);
 
     }
 
@@ -97,12 +105,13 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
             USER_NAME = SharedPrefsTools.getInstance(getApplication()).getUserInfo().getLogin();
         }
 
+        //shimmerLayout动画初始化
         shimmerLayout.setShimmerColor(0X55FFFFFF);
         shimmerLayout.setShimmerAngle(0);
         shimmerLayout.startShimmerAnimation();
 
         //从Parcelable获取图片数据
-        final Pixabay.HitsBean hitsBean = getIntent().getExtras().getParcelable("CHECKED_PHOTO_ID");
+        hitsBean = getIntent().getExtras().getParcelable("CHECKED_PHOTO_ID");
 
         //传入图片URL，Glide初始化
         assert hitsBean != null;
@@ -144,7 +153,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
         imgAddress.setText(Html.fromHtml("<u>" + "点击这里去详细地址" + "</u>"));
 
         //如果已经点赞，则图标为红色
-        if (UserDAO.getInstance(getApplicationContext()).isFavoriteImage(USER_NAME,hitsBean.getWebformatURL())){
+        if (UserDAO.getInstance(getApplicationContext()).isFavoriteImage(USER_NAME, hitsBean.getWebformatURL())){
             MenuItem item = bottomAppBar.getMenu().findItem(R.id.fav);
             item.setIcon(R.drawable.ic_favorite);
         }
@@ -154,7 +163,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
     }
 
     /**
-     * 初始化所有页面相关点击数据
+     * 初始化所有页面相关点击事件
      * @param hitsBean 数据源
      */
     private void initAllOnClick(Pixabay.HitsBean hitsBean) {
@@ -205,6 +214,25 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
                 return false;
             }
         });
+
+        //chipGroup点击事件，选择图片尺寸
+        imageSizeChipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(ChipGroup group, int checkedId) {
+                switch (imageSizeChipGroup.getCheckedChipId()){
+                    case R.id.size1:
+                        ImageSize = hitsBean.getPreviewWidth() + " × " + hitsBean.getPreviewHeight();
+                        break;
+                    case R.id.size2:
+                        ImageSize = hitsBean.getWebformatWidth() + " × " + hitsBean.getWebformatHeight();
+                        break;
+                    case R.id.size3:
+                        ImageSize = hitsBean.getImageWidth() + " × " + hitsBean.getImageHeight();
+                        break;
+                }
+            }
+        });
+
     }
 
     /**
@@ -241,9 +269,21 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
      */
     void isAddtoCat() {
 
+        UserShopCar userShopCar = new UserShopCar();
+        userShopCar.setUserName(USER_NAME);
+        userShopCar.setShopCarItemUrl(hitsBean.getWebformatURL());
+        if ( ImageSize == null ){
+            Toast.makeText(getApplicationContext(),"请先选择图片尺寸",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        userShopCar.setSize(ImageSize);
+        userShopCar.setPrice(""+hitsBean.getPreviewHeight());
+
         new MaterialAlertDialogBuilder(this)
-                .setTitle("CIMO")
-                .setMessage("确认将该图片加入购物车吗")
+                .setTitle("确认将该图片加入购物车吗")
+                .setMessage("购买者："+ userShopCar.getUserName()+"\n"
+                        +"图片尺寸："+ userShopCar.getSize()+"\n"
+                +"图片价格：¥ "+userShopCar.getPrice())
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -253,7 +293,11 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getApplication(), "加入购物车成功", Toast.LENGTH_SHORT).show();
+                        if ( UserDAO.getInstance(getApplicationContext()).addImageToShopCar(userShopCar) ){
+                            Toast.makeText(getApplication(), "加入购物车成功", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getApplication(), "加入购物车失败", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 })
                 .show();

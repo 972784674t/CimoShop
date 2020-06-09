@@ -184,6 +184,7 @@
         tools:text="选择尺寸" />
 
     <com.google.android.material.chip.ChipGroup
+        android:id="@+id/imageSizeChipGroup"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline21"
