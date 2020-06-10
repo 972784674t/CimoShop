@@ -164,13 +164,13 @@ public class UserDAO {
 
     /**
      * 删除购物车中的图片
-     * @param imageUrl 图片链接
-     * @param price 图片尺寸
+     * @param imageSize 图片尺寸
+     * @param price 图片价格
      * @return  是否成功
      */
-    public boolean delImageFromShopCar(String imageUrl,String price){
+    public boolean delImageFromShopCar(String imageSize,String price){
         boolean flag = false;
-        if ( db.delete(USER_FAVORITES, "shopCarItemUrl=? and price=?",new String[]{imageUrl,price}) > 0 ){
+        if ( db.delete(USER_SHOP_CAR, "imageSize=? and price=?",new String[]{imageSize,price}) > 0 ){
             flag = true ;
         }
         return flag;

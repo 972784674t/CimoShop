@@ -89,6 +89,7 @@ public class Login extends AppCompatActivity {
         logonWebProgress = findViewById(R.id.logonWebProgress);
         UITools.makeStatusBarTransparent(this);
         UITools.MIUISetStatusBarLightMode(this, true);
+
     }
 
     @Override

@@ -74,8 +74,7 @@ public class MyFavorites extends Fragment {
         Log.d(TAG, "initFavoriteRecyclerView: ");
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
         favoritesImageAdapter = new FavoritesImageAdapter();
-        View emptyView = initEmptyView();
-        favoritesImageAdapter.setEmptyView(emptyView);
+        favoritesImageAdapter.setEmptyView(initEmptyView());
         favoritesImageAdapter.setDiffCallback(new MyDiffCallback());
         favoritesImageAdapter.setDiffNewData(favoriteImgList);
         recyclerView.setAdapter(favoritesImageAdapter);

@@ -9,14 +9,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemChildClickListener;
 import com.chad.library.adapter.base.listener.OnItemDragListener;
@@ -79,7 +83,7 @@ public class ShopCatFragment extends Fragment {
         shopCarAdapter = new ShopCarAdapter();
         shopCarAdapter.setEmptyView(initEmptyView());
         shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
-        shopCarRecyclerView.setAdapter(shopCarAdapter);
+
 
         return root;
     }
@@ -92,12 +96,13 @@ public class ShopCatFragment extends Fragment {
         OnItemDragListener ItemDragListener = new OnItemDragListener() {
             @Override
             public void onItemDragStart(RecyclerView.ViewHolder viewHolder, int pos) {
-                Log.d(TAG, "drag start");
+                Log.d(TAG, "开始拖拽");
                 final BaseViewHolder holder = ((BaseViewHolder) viewHolder);
 
-                // 开始时，item背景色变化，demo这里使用了一个动画渐变，使得自然
+                // 开始拖砖时，item背景色变化，使得自然拖拽更自然
                 int startColor = Color.WHITE;
                 int endColor = Color.rgb(245, 245, 245);
+                //如果当前版本大于5.0则可以执行动画
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                     ValueAnimator v = ValueAnimator.ofArgb(startColor, endColor);
                     v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -106,6 +111,7 @@ public class ShopCatFragment extends Fragment {
                             holder.itemView.setBackgroundColor((int)animation.getAnimatedValue());
                         }
                     });
+                    //动画持续时间
                     v.setDuration(300);
                     v.start();
                 }
@@ -118,11 +124,12 @@ public class ShopCatFragment extends Fragment {
 
             @Override
             public void onItemDragEnd(RecyclerView.ViewHolder viewHolder, int pos) {
-                Log.d(TAG, "drag end");
+                Log.d(TAG, "结束拖拽");
                 final BaseViewHolder holder = ((BaseViewHolder) viewHolder);
-                // 结束时，item背景色变化，demo这里使用了一个动画渐变，使得自然
+                // 结束拖砖时，item背景色变化，demo这里使用了一个动画渐变，使得自然
                 int startColor = Color.rgb(245, 245, 245);
                 int endColor = Color.WHITE;
+                //如果当前版本大于5.0则可以执行动画
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                     ValueAnimator v = ValueAnimator.ofArgb(startColor, endColor);
                     v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -131,6 +138,7 @@ public class ShopCatFragment extends Fragment {
                             holder.itemView.setBackgroundColor((int)animation.getAnimatedValue());
                         }
                     });
+                    //动画持续时间
                     v.setDuration(300);
                     v.start();
                 }
@@ -141,22 +149,33 @@ public class ShopCatFragment extends Fragment {
         OnItemSwipeListener itemSwipeListener = new OnItemSwipeListener() {
             @Override
             public void onItemSwipeStart(RecyclerView.ViewHolder viewHolder, int pos) {
-
+                Log.d(TAG, "侧滑开始: " + pos);
+                BaseViewHolder holder = ((BaseViewHolder) viewHolder);
             }
 
             @Override
             public void clearView(RecyclerView.ViewHolder viewHolder, int pos) {
-
+                Log.d(TAG, "侧滑结束: " + pos);
             }
 
             @Override
             public void onItemSwiped(RecyclerView.ViewHolder viewHolder, int pos) {
-
+                Log.d(TAG, "删除视图: " + pos);
+                TextView price = viewHolder.itemView.findViewById(R.id.shopcaritemprice);
+                TextView size = viewHolder.itemView.findViewById(R.id.shopcaritemsize);
+                String imageSize = size.getText().toString();
+                String imagePrice = price.getText().toString();
+                if(UserDAO.getInstance(getContext()).delImageFromShopCar(imageSize,imagePrice)){
+                    Toast.makeText(getContext(),"删除图片id："+pos+" 成功",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(),"删除图片id："+pos+" 失败",Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             public void onItemSwipeMoving(Canvas canvas, RecyclerView.ViewHolder viewHolder, float dX, float dY, boolean isCurrentlyActive) {
-
+                Log.d(TAG, "侧滑中->   X:" + dX +"   Y:"+ dY);
+                canvas.drawColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
             }
         };
 
@@ -165,8 +184,10 @@ public class ShopCatFragment extends Fragment {
         shopCarAdapter.getDraggableModule().setOnItemDragListener(ItemDragListener);
         //允许侧滑
         shopCarAdapter.getDraggableModule().setSwipeEnabled(true);
+        //只允许从左侧滑动删除
+        shopCarAdapter.getDraggableModule().getItemTouchHelperCallback().setSwipeMoveFlags(ItemTouchHelper.START);
         shopCarAdapter.getDraggableModule().setOnItemSwipeListener(itemSwipeListener);
-
+        shopCarRecyclerView.setAdapter(shopCarAdapter);
 
 
     }

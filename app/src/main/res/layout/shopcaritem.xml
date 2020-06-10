@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="1dp"
+    android:layout_marginTop="0dp"
     android:layout_marginBottom="1dp"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
@@ -50,10 +50,10 @@
             android:text="TextView"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.07"
-            app:layout_constraintStart_toEndOf="@+id/shopCarItemShimmerLayout"
+            app:layout_constraintHorizontal_bias="0.01"
+            app:layout_constraintStart_toEndOf="@+id/textView15"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="78 ¥ " />
+            tools:text="78 " />
 
         <TextView
             android:id="@+id/shopcaritemsize"
@@ -63,7 +63,7 @@
             android:text="TextView"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/shopcaritemprice"
+            app:layout_constraintStart_toEndOf="@+id/textView16"
             tools:text="652x56" />
 
         <ImageView
@@ -83,11 +83,32 @@
             android:text="TextView"
             android:textSize="12sp"
             app:layout_constraintBottom_toTopOf="@+id/shopcaritemsize"
-            app:layout_constraintStart_toStartOf="@+id/shopcaritemprice"
+            app:layout_constraintStart_toStartOf="@+id/textView15"
             app:layout_constraintTop_toBottomOf="@+id/shopcaritemprice"
             tools:text="购买者：incmo" />
+
+        <TextView
+            android:id="@+id/textView15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="¥ "
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@+id/shopcaritemprice"
+            app:layout_constraintStart_toEndOf="@+id/shopCarItemShimmerLayout"
+            app:layout_constraintTop_toTopOf="@+id/shopcaritemprice" />
+
+        <TextView
+            android:id="@+id/textView16"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="尺寸："
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/shopcaritemsize"
+            app:layout_constraintStart_toStartOf="@+id/textView15"
+            app:layout_constraintTop_toTopOf="@+id/shopcaritemsize" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</com.google.android.material.card.MaterialCardView>
+</androidx.cardview.widget.CardView>

@@ -42,8 +42,8 @@ public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolde
         shopImageBuyer = baseViewHolder.getView(R.id.buyer);
         shimmerLayout = baseViewHolder.getView(R.id.shopCarItemShimmerLayout);
 
-        shopPrice.setText("¥ "+userShopCar.getPrice());
-        shopSize.setText("尺寸："+userShopCar.getSize());
+        shopPrice.setText(userShopCar.getPrice());
+        shopSize.setText(userShopCar.getSize());
         shopImageBuyer.setText("购买人ID："+userShopCar.getUserId());
 
         shimmerLayout.setShimmerColor(0X55FFFFFF);

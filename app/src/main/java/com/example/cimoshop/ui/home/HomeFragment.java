@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
@@ -15,6 +16,8 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.cimoshop.R;
+
+import com.example.cimoshop.utils.MyViewPager;
 import com.example.cimoshop.utils.UITools;
 import com.example.cimoshop.ui.goodsclass.gallery.Gallery;
 import com.example.cimoshop.ui.personalcenter.PersonalCenter;
@@ -32,7 +35,7 @@ public class HomeFragment extends Fragment {
 
     private static final String TAG = "HomeFragmentCIMO";
 
-    private ViewPager viewPager;
+    private MyViewPager viewPager;
     private BottomNavigationView bottomNavigationView;
 
     @Override
@@ -41,7 +44,7 @@ public class HomeFragment extends Fragment {
 
         HomeViewModel homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
-        viewPager = root.findViewById(R.id.viewpage);
+        viewPager =  root.findViewById(R.id.viewpage);
         bottomNavigationView = root.findViewById(R.id.bv);
 
         return root;

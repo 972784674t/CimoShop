@@ -264,6 +264,7 @@ public class Gallery extends Fragment {
         public boolean areContentsTheSame(@NonNull Pixabay.HitsBean oldItem, @NonNull Pixabay.HitsBean newItem) {
             return oldItem.equals(newItem) ;
         }
+
     }
 
     /**
