@@ -21,6 +21,8 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -284,7 +286,14 @@ public class PersonalCenter extends Fragment {
      */
     public void saveGithubUserInfoByToken(final Context context, final String token) {
 
-        Toast.makeText(context, "正在从Github获取用户信息，请稍等...", Toast.LENGTH_SHORT).show();
+        MaterialDialog materialDialog = new MaterialDialog.Builder(getContext())
+                //.title("登录github成功")
+                .content("正在从Github获取用户信息，请稍等...")
+                .theme(Theme.LIGHT)
+                .progress(true, 0)
+                .progressIndeterminateStyle(true)
+                .show();
+
         String baseUrl = "https://api.github.com/user";
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
@@ -293,6 +302,7 @@ public class PersonalCenter extends Fragment {
                     @Override
                     public void onResponse(String response) {
                         Log.d(TAG, "response" + response);
+                        materialDialog.dismiss();
 
                         Toast.makeText(context, "用户信息获取成功", Toast.LENGTH_SHORT).show();
                         logonbtn.setVisibility(View.GONE);
@@ -317,6 +327,8 @@ public class PersonalCenter extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        materialDialog.dismiss();
+
                         Toast.makeText(context, "Oops!服务器开了点小差，重新登录试试", Toast.LENGTH_SHORT).show();
                         if (token == null) {
                             Log.d(TAG, "error：" + error);

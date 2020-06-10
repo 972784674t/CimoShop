@@ -46,6 +46,7 @@ public class ShopCatFragment extends Fragment {
 
     private MaterialToolbar toolbar;
     private RecyclerView shopCarRecyclerView;
+    private ShopCarAdapter shopCarAdapter;
 
     /**
      * 数据源
@@ -56,7 +57,7 @@ public class ShopCatFragment extends Fragment {
      * 当前用户名
      */
     private static String USER_NAME = null;
-    private ShopCarAdapter shopCarAdapter;
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,

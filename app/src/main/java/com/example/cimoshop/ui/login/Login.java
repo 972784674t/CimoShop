@@ -22,6 +22,8 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -31,6 +33,8 @@ import com.example.cimoshop.api.VolleySingleton;
 import com.example.cimoshop.utils.UITools;
 import com.example.cimoshop.utils.SharedPrefsTools;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.dialog.MaterialDialogs;
 
 /**
  * @author 谭海山
@@ -199,7 +203,13 @@ public class Login extends AppCompatActivity {
      * 获取code后，从服务器inicmo.xyz获取github的token
      */
     void getGithubToken() {
-        Toast.makeText(getApplicationContext(), "登录github成功,正在获取授权", Toast.LENGTH_SHORT).show();
+        new MaterialDialog.Builder(this)
+                .title("登录github成功")
+                .content("正在获取授权...")
+                .theme(Theme.LIGHT)
+                .progress(true, 0)
+                .progressIndeterminateStyle(true)
+                .show();
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
                 githubCallbackUrl,
