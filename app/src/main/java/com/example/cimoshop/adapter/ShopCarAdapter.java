@@ -31,7 +31,11 @@ import io.supercharge.shimmerlayout.ShimmerLayout;
  */
 public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolder> implements DraggableModule, OnItemClickListener, OnItemChildClickListener {
 
-    public ShopCarAdapter() { super(R.layout.shopcaritem); }
+    public ShopCarAdapter() {
+        super(R.layout.shopcaritem);
+        //为复选框添加点击事件
+        addChildClickViewIds(R.id.shopCarItemcheckBox);
+    }
 
     @Override
     protected void convert(BaseViewHolder baseViewHolder, UserShopCar userShopCar) {
@@ -49,8 +53,6 @@ public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolde
         shopImageBuyer = baseViewHolder.getView(R.id.buyer);
         shimmerLayout = baseViewHolder.getView(R.id.shopCarItemShimmerLayout);
         shopCarItemCheckBox = baseViewHolder.getView(R.id.shopCarItemcheckBox);
-
-
 
         shopPrice.setText(userShopCar.getPrice());
         shopSize.setText(userShopCar.getSize());
@@ -79,9 +81,10 @@ public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolde
 
     }
 
+
     @Override
     public void onItemChildClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
-        //Toast.makeText(getContext(),"勾选了"+position,Toast.LENGTH_SHORT).show();
+
     }
 
     @Override

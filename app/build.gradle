@@ -64,7 +64,7 @@ dependencies {
     implementation 'com.github.chrisbanes.photoview:library:1.2.4'
 
     //BaseRecyclerViewAdapterHelper recycleView框架
-    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.2'
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4'
 
     //PictureSelector 图片选择器
     implementation 'com.github.LuckSiege.PictureSelector:picture_library:v2.5.6'

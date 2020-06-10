@@ -146,7 +146,7 @@ public class ShopCatFragment extends Fragment {
         shopCarAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
-                Toast.makeText(getContext(),"勾选了"+position,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(),"点击了"+position,Toast.LENGTH_SHORT).show();
             }
         });
 
