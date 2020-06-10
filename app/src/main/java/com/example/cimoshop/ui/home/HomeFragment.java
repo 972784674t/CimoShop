@@ -17,7 +17,10 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.cimoshop.R;
 
+import com.example.cimoshop.db.UserDAO;
+import com.example.cimoshop.entity.UserShopCar;
 import com.example.cimoshop.utils.MyViewPager;
+import com.example.cimoshop.utils.SharedPrefsTools;
 import com.example.cimoshop.utils.UITools;
 import com.example.cimoshop.ui.goodsclass.gallery.Gallery;
 import com.example.cimoshop.ui.personalcenter.PersonalCenter;
@@ -37,6 +40,16 @@ public class HomeFragment extends Fragment {
 
     private MyViewPager viewPager;
     private BottomNavigationView bottomNavigationView;
+
+    /**
+     * 购物车数据源
+     */
+    private static ArrayList<UserShopCar> SHOP_CAR_ITEM_LIST = null;
+
+    /**
+     * 当前用户名
+     */
+    private static String USER_NAME = null;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -64,9 +77,13 @@ public class HomeFragment extends Fragment {
         initViewPage();
         initBottomNav();
 
-        BadgeDrawable shopCat = bottomNavigationView.getOrCreateBadge(R.id.navigation_shopCat);
-        shopCat.setNumber(5);
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG,"onResume");
+        getShopCarNavBadge();
     }
 
     /**
@@ -139,6 +156,16 @@ public class HomeFragment extends Fragment {
                 return false;
             }
         });
+    }
+
+    /**
+     * 设置底部导航购物车商品数量标签
+     */
+    private void getShopCarNavBadge() {
+        USER_NAME = SharedPrefsTools.getInstance(getActivity().getApplication()).getUserInfo().getLogin();
+        SHOP_CAR_ITEM_LIST = UserDAO.getInstance(getContext()).getShopCarList(USER_NAME);
+        BadgeDrawable shopCat = bottomNavigationView.getOrCreateBadge(R.id.navigation_shopCat);
+        shopCat.setNumber(SHOP_CAR_ITEM_LIST.size());
     }
 
 }

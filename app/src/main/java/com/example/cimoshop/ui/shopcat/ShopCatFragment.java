@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemChildClickListener;
+import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.chad.library.adapter.base.listener.OnItemDragListener;
 import com.chad.library.adapter.base.listener.OnItemSwipeListener;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
@@ -33,8 +34,12 @@ import com.example.cimoshop.entity.UserShopCar;
 import com.example.cimoshop.utils.SharedPrefsTools;
 import com.example.cimoshop.utils.UITools;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
+
+import uk.co.senab.photoview.log.LoggerDefault;
 
 
 /**
@@ -42,7 +47,7 @@ import java.util.ArrayList;
  */
 public class ShopCatFragment extends Fragment {
 
-    private static final String TAG = "ShopCat";
+    private static final String TAG = "ShopCar";
 
     private MaterialToolbar toolbar;
     private RecyclerView shopCarRecyclerView;
@@ -58,10 +63,8 @@ public class ShopCatFragment extends Fragment {
      */
     private static String USER_NAME = null;
 
-
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_shopcat, container, false);
         initViewAndDataSource(root);
         return root;
@@ -73,20 +76,43 @@ public class ShopCatFragment extends Fragment {
         initShopCarRecycleView();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause: getShopCarList()");
+        getShopCarList();
+        shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: getShopCarList()");
+    }
+
     /**
      * 初始化视图控件和数据源
      * @param root
      */
     private void initViewAndDataSource(View root) {
         toolbar = root.findViewById(R.id.shopCatToobar);
+
         //状态栏文字透明
         UITools.makeStatusBarTransparent(getActivity());
         //修复标题栏与状态栏重叠
         UITools.fitTitleBar(getActivity(),toolbar);
-        //购物车数据初始化
+        getShopCarList();
+        toolbar.setTitle("购物车：( "+SHOP_CAR_ITEM_LIST.size()+" )");
+        shopCarRecyclerView = root.findViewById(R.id.shopCarRecyclerView);
+
+    }
+
+    /**
+     * 获取购物车数据
+     */
+    private void getShopCarList() {
         USER_NAME = SharedPrefsTools.getInstance(getActivity().getApplication()).getUserInfo().getLogin();
         SHOP_CAR_ITEM_LIST = UserDAO.getInstance(getContext()).getShopCarList(USER_NAME);
-        shopCarRecyclerView = root.findViewById(R.id.shopCarRecyclerView);
     }
 
     /**
@@ -105,10 +131,31 @@ public class ShopCatFragment extends Fragment {
         //允许侧滑
         shopCarAdapter.getDraggableModule().setSwipeEnabled(true);
 
+        //开启动画
+        shopCarAdapter.setAnimationEnable(true);
+        //动画只执行一次
+        shopCarAdapter.setAnimationFirstOnly(false);
+        //item从左边进入
+        shopCarAdapter.setAnimationWithDefault(BaseQuickAdapter.AnimationType.SlideInLeft);
+
         //只允许从左侧滑动删除
         shopCarAdapter.getDraggableModule().getItemTouchHelperCallback().setSwipeMoveFlags(ItemTouchHelper.START);
         shopCarAdapter.getDraggableModule().setOnItemSwipeListener(initOnItemSwipeListener());
         shopCarRecyclerView.setAdapter(shopCarAdapter);
+
+        shopCarAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
+                Toast.makeText(getContext(),"勾选了"+position,Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        shopCarAdapter.setOnItemChildClickListener(new OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
+                Toast.makeText(getContext(),"勾选了"+position,Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**

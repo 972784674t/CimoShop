@@ -21,9 +21,9 @@
             android:id="@+id/shopCarItemShimmerLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/shopCarItemcheckBox"
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
@@ -107,6 +107,15 @@
             app:layout_constraintBottom_toBottomOf="@+id/shopcaritemsize"
             app:layout_constraintStart_toStartOf="@+id/textView15"
             app:layout_constraintTop_toTopOf="@+id/shopcaritemsize" />
+
+        <CheckBox
+            android:id="@+id/shopCarItemcheckBox"
+            android:layout_width="32dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,9 +1,13 @@
 package com.example.cimoshop.adapter;
 
 import android.graphics.drawable.Drawable;
+import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
@@ -12,6 +16,8 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.listener.OnItemChildClickListener;
+import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.chad.library.adapter.base.module.DraggableModule;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.example.cimoshop.R;
@@ -23,7 +29,7 @@ import io.supercharge.shimmerlayout.ShimmerLayout;
  * @author 谭海山
  * 购物车recycleView适配器
  */
-public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolder> implements DraggableModule {
+public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolder> implements DraggableModule, OnItemClickListener, OnItemChildClickListener {
 
     public ShopCarAdapter() { super(R.layout.shopcaritem); }
 
@@ -35,12 +41,16 @@ public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolde
         TextView shopSize;
         TextView shopImageBuyer;
         ShimmerLayout shimmerLayout;
+        CheckBox shopCarItemCheckBox;
 
         shopImage = baseViewHolder.getView(R.id.shopcaritemimg);
         shopPrice = baseViewHolder.getView(R.id.shopcaritemprice);
         shopSize = baseViewHolder.getView(R.id.shopcaritemsize);
         shopImageBuyer = baseViewHolder.getView(R.id.buyer);
         shimmerLayout = baseViewHolder.getView(R.id.shopCarItemShimmerLayout);
+        shopCarItemCheckBox = baseViewHolder.getView(R.id.shopCarItemcheckBox);
+
+
 
         shopPrice.setText(userShopCar.getPrice());
         shopSize.setText(userShopCar.getSize());
@@ -66,6 +76,16 @@ public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolde
                     }
                 })
                 .into(shopImage);
+
+    }
+
+    @Override
+    public void onItemChildClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
+        //Toast.makeText(getContext(),"勾选了"+position,Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
 
     }
 }
