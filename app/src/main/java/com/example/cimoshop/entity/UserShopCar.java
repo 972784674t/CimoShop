@@ -2,6 +2,8 @@ package com.example.cimoshop.entity;
 
 import androidx.annotation.NonNull;
 
+import kotlin.TuplesKt;
+
 /**
  * @author 谭海山
  */
@@ -61,6 +63,7 @@ public class UserShopCar {
     public String toString() {
         return "UserShopCar{" +
                 "userId=" + userId +
+                ", userName='" + userName + '\'' +
                 ", shopCarItemUrl='" + shopCarItemUrl + '\'' +
                 ", size='" + size + '\'' +
                 ", price='" + price + '\'' +

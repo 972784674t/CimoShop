@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +40,9 @@ import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import uk.co.senab.photoview.log.LoggerDefault;
 
@@ -52,6 +57,7 @@ public class ShopCatFragment extends Fragment {
     private MaterialToolbar toolbar;
     private RecyclerView shopCarRecyclerView;
     private ShopCarAdapter shopCarAdapter;
+    private CheckBox selectAllShopCarItem;
 
     /**
      * 数据源
@@ -62,6 +68,11 @@ public class ShopCatFragment extends Fragment {
      * 当前用户名
      */
     private static String USER_NAME = null;
+
+    /**
+     * 关联 checkbox 和 item
+     */
+//    private static HashMap<Integer, Boolean> IS_ITEM_CHECKED_HASMAP;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -79,15 +90,16 @@ public class ShopCatFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        Log.d(TAG, "onPause: getShopCarList()");
-        getShopCarList();
-        shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
+        Log.d(TAG, "onPause");
     }
 
     @Override
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume: getShopCarList()");
+        getShopCarList();
+        Log.d(TAG, "onResume: DATASOUCE -> "+SHOP_CAR_ITEM_LIST.size());
+        shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
     }
 
     /**
@@ -96,7 +108,6 @@ public class ShopCatFragment extends Fragment {
      */
     private void initViewAndDataSource(View root) {
         toolbar = root.findViewById(R.id.shopCatToobar);
-
         //状态栏文字透明
         UITools.makeStatusBarTransparent(getActivity());
         //修复标题栏与状态栏重叠
@@ -104,6 +115,17 @@ public class ShopCatFragment extends Fragment {
         getShopCarList();
         toolbar.setTitle("购物车：( "+SHOP_CAR_ITEM_LIST.size()+" )");
         shopCarRecyclerView = root.findViewById(R.id.shopCarRecyclerView);
+
+//        IS_ITEM_CHECKED_HASMAP = new HashMap<>();
+
+        selectAllShopCarItem = root.findViewById(R.id.selectAllShopCarItem);
+        selectAllShopCarItem.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Toast.makeText(getContext(),""+isChecked,Toast.LENGTH_SHORT).show();
+
+            }
+        });
 
     }
 
@@ -154,8 +176,18 @@ public class ShopCatFragment extends Fragment {
             @Override
             public void onItemChildClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
                 Toast.makeText(getContext(),"勾选了"+position,Toast.LENGTH_SHORT).show();
+                CheckBox checkBox = view.findViewById(R.id.shopCarItemcheckBox);
+                Log.d(TAG, "onItemChildClick: "+checkBox.isChecked());
+                if ( checkBox.isChecked() ){
+                    shopCarAdapter.addToUserShopCartoShoppingBag(position,SHOP_CAR_ITEM_LIST.get(position));
+                } else {
+                    shopCarAdapter.delFromUserShopCartoShoppingBag(position);
+                }
+//                IS_ITEM_CHECKED_HASMAP.put(position,!IS_ITEM_CHECKED_HASMAP.get(position));
+//                Log.d(TAG, "onItemChildClick: "+position+" "+IS_ITEM_CHECKED_HASMAP.get(position));
             }
         });
+
     }
 
     /**
@@ -266,5 +298,20 @@ public class ShopCatFragment extends Fragment {
         emptyTextView.setText("Oops！购物车空空如野");
         return emptyView;
     }
+
+//    public void selectedAll() {
+//        Set<Map.Entry<Integer, Boolean>> entries = IS_ITEM_CHECKED_HASMAP.entrySet();
+//        boolean shouldSelectedAll = false;
+//        for (Map.Entry<Integer, Boolean> entryset : entries) {
+//            Boolean aBoolean = entryset.getValue();
+//            if (!aBoolean) {
+//                shouldSelectedAll = true;
+//                break;
+//            }
+//        }
+//        for (Map.Entry<Integer, Boolean> entryset : entries) {
+//            entryset.setValue(shouldSelectedAll);
+//        }
+//    }
 
 }
