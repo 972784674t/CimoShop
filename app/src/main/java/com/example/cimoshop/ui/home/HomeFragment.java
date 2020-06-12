@@ -50,6 +50,7 @@ public class HomeFragment extends Fragment {
      * 当前用户名
      */
     private static String USER_NAME = null;
+    private BadgeDrawable shopCat;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -81,8 +82,15 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG,"onResume");
+        Log.d(TAG,"onResume"+getId());
         getShopCarNavBadge();
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        shopCat.setNumber(0);
     }
 
     /**
@@ -163,7 +171,7 @@ public class HomeFragment extends Fragment {
     private void getShopCarNavBadge() {
         USER_NAME = SharedPrefsTools.getInstance(getActivity().getApplication()).getUserInfo().getLogin();
         SHOP_CAR_ITEM_LIST = UserDAO.getInstance(getContext()).getShopCarList(USER_NAME);
-        BadgeDrawable shopCat = bottomNavigationView.getOrCreateBadge(R.id.navigation_shopCat);
+        shopCat = bottomNavigationView.getOrCreateBadge(R.id.navigation_shopCat);
         shopCat.setNumber(SHOP_CAR_ITEM_LIST.size());
     }
 

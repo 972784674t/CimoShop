@@ -34,9 +34,12 @@ import com.example.cimoshop.R;
 import com.example.cimoshop.adapter.ShopCarAdapter;
 import com.example.cimoshop.db.UserDAO;
 import com.example.cimoshop.entity.UserShopCar;
+import com.example.cimoshop.ui.home.HomeFragment;
 import com.example.cimoshop.utils.SharedPrefsTools;
 import com.example.cimoshop.utils.UITools;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.dialog.MaterialDialogs;
@@ -58,6 +61,7 @@ public class ShopCatFragment extends Fragment {
     private TextView selectedImageNumber;
     private TextView tatolPrice;
     private MaterialButton SettlementButton;
+    private BottomNavigationView bottomNavigationView;
 
     /**
      * 数据源
@@ -255,6 +259,7 @@ public class ShopCatFragment extends Fragment {
                 String imagePrice = price.getText().toString();
                 if( UserDAO.getInstance(getContext()).delImageFromShopCar(imageSize,imagePrice) ){
                     Toast.makeText(getContext(),"删除图片id："+pos+" 成功",Toast.LENGTH_SHORT).show();
+                    updataBottomNavgationView();
                 } else {
                     Toast.makeText(getContext(),"删除图片id："+pos+" 失败",Toast.LENGTH_SHORT).show();
                 }
@@ -266,6 +271,17 @@ public class ShopCatFragment extends Fragment {
                 canvas.drawColor(ContextCompat.getColor(getContext(), R.color.warning));
             }
         };
+    }
+
+    /**
+     * 更新 底部导航栏 UI
+     */
+    private void updataBottomNavgationView() {
+        int t = SHOP_CAR_ITEM_LIST.size()-1;
+        toolbar.setTitle("购物车：( "+t+" )");
+        bottomNavigationView = (BottomNavigationView) getParentFragment().getView().findViewById(R.id.bv);
+        BadgeDrawable shopCat = bottomNavigationView.getOrCreateBadge(R.id.navigation_shopCat);
+        shopCat.setNumber(t);
     }
 
     /**
