@@ -9,6 +9,8 @@ import kotlin.TuplesKt;
  */
 public class UserShopCar {
 
+    private boolean isCheck = false;
+
     private int userId;
 
     private String userName;
@@ -18,6 +20,14 @@ public class UserShopCar {
     private String size;
 
     private String price;
+
+    public boolean isCheck() {
+        return isCheck;
+    }
+
+    public void setCheck(boolean check) {
+        isCheck = check;
+    }
 
     public int getUserId() {
         return userId;
@@ -62,7 +72,8 @@ public class UserShopCar {
     @Override
     public String toString() {
         return "UserShopCar{" +
-                "userId=" + userId +
+                "isCheck=" + isCheck +
+                ", userId=" + userId +
                 ", userName='" + userName + '\'' +
                 ", shopCarItemUrl='" + shopCarItemUrl + '\'' +
                 ", size='" + size + '\'' +

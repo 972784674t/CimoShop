@@ -6,4 +6,5 @@
     <color name="background">#FAFAFA</color>
     <color name="while_t">#FFFFFF</color>
     <color name="materialPry">#212121</color>
+    <color name="warning">#F44336</color>
 </resources>

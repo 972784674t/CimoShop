@@ -1,6 +1,7 @@
 package com.example.cimoshop.ui.shopcat;
 
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,6 +34,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.example.cimoshop.R;
 import com.example.cimoshop.adapter.ShopCarAdapter;
 import com.example.cimoshop.db.UserDAO;
+import com.example.cimoshop.entity.Pixabay;
 import com.example.cimoshop.entity.UserShopCar;
 import com.example.cimoshop.utils.SharedPrefsTools;
 import com.example.cimoshop.utils.UITools;
@@ -107,23 +110,27 @@ public class ShopCatFragment extends Fragment {
      * @param root
      */
     private void initViewAndDataSource(View root) {
+
         toolbar = root.findViewById(R.id.shopCatToobar);
         //状态栏文字透明
         UITools.makeStatusBarTransparent(getActivity());
+
         //修复标题栏与状态栏重叠
         UITools.fitTitleBar(getActivity(),toolbar);
         getShopCarList();
         toolbar.setTitle("购物车：( "+SHOP_CAR_ITEM_LIST.size()+" )");
         shopCarRecyclerView = root.findViewById(R.id.shopCarRecyclerView);
 
-//        IS_ITEM_CHECKED_HASMAP = new HashMap<>();
-
+        //全选操作
         selectAllShopCarItem = root.findViewById(R.id.selectAllShopCarItem);
         selectAllShopCarItem.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Toast.makeText(getContext(),""+isChecked,Toast.LENGTH_SHORT).show();
-
+                if (isChecked) {
+                    shopCarAdapter.selectAllItem();
+                } else {
+                    shopCarAdapter.unSelectAllItem();
+                }
             }
         });
 
@@ -143,6 +150,7 @@ public class ShopCatFragment extends Fragment {
     private void initShopCarRecycleView() {
         shopCarRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         shopCarAdapter = new ShopCarAdapter();
+        shopCarAdapter.setDiffCallback(new MyDiffCallback());
         shopCarAdapter.setEmptyView(initEmptyView());
         shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
 
@@ -168,23 +176,20 @@ public class ShopCatFragment extends Fragment {
         shopCarAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
-                Toast.makeText(getContext(),"点击了"+position,Toast.LENGTH_SHORT).show();
             }
         });
 
+        //ItemChild点击事件
         shopCarAdapter.setOnItemChildClickListener(new OnItemChildClickListener() {
             @Override
             public void onItemChildClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
-                Toast.makeText(getContext(),"勾选了"+position,Toast.LENGTH_SHORT).show();
                 CheckBox checkBox = view.findViewById(R.id.shopCarItemcheckBox);
-                Log.d(TAG, "onItemChildClick: "+checkBox.isChecked());
-                if ( checkBox.isChecked() ){
-                    shopCarAdapter.addToUserShopCartoShoppingBag(position,SHOP_CAR_ITEM_LIST.get(position));
+                if (checkBox.isChecked()){
+                    shopCarAdapter.selectItem(position);
                 } else {
-                    shopCarAdapter.delFromUserShopCartoShoppingBag(position);
+                    shopCarAdapter.unSelectIem(position);
+                    //selectAllShopCarItem.setChecked(false);
                 }
-//                IS_ITEM_CHECKED_HASMAP.put(position,!IS_ITEM_CHECKED_HASMAP.get(position));
-//                Log.d(TAG, "onItemChildClick: "+position+" "+IS_ITEM_CHECKED_HASMAP.get(position));
             }
         });
 
@@ -214,7 +219,7 @@ public class ShopCatFragment extends Fragment {
                 TextView size = viewHolder.itemView.findViewById(R.id.shopcaritemsize);
                 String imageSize = size.getText().toString();
                 String imagePrice = price.getText().toString();
-                if(UserDAO.getInstance(getContext()).delImageFromShopCar(imageSize,imagePrice)){
+                if( UserDAO.getInstance(getContext()).delImageFromShopCar(imageSize,imagePrice) ){
                     Toast.makeText(getContext(),"删除图片id："+pos+" 成功",Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getContext(),"删除图片id："+pos+" 失败",Toast.LENGTH_SHORT).show();
@@ -224,7 +229,7 @@ public class ShopCatFragment extends Fragment {
             @Override
             public void onItemSwipeMoving(Canvas canvas, RecyclerView.ViewHolder viewHolder, float dX, float dY, boolean isCurrentlyActive) {
                 Log.d(TAG, "侧滑中->   X:" + dX +"   Y:"+ dY);
-                canvas.drawColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                canvas.drawColor(ContextCompat.getColor(getContext(), R.color.warning));
             }
         };
     }
@@ -299,19 +304,22 @@ public class ShopCatFragment extends Fragment {
         return emptyView;
     }
 
-//    public void selectedAll() {
-//        Set<Map.Entry<Integer, Boolean>> entries = IS_ITEM_CHECKED_HASMAP.entrySet();
-//        boolean shouldSelectedAll = false;
-//        for (Map.Entry<Integer, Boolean> entryset : entries) {
-//            Boolean aBoolean = entryset.getValue();
-//            if (!aBoolean) {
-//                shouldSelectedAll = true;
-//                break;
-//            }
-//        }
-//        for (Map.Entry<Integer, Boolean> entryset : entries) {
-//            entryset.setValue(shouldSelectedAll);
-//        }
-//    }
+    /**
+     * 指定DiffUtil类，判断item是否相同
+     */
+    static class MyDiffCallback extends DiffUtil.ItemCallback<UserShopCar>{
+
+        @Override
+        public boolean areItemsTheSame(@NonNull UserShopCar oldItem, @NonNull UserShopCar newItem) {
+            return oldItem.getShopCarItemUrl() == newItem.getShopCarItemUrl();
+        }
+
+        @SuppressLint("DiffUtilEquals")
+        @Override
+        public boolean areContentsTheSame(@NonNull UserShopCar oldItem, @NonNull UserShopCar newItem) {
+            return oldItem.equals(newItem) ;
+        }
+
+    }
 
 }

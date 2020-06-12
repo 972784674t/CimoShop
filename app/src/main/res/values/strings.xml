@@ -4,7 +4,6 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-
     <!--  SQL语句  -->
 
     <!--  初始化userInfo表  -->
@@ -26,5 +25,7 @@
     <string name="initTable_userWareHouses">
         create table userWareHouses(id INTEGER,wareHouseItemUrl varchar(50))
     </string>
+
+    <string name="numberOfChoseItem">已选择%d张图片</string>
 
 </resources>

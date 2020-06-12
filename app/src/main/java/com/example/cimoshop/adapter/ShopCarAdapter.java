@@ -47,13 +47,9 @@ public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolde
     private static List<UserShopCar> SHOP_CAR_ITEM_LIST = new ArrayList<>();
 
     /**
-     * 购物袋
+     * 购物袋 HashMap
      */
-    private static HashMap<Integer,UserShopCar> SHOPPING_BAG = new HashMap<>();
-
-    public static HashMap<Integer, UserShopCar> getShoppingBag() {
-        return SHOPPING_BAG;
-    }
+    private static HashMap<Integer, UserShopCar> SHOPPING_BAG = new HashMap<>();
 
     public ShopCarAdapter() {
         super(R.layout.shopcaritem);
@@ -61,20 +57,64 @@ public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolde
         addChildClickViewIds(R.id.shopCarItemcheckBox);
     }
 
+    public static HashMap<Integer, UserShopCar> getShoppingBag() {
+        return SHOPPING_BAG;
+    }
+
     @Override
     public void setDiffNewData(@org.jetbrains.annotations.Nullable List<UserShopCar> list) {
         super.setDiffNewData(list);
         SHOP_CAR_ITEM_LIST = list;
+        //将checkBox和item关联
+        for (int i = 0; i < SHOP_CAR_ITEM_LIST.size(); i++){
+            SHOPPING_BAG.put(i,SHOP_CAR_ITEM_LIST.get(i));
+        }
     }
 
-    public void addToUserShopCartoShoppingBag(Integer position,UserShopCar checkedUserShopCarItem){
-        SHOPPING_BAG.put(position,checkedUserShopCarItem);
-        Log.d(TAG, "addToUserShopCartoShoppingBag: "+SHOPPING_BAG.size());
+    /**
+     * 勾选 item
+     * @param position
+     */
+    public void selectItem(Integer position){
+        SHOPPING_BAG.get(position).setCheck(true);
     }
 
-    public void delFromUserShopCartoShoppingBag(Integer position){
-        SHOPPING_BAG.remove(position);
-        Log.d(TAG, "delFromUserShopCartoShoppingBag: "+SHOPPING_BAG.size());
+    /**
+     * 取消勾选 item
+     * @param position
+     */
+    public void unSelectIem(Integer position){
+        SHOPPING_BAG.get(position).setCheck(false);
+    }
+
+    /**
+     * 勾选所有 item
+     */
+    public void selectAllItem(){
+        SHOP_CAR_ITEM_LIST.clear();
+        for (int i = 0; i < SHOPPING_BAG.size(); i++){
+            SHOPPING_BAG.get(i).setCheck(true);
+            SHOP_CAR_ITEM_LIST.add(SHOPPING_BAG.get(i));
+            setData(i,SHOP_CAR_ITEM_LIST.get(i));
+            notifyItemChanged(i);
+        }
+//        setNewData(SHOP_CAR_ITEM_LIST);
+//        notifyDataSetChanged();
+    }
+
+    /**
+     * 取消勾选所有 item
+     */
+    public void unSelectAllItem(){
+        SHOP_CAR_ITEM_LIST.clear();
+        for (int i = 0; i < SHOPPING_BAG.size(); i++){
+            SHOPPING_BAG.get(i).setCheck(false);
+            SHOP_CAR_ITEM_LIST.add(SHOPPING_BAG.get(i));
+            setData(i,SHOP_CAR_ITEM_LIST.get(i));
+            notifyItemChanged(i);
+        }
+//        setNewData(SHOP_CAR_ITEM_LIST);
+//        notifyDataSetChanged();
     }
 
     @Override
@@ -93,6 +133,8 @@ public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolde
         shopImageBuyer = baseViewHolder.getView(R.id.buyer);
         shimmerLayout = baseViewHolder.getView(R.id.shopCarItemShimmerLayout);
         shopCarItemCheckBox = baseViewHolder.getView(R.id.shopCarItemcheckBox);
+
+        shopCarItemCheckBox.setChecked(userShopCar.isCheck());
 
         shopPrice.setText(userShopCar.getPrice());
         shopSize.setText(userShopCar.getSize());
@@ -118,7 +160,6 @@ public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolde
                     }
                 })
                 .into(shopImage);
-
     }
 
 
