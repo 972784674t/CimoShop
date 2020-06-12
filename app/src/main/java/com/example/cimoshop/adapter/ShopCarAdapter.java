@@ -51,14 +51,14 @@ public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolde
      */
     private static HashMap<Integer, UserShopCar> SHOPPING_BAG = new HashMap<>();
 
+    private CheckBox selectAllCheckBox;
+    private TextView selectedImageNumber;
+    private TextView totalPrice;
+
     public ShopCarAdapter() {
         super(R.layout.shopcaritem);
-        //为复选框添加点击事件
+        //为复选框注册点击事件
         addChildClickViewIds(R.id.shopCarItemcheckBox);
-    }
-
-    public static HashMap<Integer, UserShopCar> getShoppingBag() {
-        return SHOPPING_BAG;
     }
 
     @Override
@@ -71,12 +71,30 @@ public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolde
         }
     }
 
+    public static HashMap<Integer, UserShopCar> getShoppingBag() {
+        return SHOPPING_BAG;
+    }
+
+    /**
+     * 关联适配器内容和结算 UI
+     * <br/>传入全选 checkBox，已选图片数量 textView，总价 textView 方便更新 UI
+     * @param selectAllCheckBox
+     * @param selectedImageNumber
+     * @param totalPrice
+     */
+    public void connectionAdapterAndSettlementUI(CheckBox selectAllCheckBox,TextView selectedImageNumber,TextView totalPrice){
+        this.selectAllCheckBox = selectAllCheckBox;
+        this.selectedImageNumber = selectedImageNumber;
+        this.totalPrice = totalPrice;
+    }
+
     /**
      * 勾选 item
      * @param position
      */
     public void selectItem(Integer position){
         SHOPPING_BAG.get(position).setCheck(true);
+        updataSettlementUI(position,1);
     }
 
     /**
@@ -85,6 +103,42 @@ public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolde
      */
     public void unSelectIem(Integer position){
         SHOPPING_BAG.get(position).setCheck(false);
+        updataSettlementUI(position,-1);
+    }
+
+    /**
+     * 选择或取消选择 item 时更新结算 UI
+     * @param position item位置
+     * @param Minus 减数 或 加数
+     */
+    private void updataSettlementUI(Integer position,int Minus) {
+        isCheckAll();
+        int totalPrice = Integer.parseInt(this.totalPrice.getText().toString());
+        if( Minus > 0 ){
+            totalPrice = totalPrice + Integer.parseInt(SHOPPING_BAG.get(position).getPrice());
+        } else {
+            totalPrice = totalPrice - Integer.parseInt(SHOPPING_BAG.get(position).getPrice());
+        }
+        this.totalPrice.setText(""+totalPrice);
+        int selectedImageNumber = Integer.parseInt(this.selectedImageNumber.getText().toString()) + Minus;
+        this.selectedImageNumber.setText(""+selectedImageNumber);
+    }
+
+    /**
+     * 更新全选UI：如果已经全选，则全选按钮打钩,如果不是全选则全选取消打钩
+     */
+    private void isCheckAll() {
+        int t = 0;
+        for (int i = 0;i < SHOPPING_BAG.size(); i++){
+            if (SHOPPING_BAG.get(i).isCheck()){
+                t++;
+            }
+        }
+        if (t == SHOPPING_BAG.size()){
+            this.selectAllCheckBox.setChecked(true);
+        } else {
+            this.selectAllCheckBox.setChecked(false);
+        }
     }
 
     /**
@@ -92,12 +146,17 @@ public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolde
      */
     public void selectAllItem(){
         SHOP_CAR_ITEM_LIST.clear();
+        int totalPrice = 0;
         for (int i = 0; i < SHOPPING_BAG.size(); i++){
             SHOPPING_BAG.get(i).setCheck(true);
             SHOP_CAR_ITEM_LIST.add(SHOPPING_BAG.get(i));
+            totalPrice += Integer.parseInt(SHOP_CAR_ITEM_LIST.get(i).getPrice());
             setData(i,SHOP_CAR_ITEM_LIST.get(i));
             notifyItemChanged(i);
         }
+        this.totalPrice.setText(""+totalPrice);
+        this.selectedImageNumber.setText(""+SHOP_CAR_ITEM_LIST.size());
+//        updateSettlementUI();
 //        setNewData(SHOP_CAR_ITEM_LIST);
 //        notifyDataSetChanged();
     }
@@ -113,6 +172,8 @@ public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolde
             setData(i,SHOP_CAR_ITEM_LIST.get(i));
             notifyItemChanged(i);
         }
+        this.totalPrice.setText(""+0);
+        this.selectedImageNumber.setText(""+0);
 //        setNewData(SHOP_CAR_ITEM_LIST);
 //        notifyDataSetChanged();
     }
@@ -161,7 +222,6 @@ public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolde
                 })
                 .into(shopImage);
     }
-
 
     @Override
     public void onItemChildClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {

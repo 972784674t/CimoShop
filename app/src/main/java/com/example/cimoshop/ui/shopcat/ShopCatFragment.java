@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +23,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemChildClickListener;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
@@ -34,20 +32,12 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.example.cimoshop.R;
 import com.example.cimoshop.adapter.ShopCarAdapter;
 import com.example.cimoshop.db.UserDAO;
-import com.example.cimoshop.entity.Pixabay;
 import com.example.cimoshop.entity.UserShopCar;
 import com.example.cimoshop.utils.SharedPrefsTools;
 import com.example.cimoshop.utils.UITools;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.badge.BadgeDrawable;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import uk.co.senab.photoview.log.LoggerDefault;
 
 
 /**
@@ -60,7 +50,9 @@ public class ShopCatFragment extends Fragment {
     private MaterialToolbar toolbar;
     private RecyclerView shopCarRecyclerView;
     private ShopCarAdapter shopCarAdapter;
-    private CheckBox selectAllShopCarItem;
+    private CheckBox selectAllShopCarItemCheakBox;
+    private TextView selectedImageNumber;
+    private TextView tatolPrice;
 
     /**
      * 数据源
@@ -103,6 +95,7 @@ public class ShopCatFragment extends Fragment {
         getShopCarList();
         Log.d(TAG, "onResume: DATASOUCE -> "+SHOP_CAR_ITEM_LIST.size());
         shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
+        toolbar.setTitle("购物车：( "+SHOP_CAR_ITEM_LIST.size()+" )");
     }
 
     /**
@@ -112,6 +105,11 @@ public class ShopCatFragment extends Fragment {
     private void initViewAndDataSource(View root) {
 
         toolbar = root.findViewById(R.id.shopCatToobar);
+        shopCarRecyclerView = root.findViewById(R.id.shopCarRecyclerView);
+        selectAllShopCarItemCheakBox = root.findViewById(R.id.selectAllShopCarItem);
+        selectedImageNumber = root.findViewById(R.id.selectedImageNumber);
+        tatolPrice = root.findViewById(R.id.totalPrice);
+
         //状态栏文字透明
         UITools.makeStatusBarTransparent(getActivity());
 
@@ -119,14 +117,12 @@ public class ShopCatFragment extends Fragment {
         UITools.fitTitleBar(getActivity(),toolbar);
         getShopCarList();
         toolbar.setTitle("购物车：( "+SHOP_CAR_ITEM_LIST.size()+" )");
-        shopCarRecyclerView = root.findViewById(R.id.shopCarRecyclerView);
 
         //全选操作
-        selectAllShopCarItem = root.findViewById(R.id.selectAllShopCarItem);
-        selectAllShopCarItem.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        selectAllShopCarItemCheakBox.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
+            public void onClick(View v) {
+                if ( selectAllShopCarItemCheakBox.isChecked() ){
                     shopCarAdapter.selectAllItem();
                 } else {
                     shopCarAdapter.unSelectAllItem();
@@ -148,11 +144,12 @@ public class ShopCatFragment extends Fragment {
      * 初始化购物车RecycleView以及拖拽效果和滑动删除效果事件处理
      */
     private void initShopCarRecycleView() {
+
+        //初始化适配器并设置数据源
         shopCarRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         shopCarAdapter = new ShopCarAdapter();
         shopCarAdapter.setDiffCallback(new MyDiffCallback());
         shopCarAdapter.setEmptyView(initEmptyView());
-        shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
 
         //允许拖拽并设置拖拽监听
         shopCarAdapter.getDraggableModule().setDragEnabled(true);
@@ -173,6 +170,11 @@ public class ShopCatFragment extends Fragment {
         shopCarAdapter.getDraggableModule().setOnItemSwipeListener(initOnItemSwipeListener());
         shopCarRecyclerView.setAdapter(shopCarAdapter);
 
+        shopCarAdapter.connectionAdapterAndSettlementUI(selectAllShopCarItemCheakBox,selectedImageNumber,tatolPrice);
+
+        //设置数据源
+        shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
+
         shopCarAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
@@ -188,7 +190,6 @@ public class ShopCatFragment extends Fragment {
                     shopCarAdapter.selectItem(position);
                 } else {
                     shopCarAdapter.unSelectIem(position);
-                    //selectAllShopCarItem.setChecked(false);
                 }
             }
         });
