@@ -50,7 +50,7 @@
             tools:text="总价：" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/materialButton"
+            android:id="@+id/SettlementButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
@@ -70,7 +70,7 @@
             android:textColor="@color/picture_color_e0ff6100"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="@+id/textView19"
-            app:layout_constraintEnd_toStartOf="@+id/materialButton"
+            app:layout_constraintEnd_toStartOf="@+id/SettlementButton"
             app:layout_constraintTop_toTopOf="@+id/textView19"
             tools:text="556" />
 

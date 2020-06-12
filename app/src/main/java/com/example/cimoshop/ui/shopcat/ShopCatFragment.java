@@ -2,6 +2,7 @@ package com.example.cimoshop.ui.shopcat;
 
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -36,6 +37,9 @@ import com.example.cimoshop.entity.UserShopCar;
 import com.example.cimoshop.utils.SharedPrefsTools;
 import com.example.cimoshop.utils.UITools;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.dialog.MaterialDialogs;
 
 import java.util.ArrayList;
 
@@ -53,6 +57,7 @@ public class ShopCatFragment extends Fragment {
     private CheckBox selectAllShopCarItemCheakBox;
     private TextView selectedImageNumber;
     private TextView tatolPrice;
+    private MaterialButton SettlementButton;
 
     /**
      * 数据源
@@ -67,7 +72,6 @@ public class ShopCatFragment extends Fragment {
     /**
      * 关联 checkbox 和 item
      */
-//    private static HashMap<Integer, Boolean> IS_ITEM_CHECKED_HASMAP;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -91,7 +95,6 @@ public class ShopCatFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume: getShopCarList()");
         getShopCarList();
         Log.d(TAG, "onResume: DATASOUCE -> "+SHOP_CAR_ITEM_LIST.size());
         shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
@@ -109,6 +112,7 @@ public class ShopCatFragment extends Fragment {
         selectAllShopCarItemCheakBox = root.findViewById(R.id.selectAllShopCarItem);
         selectedImageNumber = root.findViewById(R.id.selectedImageNumber);
         tatolPrice = root.findViewById(R.id.totalPrice);
+        SettlementButton = root.findViewById(R.id.SettlementButton);
 
         //状态栏文字透明
         UITools.makeStatusBarTransparent(getActivity());
@@ -126,6 +130,35 @@ public class ShopCatFragment extends Fragment {
                     shopCarAdapter.selectAllItem();
                 } else {
                     shopCarAdapter.unSelectAllItem();
+                }
+            }
+        });
+
+        //结算操作
+        SettlementButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String tp = tatolPrice.getText().toString();
+                String imageNumber = selectedImageNumber.getText().toString();
+                if(tp.equals("0")){
+                    Toast.makeText(getContext(),"请先选择要结算的图片哦",Toast.LENGTH_SHORT).show();
+                } else {
+                    new MaterialAlertDialogBuilder(getContext())
+                            .setTitle("请确认结算信息")
+                            .setMessage("当前选择："+imageNumber+" 张图片\n"+"总价："+tp+" 元")
+                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            })
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            })
+                            .show();
                 }
             }
         });
