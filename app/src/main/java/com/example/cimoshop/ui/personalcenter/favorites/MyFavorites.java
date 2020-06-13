@@ -25,6 +25,7 @@ import com.example.cimoshop.R;
 import com.example.cimoshop.adapter.FavoritesImageAdapter;
 import com.example.cimoshop.db.UserDAO;
 import com.example.cimoshop.entity.Pixabay;
+import com.example.cimoshop.utils.SharedPrefsTools;
 
 import java.util.ArrayList;
 
@@ -35,7 +36,15 @@ public class MyFavorites extends Fragment {
 
     private static final String TAG = "cimoshopMyFavorites";
 
+    /**
+     * 数据源
+     */
     private ArrayList<String> favoriteImgList;
+
+    /**
+     * 如果 token 不为空,则用户已经登录
+     */
+    private String isToken;
 
     private RecyclerView recyclerView;
     private FavoritesImageAdapter favoritesImageAdapter;
@@ -48,22 +57,35 @@ public class MyFavorites extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.my_favorites_fragment, container, false);
         recyclerView = root.findViewById(R.id.favoriteimgrecycleview);
-        favoriteImgList = UserDAO.getInstance(getContext()).getUserFavoriteImageList(UserDAO.getInstance(getContext()).findUserByUserName("972784674t").getUserId());
+        isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
+        Log.d(TAG, "onCreateView: "+isToken);
+        if (!"null".equals(isToken)) {
+            favoriteImgList = UserDAO.getInstance(getContext()).getUserFavoriteImageList(UserDAO.getInstance(getContext()).findUserByUserName("972784674t").getUserId());
+        } else {
+            favoriteImgList = null;
+        }
         return root;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        favoriteImgList = UserDAO.getInstance(getContext()).getUserFavoriteImageList(UserDAO.getInstance(getContext()).findUserByUserName("972784674t").getUserId());
+        if (!"null".equals(isToken)) {
+            favoriteImgList = UserDAO.getInstance(getContext()).getUserFavoriteImageList(UserDAO.getInstance(getContext()).findUserByUserName("972784674t").getUserId());
+        }
         favoritesImageAdapter.setDiffNewData(favoriteImgList);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Log.d(TAG,"onActivityCreated");
         Log.d(TAG,"我的收藏list："+favoriteImgList);
-        initFavoriteRecyclerView(favoriteImgList);
+        if (!isToken.equals("null")){
+            initFavoriteRecyclerView(favoriteImgList);
+        } else {
+            initFavoriteRecyclerView(null);
+        }
     }
 
     /**
@@ -87,7 +109,11 @@ public class MyFavorites extends Fragment {
     private View initEmptyView() {
         View emptyView = getLayoutInflater().inflate(R.layout.emptyview, null);
         TextView emptyTextView = emptyView.findViewById(R.id.emptytextView);
-        emptyTextView.setText("您还没有收藏任何图片哦");
+        if ("null".equals(isToken)) {
+            emptyTextView.setText("您还没有登录哦");
+        } else {
+            emptyTextView.setText("您还没有收藏任何图片哦");
+        }
         return emptyView;
     }
 

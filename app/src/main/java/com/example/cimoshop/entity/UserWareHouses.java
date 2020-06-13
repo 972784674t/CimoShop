@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 /**
  * @author 谭海山
  */
-class UserWareHouses {
+public class UserWareHouses {
 
     private int userId;
 

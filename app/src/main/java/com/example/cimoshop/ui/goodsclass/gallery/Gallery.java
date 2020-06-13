@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.TranslateAnimation;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,6 +40,7 @@ import com.example.cimoshop.R;
 import com.example.cimoshop.adapter.GalleryAdapter_BRVAH;
 import com.example.cimoshop.api.VolleySingleton;
 import com.example.cimoshop.entity.Pixabay;
+import com.example.cimoshop.utils.SharedPrefsTools;
 import com.example.cimoshop.utils.UITools;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -63,6 +65,11 @@ public class Gallery extends Fragment {
     private GalleryAdapter_BRVAH galleryAdapter;
     private FloatingActionButton toTheTopBtn;
 
+    /**
+     * 如果 token 不为空,则用户已经登录
+     */
+    private String isToken;
+
     //加载更多事件处理类
     private BaseLoadMoreModule loadMore;
 
@@ -85,6 +92,7 @@ public class Gallery extends Fragment {
     }
 
     private void initView(View root){
+        isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
         swipeRefreshLayout = root.findViewById(R.id.swipeGallery);
         recyclerViewGallery = root.findViewById(R.id.recyclerview_gallery);
         toolbar = root.findViewById(R.id.GalleryToolbar);
@@ -143,6 +151,8 @@ public class Gallery extends Fragment {
         galleryAdapter.setAnimationEnable(true);
         //动画只执行一次
         galleryAdapter.setAnimationFirstOnly(false);
+
+        galleryAdapter.setEmptyView(initEmptyView());
 
         //加载更多对象，来自于BRVAH
         loadMore = galleryAdapter.getLoadMoreModule();
@@ -209,6 +219,17 @@ public class Gallery extends Fragment {
             }
         });
 
+    }
+
+    /**
+     * 初始化空列表视图
+     * @return 空列表视图 view
+     */
+    private View initEmptyView() {
+        View emptyView = getLayoutInflater().inflate(R.layout.emptyview, null);
+        TextView emptyTextView = emptyView.findViewById(R.id.emptytextView);
+        emptyTextView.setText("正在初始化资源哦...");
+        return emptyView;
     }
 
     /**

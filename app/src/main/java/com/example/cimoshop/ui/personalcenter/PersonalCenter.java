@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -34,6 +35,7 @@ import com.example.cimoshop.account.GithubAccount;
 import com.example.cimoshop.api.VolleySingleton;
 import com.example.cimoshop.db.UserDAO;
 import com.example.cimoshop.entity.User;
+import com.example.cimoshop.utils.FakeX509TrustManager;
 import com.example.cimoshop.utils.UITools;
 import com.example.cimoshop.ui.login.Login;
 import com.example.cimoshop.ui.personalcenter.favorites.MyFavorites;
@@ -61,7 +63,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class PersonalCenter extends Fragment {
 
     private static final String TAG = "cimoPersonalcenter";
+    final ArrayList<Fragment> fragmentList = new ArrayList<>();
     private static final String[] TAB_LABEL = {"我的作品", "我的喜欢", "已经购买"};
+
     //token是否存在
     private String isToken;
     private MaterialButton logonbtn;
@@ -92,6 +96,9 @@ public class PersonalCenter extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         PersonalCenterViewModel mViewModel = ViewModelProviders.of(this).get(PersonalCenterViewModel.class);
+        fragmentList.add(MyWorks.newInstance());
+        fragmentList.add(MyFavorites.newInstance());
+        fragmentList.add(MyWareHouse.newInstance());
         initViewpage2();
     }
 
@@ -121,11 +128,8 @@ public class PersonalCenter extends Fragment {
         Log.d(TAG, "isToken：" + isToken);
         initUserAccountUI();
         if (!isToken.equals("null")) {
-
-            toolbar.inflateMenu(R.menu.personalcentermenu);
             logonbtn.setVisibility(View.GONE);
         }
-
 
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
@@ -165,9 +169,11 @@ public class PersonalCenter extends Fragment {
                         SharedPrefsTools.getInstance(getActivity().getApplication()).logout();
                         Toast.makeText(getContext(), "退出登录", Toast.LENGTH_LONG).show();
                         pcuserSourceText.setText("又是愉快的一天");
+                        toolbar.getMenu().clear();
                         initUserAccountUI();
                         pcuseravatar.setImageResource(R.drawable.empty_icon);
                         logonbtn.setVisibility(View.VISIBLE);
+                        initViewpage2();
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -176,18 +182,12 @@ public class PersonalCenter extends Fragment {
 
                     }
                 }).show();
-
     }
 
     /**
      * viewpage2初始化
      */
     private void initViewpage2() {
-
-        final ArrayList<Fragment> fragmentList = new ArrayList<>();
-        fragmentList.add(MyWorks.newInstance());
-        fragmentList.add(MyFavorites.newInstance());
-        fragmentList.add(MyWareHouse.newInstance());
 
         viewPager2.setAdapter(new FragmentStateAdapter(getParentFragmentManager(), getLifecycle()) {
             @NonNull
@@ -281,7 +281,6 @@ public class PersonalCenter extends Fragment {
 
     /**
      * 将token加入请求头Authorization中，获取github用户信息，并保存到本地shp文件和数据库中
-     *
      * @param context context
      */
     public void saveGithubUserInfoByToken(final Context context, final String token) {
@@ -295,6 +294,7 @@ public class PersonalCenter extends Fragment {
                 .show();
 
         String baseUrl = "https://api.github.com/user";
+        FakeX509TrustManager.allowAllSSL();
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
                 baseUrl,
@@ -313,7 +313,7 @@ public class PersonalCenter extends Fragment {
                         Log.d(TAG, "用户信息(githubAccount)：" + githubAccount);
                         SharedPrefsTools.getInstance(getActivity().getApplication()).saveUserInfo(githubAccount);
                         initUserAccountUI();
-
+                        initViewpage2();
                         //将用户信息保存到数据库
                         User user = new User();
                         user.setUserName(githubAccount.getLogin());
@@ -328,13 +328,11 @@ public class PersonalCenter extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         materialDialog.dismiss();
-
+                        toolbar.getMenu().clear();
                         Toast.makeText(context, "Oops!服务器开了点小差，重新登录试试", Toast.LENGTH_SHORT).show();
-                        if (token == null) {
-                            Log.d(TAG, "error：" + error);
-                            Toast.makeText(context, "github授权失败", Toast.LENGTH_SHORT).show();
-                            VolleySingleton.errorMessage(error, context);
-                        }
+                        SharedPrefsTools.getInstance(getActivity().getApplication()).logout();
+                        Log.d(TAG, "error：" + error);
+                        VolleySingleton.errorMessage(error, context);
                     }
                 }) {
             @Override
@@ -345,6 +343,7 @@ public class PersonalCenter extends Fragment {
                 return headers;
             }
         };
+        //设置请求超时时间2秒
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(
                 2000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,

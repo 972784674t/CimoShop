@@ -6,19 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".ui.personalcenter.myworks.MyWorks">
 
-    <ImageView
-        android:id="@+id/imageView8"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/empty_icon"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/myWorksRecycerView"
-        app:layout_constraintVertical_bias="0.41000003" />
-
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/myWorksRecycerView"
+        android:id="@+id/myWorksRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -27,16 +16,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
-
-    <TextView
-        android:id="@+id/emptyViewtext"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="您还没有上传任何作品哦"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView8"
-        app:layout_constraintVertical_bias="0.050000012" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
