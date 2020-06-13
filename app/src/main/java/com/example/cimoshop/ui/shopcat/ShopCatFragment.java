@@ -3,6 +3,7 @@ package com.example.cimoshop.ui.shopcat;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import com.chad.library.adapter.base.listener.OnItemSwipeListener;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.example.cimoshop.R;
 import com.example.cimoshop.adapter.ShopCarAdapter;
+import com.example.cimoshop.alipay.AlipayOfSandbox;
 import com.example.cimoshop.db.UserDAO;
 import com.example.cimoshop.entity.UserShopCar;
 import com.example.cimoshop.ui.home.HomeFragment;
@@ -159,7 +161,8 @@ public class ShopCatFragment extends Fragment {
                             .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-
+                                    Intent intent = new Intent(getContext(),AlipayOfSandbox.class);
+                                    startActivity(intent);
                                 }
                             })
                             .show();

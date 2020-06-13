@@ -84,4 +84,7 @@ dependencies {
     //图片加载库 Glide
     implementation 'jp.wasabeef:glide-transformations:2.0.0'
 
+    //支付宝支付
+    implementation files('libs/alipaySdk-15.7.6-20200521195109.aar')
+
 }

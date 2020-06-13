@@ -66,7 +66,9 @@ public class PersonalCenter extends Fragment {
     final ArrayList<Fragment> fragmentList = new ArrayList<>();
     private static final String[] TAB_LABEL = {"我的作品", "我的喜欢", "已经购买"};
 
-    //token是否存在
+    /**
+     * token存在则说明已经登录
+     */
     private String isToken;
     private MaterialButton logonbtn;
     private MaterialToolbar toolbar;
@@ -84,8 +86,7 @@ public class PersonalCenter extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = LayoutInflater.from(getContext()).inflate(R.layout.personal_center_fragment, container, false);
         initView(root);
 
@@ -100,6 +101,25 @@ public class PersonalCenter extends Fragment {
         fragmentList.add(MyFavorites.newInstance());
         fragmentList.add(MyWareHouse.newInstance());
         initViewpage2();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (resultCode) {
+            case 1:
+                Toast.makeText(getContext(), "取消登录", Toast.LENGTH_SHORT).show();
+                break;
+            case 2:
+                String token = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
+                Log.d(TAG, "PersonalCenter token -> " + token);
+                //登录成功后执行保存token操作
+                saveGithubUserInfoByToken(getContext(), token);
+                break;
+            default:
+                break;
+        }
     }
 
     /**
@@ -208,26 +228,6 @@ public class PersonalCenter extends Fragment {
                 tab.setText(TAB_LABEL[position]);
             }
         }).attach();
-    }
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch (resultCode) {
-            case 1:
-                Toast.makeText(getContext(), "取消登录", Toast.LENGTH_SHORT).show();
-                break;
-            case 2:
-                String token = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
-                Log.d(TAG, "PersonalCenter token -> " + token);
-                //登录成功后执行保存token操作
-                saveGithubUserInfoByToken(getContext(), token);
-                break;
-            default:
-                break;
-        }
     }
 
     /**

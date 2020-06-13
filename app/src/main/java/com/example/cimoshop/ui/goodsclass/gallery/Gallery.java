@@ -83,44 +83,11 @@ public class Gallery extends Fragment {
     private int perPage = 50;
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG,"onCreateView");
         View root = inflater.inflate(R.layout.gallery_fragment, container, false);
         initView(root);
         return root;
-    }
-
-    private void initView(View root){
-        isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
-        swipeRefreshLayout = root.findViewById(R.id.swipeGallery);
-        recyclerViewGallery = root.findViewById(R.id.recyclerview_gallery);
-        toolbar = root.findViewById(R.id.GalleryToolbar);
-        appBarLayout = root.findViewById(R.id.appBarLayout);
-        toTheTopBtn = root.findViewById(R.id.ToTheTopBtn);
-        toTheTopBtn.setVisibility(View.GONE);
-
-        //点击返回顶部按钮时滑动到顶部
-        toTheTopBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                recyclerViewGallery.scrollToPosition(0);
-            }
-        });
-
-        //监听appBarLayout是否在顶部，如果在，则swipeRefreshLayout可用
-        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                if (verticalOffset >= 0) {
-                    swipeRefreshLayout.setEnabled(true);
-                } else {
-                    swipeRefreshLayout.setRefreshing(false);
-                    swipeRefreshLayout.setEnabled(false);
-                }
-            }
-        });
-
     }
 
     @Override
@@ -133,13 +100,6 @@ public class Gallery extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG,"onActivityCreated");
-
-        //状态栏文字透明
-        UITools.makeStatusBarTransparent(getActivity());
-
-        //修复标题栏与状态栏重叠
-        UITools.fitTitleBar(getActivity(),toolbar);
-        UITools.setMIUI(getActivity(),true);
 
         //viewModel初始化
         mViewModel = new ViewModelProvider(this,new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())).get(GalleryViewModel.class);
@@ -216,6 +176,49 @@ public class Gallery extends Fragment {
             @Override
             public void onLoadMore() {
                 loadMoreGallery();
+            }
+        });
+
+    }
+
+    /**
+     * 控件初始化
+     * @param root
+     */
+    private void initView(View root){
+        isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
+        swipeRefreshLayout = root.findViewById(R.id.swipeGallery);
+        recyclerViewGallery = root.findViewById(R.id.recyclerview_gallery);
+        toolbar = root.findViewById(R.id.GalleryToolbar);
+        appBarLayout = root.findViewById(R.id.appBarLayout);
+        toTheTopBtn = root.findViewById(R.id.ToTheTopBtn);
+        toTheTopBtn.setVisibility(View.GONE);
+
+        //状态栏文字透明
+        UITools.makeStatusBarTransparent(getActivity());
+
+        //修复标题栏与状态栏重叠
+        UITools.fitTitleBar(getActivity(),toolbar);
+        UITools.setMIUI(getActivity(),true);
+
+        //点击返回顶部按钮时滑动到顶部
+        toTheTopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recyclerViewGallery.scrollToPosition(0);
+            }
+        });
+
+        //监听appBarLayout是否在顶部，如果在，则swipeRefreshLayout可用
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (verticalOffset >= 0) {
+                    swipeRefreshLayout.setEnabled(true);
+                } else {
+                    swipeRefreshLayout.setRefreshing(false);
+                    swipeRefreshLayout.setEnabled(false);
+                }
             }
         });
 
