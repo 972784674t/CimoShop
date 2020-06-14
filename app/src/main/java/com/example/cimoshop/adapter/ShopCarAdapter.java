@@ -1,6 +1,8 @@
 package com.example.cimoshop.adapter;
 
 import android.graphics.drawable.Drawable;
+import android.net.VpnService;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -179,7 +181,7 @@ public class ShopCarAdapter extends BaseQuickAdapter<UserShopCar, BaseViewHolder
     }
 
     /**
-     * 更新全选UI：如果已经全选，则全选按钮打钩,如果不是全选则全选取消打钩
+     * 更新全选 UI：如果已经全选，则全选按钮打钩,如果不是全选则全选取消打钩
      */
     private void isCheckAll() {
         int t = 0;
@@ -201,6 +203,7 @@ public class ShopCarAdapter extends BaseQuickAdapter<UserShopCar, BaseViewHolder
     public void selectAllItem() {
         SHOP_CAR_ITEM_LIST.clear();
         int totalPrice = 0;
+        Log.d(TAG, "selectAllItem: "+SHOPPING_BAG.toString());
         for (int i = 0; i < SHOPPING_BAG.size(); i++) {
             SHOPPING_BAG.get(i).setCheck(true);
             SHOP_CAR_ITEM_LIST.add(SHOPPING_BAG.get(i));
@@ -227,6 +230,31 @@ public class ShopCarAdapter extends BaseQuickAdapter<UserShopCar, BaseViewHolder
         this.selectedImageNumber.setText("" + 0);
     }
 
+    /**
+     * 将 item 从购物袋移除
+     * @param position
+     */
+    public void delItemFormShopBag(int position){
+        SHOPPING_BAG.remove(position);
+    }
 
+    /**
+     * 完成支付
+     */
+    public void finishPay(){
+        totalPrice.setText(""+0);
+        selectedImageNumber.setText(""+0);
+        selectAllCheckBox.setChecked(false);
+        SHOPPING_BAG.clear();
+    }
+
+    /**
+     * 取消支付
+     */
+    public void cancelPay(){
+        totalPrice.setText(""+0);
+        selectedImageNumber.setText(""+0);
+        selectAllCheckBox.setChecked(false);
+    }
 
 }

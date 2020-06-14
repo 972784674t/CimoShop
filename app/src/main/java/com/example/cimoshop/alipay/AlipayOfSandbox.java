@@ -82,6 +82,7 @@ public class AlipayOfSandbox extends AppCompatActivity {
     private static String IMAGE_NUMBER = null;
 
     private static final int RESULT_CODE_ALIPAY = 10086;
+    private static final int CANCEL_CODE_ALIPAY = 10001;
 
     private MaterialToolbar toolbar;
     private TextView payTotalPrice;
@@ -157,6 +158,13 @@ public class AlipayOfSandbox extends AppCompatActivity {
         //修复标题栏与状态栏重叠
         UITools.fitTitleBar(this, toolbar);
 
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
         TOTAL_PRICE = getIntent().getExtras().getString("totalPrice");
         IMAGE_NUMBER = getIntent().getExtras().getString("imageNumber");
 
@@ -203,6 +211,17 @@ public class AlipayOfSandbox extends AppCompatActivity {
         // 必须异步调用
         Thread payThread = new Thread(payRunnable);
         payThread.start();
+    }
+
+    @Override
+    public void onBackPressed() {
+        //数据是使用Intent返回
+        Intent intent = new Intent();
+        //把返回数据存入Intent
+        intent.putExtra("info", "null");
+        //设置返回数据
+        setResult(CANCEL_CODE_ALIPAY, intent);
+        finish();
     }
 
 }

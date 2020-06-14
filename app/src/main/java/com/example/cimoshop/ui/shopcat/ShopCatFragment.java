@@ -58,6 +58,8 @@ public class ShopCatFragment extends Fragment {
     private static final String TAG = "ShopCar";
 
     private static final int RESULT_CODE_ALIPAY = 10086;
+    private static final int CANCEL_CODE_ALIPAY = 10001;
+
 
     private MaterialToolbar toolbar;
     private RecyclerView shopCarRecyclerView;
@@ -108,9 +110,11 @@ public class ShopCatFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume");
         isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
         if ( !isToken.equals("null") ){
             getShopCarList();
+            ShopCarAdapter.SHOPPING_BAG.clear();
             shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
             toolbar.setTitle("购物车：( "+SHOP_CAR_ITEM_LIST.size()+" )");
         } else {
@@ -145,6 +149,12 @@ public class ShopCatFragment extends Fragment {
                 } else {
                     Toast.makeText(getContext(),"Oop,系统出了点问题，请联系管理员",Toast.LENGTH_SHORT).show();
                 }
+                Log.d(TAG, "shopCarAdapter.finishPay()");
+                shopCarAdapter.finishPay();
+                break;
+            case CANCEL_CODE_ALIPAY:
+                Toast.makeText(getContext(),"取消支付",Toast.LENGTH_SHORT).show();
+                shopCarAdapter.cancelPay();
                 break;
         }
     }
@@ -317,6 +327,7 @@ public class ShopCatFragment extends Fragment {
             @Override
             public void clearView(RecyclerView.ViewHolder viewHolder, int pos) {
                 Log.d(TAG, "侧滑结束: " + pos);
+                return;
             }
 
             @Override
@@ -328,6 +339,7 @@ public class ShopCatFragment extends Fragment {
                 String imagePrice = price.getText().toString();
                 if( UserDAO.getInstance(getContext()).delImageFromShopCar(imageSize,imagePrice) ){
                     Toast.makeText(getContext(),"删除图片id："+pos+" 成功",Toast.LENGTH_SHORT).show();
+                    shopCarAdapter.delItemFormShopBag(pos);
                     updataBottomNavgationView();
                 } else {
                     Toast.makeText(getContext(),"删除图片id："+pos+" 失败",Toast.LENGTH_SHORT).show();
@@ -405,7 +417,7 @@ public class ShopCatFragment extends Fragment {
      * 更新底部导航栏 UI
      */
     private void updataBottomNavgationView() {
-        int t = SHOP_CAR_ITEM_LIST.size()-1;
+        int t = SHOP_CAR_ITEM_LIST.size();
         toolbar.setTitle("购物车：( "+t+" )");
         bottomNavigationView = (BottomNavigationView) getParentFragment().getView().findViewById(R.id.bv);
         BadgeDrawable shopCat = bottomNavigationView.getOrCreateBadge(R.id.navigation_shopCat);
