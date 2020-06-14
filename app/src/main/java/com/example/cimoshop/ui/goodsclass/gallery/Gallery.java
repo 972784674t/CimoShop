@@ -12,9 +12,11 @@ import android.view.animation.Animation;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
@@ -61,6 +63,7 @@ public class Gallery extends Fragment {
     private RecyclerView recyclerViewGallery;
     private SwipeRefreshLayout swipeRefreshLayout;
     private MaterialToolbar toolbar;
+    private SearchView searchView;
     private AppBarLayout appBarLayout;
     private GalleryAdapter_BRVAH galleryAdapter;
     private FloatingActionButton toTheTopBtn;
@@ -190,6 +193,7 @@ public class Gallery extends Fragment {
         swipeRefreshLayout = root.findViewById(R.id.swipeGallery);
         recyclerViewGallery = root.findViewById(R.id.recyclerview_gallery);
         toolbar = root.findViewById(R.id.GalleryToolbar);
+        searchView = root.findViewById(R.id.search);
         appBarLayout = root.findViewById(R.id.appBarLayout);
         toTheTopBtn = root.findViewById(R.id.ToTheTopBtn);
         toTheTopBtn.setVisibility(View.GONE);
@@ -200,6 +204,20 @@ public class Gallery extends Fragment {
         //修复标题栏与状态栏重叠
         UITools.fitTitleBar(getActivity(),toolbar);
         UITools.setMIUI(getActivity(),true);
+
+        //搜索操作
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Toast.makeText(getContext(),"搜索"+query,Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
 
         //点击返回顶部按钮时滑动到顶部
         toTheTopBtn.setOnClickListener(new View.OnClickListener() {

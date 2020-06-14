@@ -30,7 +30,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 
-
 /**
  * @author 谭海山
  */
@@ -84,13 +83,11 @@ public class HomeFragment extends Fragment {
         super.onResume();
         Log.d(TAG,"onResume"+getId());
         getShopCarNavBadge();
-
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        shopCat.setNumber(0);
     }
 
     /**
@@ -153,6 +150,8 @@ public class HomeFragment extends Fragment {
                         break;
                     case R.id.navigation_shopCat:
                         viewPager.setCurrentItem(1);
+                        shopCat = bottomNavigationView.getOrCreateBadge(R.id.navigation_shopCat);
+                        shopCat.setVisible(false);
                         break;
                     case R.id.navigation_personalCenter:
                         viewPager.setCurrentItem(2);
@@ -172,6 +171,7 @@ public class HomeFragment extends Fragment {
         USER_NAME = SharedPrefsTools.getInstance(getActivity().getApplication()).getUserInfo().getLogin();
         SHOP_CAR_ITEM_LIST = UserDAO.getInstance(getContext()).getShopCarList(USER_NAME);
         shopCat = bottomNavigationView.getOrCreateBadge(R.id.navigation_shopCat);
+        shopCat.setVisible(true);
         shopCat.setNumber(SHOP_CAR_ITEM_LIST.size());
     }
 

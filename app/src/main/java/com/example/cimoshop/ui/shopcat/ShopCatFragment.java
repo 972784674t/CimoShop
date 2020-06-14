@@ -313,6 +313,7 @@ public class ShopCatFragment extends Fragment {
         bottomNavigationView = (BottomNavigationView) getParentFragment().getView().findViewById(R.id.bv);
         BadgeDrawable shopCat = bottomNavigationView.getOrCreateBadge(R.id.navigation_shopCat);
         shopCat.setNumber(t);
+        shopCat.setVisible(false);
     }
 
     /**
