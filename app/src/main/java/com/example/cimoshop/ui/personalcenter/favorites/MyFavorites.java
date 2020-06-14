@@ -42,6 +42,11 @@ public class MyFavorites extends Fragment {
     private ArrayList<String> favoriteImgList;
 
     /**
+     * 当前用户
+     */
+    private static String USER_NAME = null;
+
+    /**
      * 如果 token 不为空,则用户已经登录
      */
     private String isToken;
@@ -60,20 +65,12 @@ public class MyFavorites extends Fragment {
         isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
         Log.d(TAG, "onCreateView: "+isToken);
         if (!"null".equals(isToken)) {
-            favoriteImgList = UserDAO.getInstance(getContext()).getUserFavoriteImageList(UserDAO.getInstance(getContext()).findUserByUserName("972784674t").getUserId());
+            USER_NAME =  SharedPrefsTools.getInstance(getActivity().getApplication()).getUserInfo().getLogin();
+            favoriteImgList = UserDAO.getInstance(getContext()).getUserFavoriteImageList(UserDAO.getInstance(getContext()).findUserByUserName(USER_NAME).getUserId());
         } else {
             favoriteImgList = null;
         }
         return root;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (!"null".equals(isToken)) {
-            favoriteImgList = UserDAO.getInstance(getContext()).getUserFavoriteImageList(UserDAO.getInstance(getContext()).findUserByUserName("972784674t").getUserId());
-        }
-        favoritesImageAdapter.setDiffNewData(favoriteImgList);
     }
 
     @Override
@@ -86,6 +83,16 @@ public class MyFavorites extends Fragment {
         } else {
             initFavoriteRecyclerView(null);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!"null".equals(isToken)) {
+            USER_NAME =  SharedPrefsTools.getInstance(getActivity().getApplication()).getUserInfo().getLogin();
+            favoriteImgList = UserDAO.getInstance(getContext()).getUserFavoriteImageList(UserDAO.getInstance(getContext()).findUserByUserName(USER_NAME).getUserId());
+        }
+        favoritesImageAdapter.setDiffNewData(favoriteImgList);
     }
 
     /**

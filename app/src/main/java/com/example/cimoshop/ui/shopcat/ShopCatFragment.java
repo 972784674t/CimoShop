@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.BitmapRegionDecoder;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -23,7 +24,6 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemChildClickListener;
@@ -47,7 +47,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.dialog.MaterialDialogs;
 
 import java.util.ArrayList;
-
+import java.util.HashMap;
 
 /**
  * @author 谭海山
@@ -55,6 +55,8 @@ import java.util.ArrayList;
 public class ShopCatFragment extends Fragment {
 
     private static final String TAG = "ShopCar";
+
+    private static final int RESULT_CODE_ALIPAY = 10086;
 
     private MaterialToolbar toolbar;
     private RecyclerView shopCarRecyclerView;
@@ -105,6 +107,34 @@ public class ShopCatFragment extends Fragment {
         Log.d(TAG, "onResume: DATASOUCE -> "+SHOP_CAR_ITEM_LIST.size());
         shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
         toolbar.setTitle("购物车：( "+SHOP_CAR_ITEM_LIST.size()+" )");
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (resultCode){
+            case RESULT_CODE_ALIPAY:
+                String payResult = data.getExtras().getString("payResult");
+                String resultStatus = data.getExtras().getString("resultStatus");
+                Log.d(TAG, "onActivityResult: \npayResult -> "+payResult+"\nresultStatus -> "+resultStatus);
+
+                //将购物袋中选中的商品加入临时购物袋
+                HashMap<Integer,UserShopCar> temporaryShoppingBags = new HashMap<>();
+                for (int i = 0; i < shopCarAdapter.getShoppingBag().size(); i++){
+                    if ( shopCarAdapter.getShoppingBag().get(i).isCheck() ){
+                        temporaryShoppingBags.put(i,shopCarAdapter.getShoppingBag().get(i));
+                    }
+                }
+                Log.d(TAG, "购物袋中选中的图片 -> "+temporaryShoppingBags.size()+"\n"+temporaryShoppingBags.toString());
+
+                //更新数据库
+                if ( UserDAO.getInstance(getContext()).addImageToUserWareHouses(temporaryShoppingBags) ){
+                    Toast.makeText(getContext(),"您都买的商品已经加入到您的仓库中了哦",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(),"Oop,系统出了点问题，请联系管理员",Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
     }
 
     /**
@@ -162,7 +192,11 @@ public class ShopCatFragment extends Fragment {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     Intent intent = new Intent(getContext(),AlipayOfSandbox.class);
-                                    startActivity(intent);
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("totalPrice",tp);
+                                    bundle.putString("imageNumber",imageNumber);
+                                    intent.putExtras(bundle);
+                                    startActivityForResult(intent,RESULT_CODE_ALIPAY);
                                 }
                             })
                             .show();
@@ -214,12 +248,6 @@ public class ShopCatFragment extends Fragment {
 
         //设置数据源
         shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
-
-        shopCarAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
-            }
-        });
 
         //ItemChild点击事件
         shopCarAdapter.setOnItemChildClickListener(new OnItemChildClickListener() {

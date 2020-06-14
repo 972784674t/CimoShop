@@ -4,12 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,8 +40,12 @@ import java.util.Map;
  *  the client side in this demo application.
  *
  *  However, in practice, both assembling and signing must be carried out on the server side.
+ *
+ *  @author 谭海山
  */
 public class AlipayOfSandbox extends AppCompatActivity {
+
+    public static final String TAG = "AlipayOfSandbox";
 
     /**
      * 用于支付宝支付业务的入参 app_id。
@@ -72,7 +78,13 @@ public class AlipayOfSandbox extends AppCompatActivity {
     private static final int SDK_PAY_FLAG = 1;
     private static final int SDK_AUTH_FLAG = 2;
 
+    private static String TOTAL_PRICE = null;
+    private static String IMAGE_NUMBER = null;
+
+    private static final int RESULT_CODE_ALIPAY = 10086;
+
     private MaterialToolbar toolbar;
+    private TextView payTotalPrice;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
@@ -91,10 +103,20 @@ public class AlipayOfSandbox extends AppCompatActivity {
                     // 判断resultStatus 为9000则代表支付成功
                     if (TextUtils.equals(resultStatus, "9000")) {
                         // 该笔订单是否真实支付成功，需要依赖服务端的异步通知。
-                        showAlert(AlipayOfSandbox.this, "支付成功" + payResult);
+                        Log.d(TAG, "handleMessage: 支付成功 -> "+payResult);
+                        Toast.makeText(getApplicationContext(),"支付成功，感谢您的支持",Toast.LENGTH_SHORT).show();
+                        //返回支付结果
+                        Intent intent = new Intent();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("payResult",resultInfo);
+                        bundle.putString("resultStatus",resultStatus);
+                        intent.putExtras(bundle);
+                        setResult(RESULT_CODE_ALIPAY,intent);
+                        finish();
                     } else {
                         // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
-                        showAlert(AlipayOfSandbox.this, "支付失败" + payResult);
+                        Log.d(TAG, "handleMessage: 支付失败 -> "+payResult);
+                        Toast.makeText(getApplicationContext(),"支付失败请稍后再试",Toast.LENGTH_SHORT).show();
                     }
                     break;
                 }
@@ -108,10 +130,10 @@ public class AlipayOfSandbox extends AppCompatActivity {
                     if (TextUtils.equals(resultStatus, "9000") && TextUtils.equals(authResult.getResultCode(), "200")) {
                         // 获取alipay_open_id，调支付时作为参数extern_token 的value
                         // 传入，则支付账户为该授权账户
-                        showAlert(AlipayOfSandbox.this, "授权成功" + authResult);
+                        Log.d(TAG, "handleMessage: 授权成功 -> "+authResult);
                     } else {
                         // 其他状态值则为授权失败
-                        showAlert(AlipayOfSandbox.this, "授权失败" + authResult);
+                        Log.d(TAG, "handleMessage: 授权失败 -> "+authResult);
                     }
                     break;
                 }
@@ -129,11 +151,17 @@ public class AlipayOfSandbox extends AppCompatActivity {
         setContentView(R.layout.activity_alipay_of_sandbox);
 
         toolbar = findViewById(R.id.selectPayToobar);
-
+        payTotalPrice = findViewById(R.id.payTotalPrice);
         //状态栏文字透明
         UITools.makeStatusBarTransparent(this);
         //修复标题栏与状态栏重叠
         UITools.fitTitleBar(this, toolbar);
+
+        TOTAL_PRICE = getIntent().getExtras().getString("totalPrice");
+        IMAGE_NUMBER = getIntent().getExtras().getString("imageNumber");
+
+        Log.d(TAG, "onCreate: 总价 -> "+TOTAL_PRICE);
+        payTotalPrice.setText("¥ "+TOTAL_PRICE);
 
     }
 
@@ -141,11 +169,7 @@ public class AlipayOfSandbox extends AppCompatActivity {
      * 支付宝支付业务示例
      */
     public void payV2(View v) {
-        if (TextUtils.isEmpty(APPID) || (TextUtils.isEmpty(RSA2_PRIVATE) && TextUtils.isEmpty(RSA_PRIVATE))) {
-            showAlert(this, getString(R.string.error_missing_appid_rsa_private));
-            return;
-        }
-
+        
         /*
          * 这里只是为了方便直接向商户展示支付宝的整个支付流程；所以Demo中加签过程直接放在客户端完成；
          * 真实App里，privateKey等数据严禁放在客户端，加签过程务必要放在服务端完成；
@@ -154,7 +178,7 @@ public class AlipayOfSandbox extends AppCompatActivity {
          * orderInfo 的获取必须来自服务端；
          */
         boolean rsa2 = (RSA2_PRIVATE.length() > 0);
-        Map<String, String> params = OrderInfoUtil2_0.buildOrderParamMap(APPID, rsa2);
+        Map<String, String> params = OrderInfoUtil2_0.buildOrderParamMap(APPID, rsa2,TOTAL_PRICE,IMAGE_NUMBER);
         String orderParam = OrderInfoUtil2_0.buildOrderParam(params);
 
         String privateKey = rsa2 ? RSA2_PRIVATE : RSA_PRIVATE;
@@ -181,110 +205,4 @@ public class AlipayOfSandbox extends AppCompatActivity {
         payThread.start();
     }
 
-    /**
-     * 支付宝账户授权业务示例
-     */
-    public void authV2(View v) {
-        if (TextUtils.isEmpty(PID) || TextUtils.isEmpty(APPID)
-                || (TextUtils.isEmpty(RSA2_PRIVATE) && TextUtils.isEmpty(RSA_PRIVATE))
-                || TextUtils.isEmpty(TARGET_ID)) {
-            showAlert(this, getString(R.string.error_auth_missing_partner_appid_rsa_private_target_id));
-            return;
-        }
-
-        /*
-         * 这里只是为了方便直接向商户展示支付宝的整个支付流程；所以Demo中加签过程直接放在客户端完成；
-         * 真实App里，privateKey等数据严禁放在客户端，加签过程务必要放在服务端完成；
-         * 防止商户私密数据泄露，造成不必要的资金损失，及面临各种安全风险；
-         *
-         * authInfo 的获取必须来自服务端；
-         */
-        boolean rsa2 = (RSA2_PRIVATE.length() > 0);
-        Map<String, String> authInfoMap = OrderInfoUtil2_0.buildAuthInfoMap(PID, APPID, TARGET_ID, rsa2);
-        String info = OrderInfoUtil2_0.buildOrderParam(authInfoMap);
-
-        String privateKey = rsa2 ? RSA2_PRIVATE : RSA_PRIVATE;
-        String sign = OrderInfoUtil2_0.getSign(authInfoMap, privateKey, rsa2);
-        final String authInfo = info + "&" + sign;
-        Runnable authRunnable = new Runnable() {
-
-            @Override
-            public void run() {
-                // 构造AuthTask 对象
-                AuthTask authTask = new AuthTask(AlipayOfSandbox.this);
-                // 调用授权接口，获取授权结果
-                Map<String, String> result = authTask.authV2(authInfo, true);
-
-                Message msg = new Message();
-                msg.what = SDK_AUTH_FLAG;
-                msg.obj = result;
-                mHandler.sendMessage(msg);
-            }
-        };
-
-        // 必须异步调用
-        Thread authThread = new Thread(authRunnable);
-        authThread.start();
-    }
-
-    /**
-     * 获取支付宝 SDK 版本号。
-     */
-    public void showSdkVersion(View v) {
-        PayTask payTask = new PayTask(this);
-        String version = payTask.getVersion();
-        showAlert(this, getString(R.string.alipay_sdk_version_is) + version);
-    }
-
-//    /**
-//     * 将 H5 网页版支付转换成支付宝 App 支付的示例
-//     */
-//    public void h5Pay(View v) {
-//        WebView.setWebContentsDebuggingEnabled(true);
-//        Intent intent = new Intent(this, H5PayDemoActivity.class);
-//        Bundle extras = new Bundle();
-//
-//        /*
-//         * URL 是要测试的网站，在 Demo App 中会使用 H5PayDemoActivity 内的 WebView 打开。
-//         *
-//         * 可以填写任一支持支付宝支付的网站（如淘宝或一号店），在网站中下订单并唤起支付宝；
-//         * 或者直接填写由支付宝文档提供的“网站 Demo”生成的订单地址
-//         * （如 https://mclient.alipay.com/h5Continue.htm?h5_route_token=303ff0894cd4dccf591b089761dexxxx）
-//         * 进行测试。
-//         *
-//         * H5PayDemoActivity 中的 MyWebViewClient.shouldOverrideUrlLoading() 实现了拦截 URL 唤起支付宝，
-//         * 可以参考它实现自定义的 URL 拦截逻辑。
-//         */
-//        String url = "https://m.taobao.com";
-//        extras.putString("url", url);
-//        intent.putExtras(extras);
-//        startActivity(intent);
-//    }
-
-    private static void showAlert(Context ctx, String info) {
-        showAlert(ctx, info, null);
-    }
-
-    private static void showAlert(Context ctx, String info, DialogInterface.OnDismissListener onDismiss) {
-        new AlertDialog.Builder(ctx)
-                .setMessage(info)
-                .setPositiveButton(R.string.confirm, null)
-                .setOnDismissListener(onDismiss)
-                .show();
-    }
-
-    private static void showToast(Context ctx, String msg) {
-        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
-    }
-
-    private static String bundleToString(Bundle bundle) {
-        if (bundle == null) {
-            return "null";
-        }
-        final StringBuilder sb = new StringBuilder();
-        for (String key: bundle.keySet()) {
-            sb.append(key).append("=>").append(bundle.get(key)).append("\n");
-        }
-        return sb.toString();
-    }
 }

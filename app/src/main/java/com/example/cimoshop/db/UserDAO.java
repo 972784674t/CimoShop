@@ -1,15 +1,20 @@
 package com.example.cimoshop.db;
 
+import com.example.cimoshop.entity.User;
+import com.example.cimoshop.entity.UserShopCar;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Entity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
-import com.example.cimoshop.entity.User;
-import com.example.cimoshop.entity.UserShopCar;
-
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
+import uk.co.senab.photoview.log.LoggerDefault;
 
 /**
  * @author 谭海山
@@ -18,16 +23,16 @@ public class UserDAO {
 
     private static final String TAG = "UserDAO";
 
-    private static final String DATABASE_NAME = "db_cimoShop";
-
     private static final int DATABASE_VERSION = 1;
 
     /**
-     * 数据库表
+     * 数据库名和数据库表
      */
+    private static final String DATABASE_NAME = "db_cimoShop";
     private static final String USER_INFO = "userInfo";
     private static final String USER_FAVORITES = "userFavorites";
     private static final String USER_SHOP_CAR = "userShopCar";
+    private static final String USER_WARE_HOUSES = "userWareHouses";
 
     private SQLiteDatabase db;
 
@@ -84,7 +89,7 @@ public class UserDAO {
      * 将用户收藏的图片url插入到数据库
      * @param userName 用户名
      * @param imageUrl 图片url
-     * @return  是否成功
+     * @return 是否成功
      */
     public boolean insertUserFavoriteImage(String userName,String imageUrl){
         boolean flag = false;
@@ -101,7 +106,7 @@ public class UserDAO {
     /**
      * 将收藏的图片从数据库中删除
      * @param imageUrl 图片url
-     * @return  是否成功
+     * @return 是否成功
      */
     public boolean delUserFavoriteImage(String imageUrl){
         boolean flag = false;
@@ -115,7 +120,7 @@ public class UserDAO {
      * 是否已经点赞此图片
      * @param userName 用户名
      * @param imageUrl 图片url
-     * @return boolean
+     * @return 是否成功
      */
     public boolean isFavoriteImage(String userName,String imageUrl){
         boolean flag = false;
@@ -193,6 +198,46 @@ public class UserDAO {
             userShopCar.setSize( cursor.getString(cursor.getColumnIndex("imageSize")));
             userShopCar.setPrice( cursor.getString(cursor.getColumnIndex("price")));
             list.add(userShopCar);
+        }
+        return list;
+    }
+
+    /**
+     * 支付成功后调用：将购物袋中的图片加入数据库
+     * @param temporaryShoppingBags
+     * @return 是否成功
+     */
+    public boolean addImageToUserWareHouses(HashMap<Integer,UserShopCar> temporaryShoppingBags){
+        boolean flag = false;
+        Iterator<Map.Entry<Integer,UserShopCar>> iterator = temporaryShoppingBags.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry<Integer,UserShopCar> entry = iterator.next();
+            Log.d(TAG, "addImageToUserWareHouses: "+entry.toString());
+            int uid = entry.getValue().getUserId();
+            ContentValues values = new ContentValues();
+            values.put("id",uid);
+            values.put("wareHouseItemUrl",entry.getValue().getShopCarItemUrl());
+            if ( db.insert(USER_WARE_HOUSES,null,values) != -1){
+                flag = true;
+            }
+            if ( db.delete(USER_SHOP_CAR, "imageSize=? and price=?",new String[]{entry.getValue().getSize(),entry.getValue().getPrice()}) > 0 ){
+                flag = true ;
+            }
+        }
+        return flag;
+    }
+
+    /**
+     * 获取仓库图片列表
+     * @param userId
+     * @return 仓库图片列表
+     */
+    public ArrayList<String> getUserWareHousesList(int userId){
+        ArrayList<String> list = new ArrayList<>();
+        String sql = "select * from userWareHouses where id = ?";
+        Cursor cursor = db.rawQuery(sql, new  String[]{String.valueOf(userId)});
+        while ( cursor.moveToNext() ){
+            list.add(cursor.getString(cursor.getColumnIndex("wareHouseItemUrl")));
         }
         return list;
     }

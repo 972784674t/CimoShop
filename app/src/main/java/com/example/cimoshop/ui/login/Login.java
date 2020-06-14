@@ -73,9 +73,7 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
         initView();
-
     }
 
     /**
@@ -93,7 +91,6 @@ public class Login extends AppCompatActivity {
         logonWebProgress = findViewById(R.id.logonWebProgress);
         UITools.makeStatusBarTransparent(this);
         UITools.MIUISetStatusBarLightMode(this, true);
-
     }
 
     @Override

@@ -35,7 +35,7 @@ import io.supercharge.shimmerlayout.ShimmerLayout;
 
 /**
  * @author 谭海山
- * 购物车recycleView适配器
+ * 购物车 recycleView 适配器
  */
 public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolder> implements DraggableModule, OnItemClickListener, OnItemChildClickListener {
 
@@ -71,13 +71,13 @@ public class ShopCarAdapter extends BaseQuickAdapter <UserShopCar, BaseViewHolde
         }
     }
 
-    public static HashMap<Integer, UserShopCar> getShoppingBag() {
+    public HashMap<Integer, UserShopCar> getShoppingBag() {
         return SHOPPING_BAG;
     }
 
     /**
      * 关联适配器内容和结算 UI
-     * <br/>传入全选 checkBox，已选图片数量 textView，总价 textView 方便更新 UI
+     * <br/>传入全选 checkBox，已选图片数量 textView，总价 textView ,更新 UI
      * @param selectAllCheckBox
      * @param selectedImageNumber
      * @param totalPrice
