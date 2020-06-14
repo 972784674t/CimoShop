@@ -7,6 +7,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -31,6 +32,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 
 /**
+ * 系统主页
+ *
  * @author 谭海山
  */
 public class HomeFragment extends Fragment {
@@ -49,14 +52,14 @@ public class HomeFragment extends Fragment {
      * 当前用户名
      */
     private static String USER_NAME = null;
+
     private BadgeDrawable shopCat;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        HomeViewModel homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
-        viewPager =  root.findViewById(R.id.viewpage);
+        viewPager = root.findViewById(R.id.viewpage);
         bottomNavigationView = root.findViewById(R.id.bv);
 
         return root;
@@ -65,13 +68,13 @@ public class HomeFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(TAG,"onActivityCreated");
+        Log.d(TAG, "onActivityCreated");
 
         //状态栏文字透明
         UITools.makeStatusBarTransparent(getActivity());
 
         //修复标题栏与状态栏重叠
-        UITools.setMIUI(getActivity(),true);
+        UITools.setMIUI(getActivity(), true);
 
         initViewPage();
         initBottomNav();
@@ -81,7 +84,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG,"onResume"+getId());
+        Log.d(TAG, "onResume()");
         getShopCarNavBadge();
     }
 
@@ -104,7 +107,7 @@ public class HomeFragment extends Fragment {
         viewPager.setAdapter(new FragmentStatePagerAdapter(getChildFragmentManager()) {
             @NonNull
             @Override
-            public Fragment getItem( int position ) {
+            public Fragment getItem(int position) {
                 return fragmentList.get(position);
             }
 
@@ -133,7 +136,7 @@ public class HomeFragment extends Fragment {
         });
 
         //预加载界面
-        viewPager.setOffscreenPageLimit(fragmentList.size()-1);
+        viewPager.setOffscreenPageLimit(fragmentList.size() - 1);
     }
 
     /**
@@ -144,7 +147,7 @@ public class HomeFragment extends Fragment {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch ( item.getItemId() ){
+                switch (item.getItemId()) {
                     case R.id.navigation_goodsClass:
                         viewPager.setCurrentItem(0);
                         break;
@@ -161,7 +164,9 @@ public class HomeFragment extends Fragment {
                 }
                 return false;
             }
+
         });
+
     }
 
     /**
@@ -171,8 +176,13 @@ public class HomeFragment extends Fragment {
         USER_NAME = SharedPrefsTools.getInstance(getActivity().getApplication()).getUserInfo().getLogin();
         SHOP_CAR_ITEM_LIST = UserDAO.getInstance(getContext()).getShopCarList(USER_NAME);
         shopCat = bottomNavigationView.getOrCreateBadge(R.id.navigation_shopCat);
-        shopCat.setVisible(true);
-        shopCat.setNumber(SHOP_CAR_ITEM_LIST.size());
+
+        if ( SHOP_CAR_ITEM_LIST.size() == 0 ){
+            shopCat.setVisible(false);
+        } else {
+            shopCat.setVisible(true);
+            shopCat.setNumber(SHOP_CAR_ITEM_LIST.size());
+        }
     }
 
 }

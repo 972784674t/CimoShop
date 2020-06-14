@@ -1,27 +1,20 @@
 package com.example.cimoshop;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.example.cimoshop.db.DataBaseHelper;
-import com.example.cimoshop.db.UserDAO;
-import com.example.cimoshop.entity.User;
-
-import java.util.ArrayList;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
+ * 因为最初打算使用 JetPack 架构，所以系统主页请移步至 HomeFragment
+ *
  * @author 谭海山
  */
 public class MainActivity extends AppCompatActivity {
-
-    private static final String TAG = "cimoshopMainActivity";
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -29,8 +22,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         checkPermission();
-        ArrayList<String> list = UserDAO.getInstance(this).getUserFavoriteImageList(UserDAO.getInstance(this).findUserByUserName("972784674t").getUserId());
-        Log.d(TAG,"数据库用户ID："+list);
     }
 
     /**
@@ -56,6 +47,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 
 }

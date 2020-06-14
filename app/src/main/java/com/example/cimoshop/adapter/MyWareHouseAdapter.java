@@ -13,9 +13,6 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.example.cimoshop.R;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 import io.supercharge.shimmerlayout.ShimmerLayout;
 

@@ -1,8 +1,11 @@
 package com.example.cimoshop.ui.personalcenter.mywarehouse;
 
-import androidx.lifecycle.ViewModelProviders;
-
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,20 +14,12 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
 import com.example.cimoshop.R;
 import com.example.cimoshop.adapter.MyWareHouseAdapter;
 import com.example.cimoshop.db.UserDAO;
-import com.example.cimoshop.entity.UserWareHouses;
 import com.example.cimoshop.utils.SharedPrefsTools;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author 谭海山
@@ -55,13 +50,12 @@ public class MyWareHouse extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         View root = inflater.inflate(R.layout.my_ware_house_fragment, container, false);
         myWareHouseRecycleView = root.findViewById(R.id.myWareHouseRecycleView);
         isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
-        Log.d(TAG, "onCreateView: "+isToken);
+        Log.d(TAG, "onCreateView: " + isToken);
         if (!"null".equals(isToken)) {
             USER_NAME = SharedPrefsTools.getInstance(getActivity().getApplication()).getUserInfo().getLogin();
             wareHouseItemList = UserDAO.getInstance(getContext()).getUserWareHousesList(UserDAO.getInstance(getContext()).findUserByUserName(USER_NAME).getUserId());
@@ -69,6 +63,7 @@ public class MyWareHouse extends Fragment {
             wareHouseItemList = null;
         }
         return root;
+
     }
 
     @Override
@@ -82,7 +77,7 @@ public class MyWareHouse extends Fragment {
      */
     private void initMyWareHouseRecycleView() {
         myWareHouseAdapter = new MyWareHouseAdapter();
-        myWareHouseRecycleView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
+        myWareHouseRecycleView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         myWareHouseRecycleView.setAdapter(myWareHouseAdapter);
         myWareHouseAdapter.setDiffCallback(new MyDiffCallback());
         myWareHouseAdapter.setEmptyView(initEmptyView());
@@ -93,7 +88,7 @@ public class MyWareHouse extends Fragment {
     public void onResume() {
         super.onResume();
         if (!"null".equals(isToken)) {
-            USER_NAME =  SharedPrefsTools.getInstance(getActivity().getApplication()).getUserInfo().getLogin();
+            USER_NAME = SharedPrefsTools.getInstance(getActivity().getApplication()).getUserInfo().getLogin();
             wareHouseItemList = UserDAO.getInstance(getContext()).getUserWareHousesList(UserDAO.getInstance(getContext()).findUserByUserName(USER_NAME).getUserId());
         }
         myWareHouseAdapter.setDiffNewData(wareHouseItemList);
@@ -101,6 +96,7 @@ public class MyWareHouse extends Fragment {
 
     /**
      * 初始化空列表视图
+     *
      * @return 空列表视图 view
      */
     private View initEmptyView() {
@@ -117,7 +113,7 @@ public class MyWareHouse extends Fragment {
     /**
      * 指定DiffUtil类，判断item是否相同
      */
-    static class MyDiffCallback extends DiffUtil.ItemCallback<String>{
+    static class MyDiffCallback extends DiffUtil.ItemCallback<String> {
 
 
         @Override
@@ -130,6 +126,5 @@ public class MyWareHouse extends Fragment {
             return oldItem.equals(newItem);
         }
     }
-
 
 }

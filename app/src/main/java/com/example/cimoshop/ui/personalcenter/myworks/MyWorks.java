@@ -25,19 +25,25 @@ import com.example.cimoshop.utils.SharedPrefsTools;
 public class MyWorks extends Fragment {
 
     private static final String TAG = "MyWorks";
+
+    /**
+     * 如果 token 不为空,则用户已经登录
+     */
     private RecyclerView myWorksRecyclerView;
 
     private String isToken;
+
     public static MyWorks newInstance() {
         return new MyWorks();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         View root =  inflater.inflate(R.layout.my_works_fragment, container, false);
         myWorksRecyclerView = root.findViewById(R.id.myWorksRecyclerView);
-
         return root;
+
     }
 
     @Override

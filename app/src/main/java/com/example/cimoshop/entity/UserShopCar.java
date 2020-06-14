@@ -1,10 +1,8 @@
 package com.example.cimoshop.entity;
 
-import androidx.annotation.NonNull;
-
-import kotlin.TuplesKt;
-
 /**
+ * 用户购物车信息实体
+ *
  * @author 谭海山
  */
 public class UserShopCar {

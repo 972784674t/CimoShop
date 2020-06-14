@@ -30,11 +30,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.example.cimoshop.R;
 import com.example.cimoshop.api.VolleySingleton;
-import com.example.cimoshop.utils.UITools;
 import com.example.cimoshop.utils.SharedPrefsTools;
+import com.example.cimoshop.utils.UITools;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.dialog.MaterialDialogs;
 
 /**
  * @author 谭海山
@@ -45,7 +43,7 @@ public class Login extends AppCompatActivity {
     private static final String GITHUB_LOGON_URL = "https://github.com/login/oauth/authorize?client_id=c92a401aa4c16f767b32";
 
     /**
-     * 带有code参数的回调
+     * 带有 code 参数的回调
      */
     private String githubCallbackUrl;
 
@@ -121,10 +119,11 @@ public class Login extends AppCompatActivity {
     }
 
     /**
-     * 初始化登录webView
+     * 初始化登录 webView
      */
     @SuppressLint("SetJavaScriptEnabled")
     private void initLogonWebView() {
+
         Toast.makeText(getApplication(), "使用github账号登录", Toast.LENGTH_SHORT).show();
 
         loginBtn.setVisibility(View.GONE);
@@ -132,14 +131,19 @@ public class Login extends AppCompatActivity {
 
         //是否允许JavaScript
         logonWebView.getSettings().setJavaScriptEnabled(true);
+
         //将图片调整到适合webView的大小
         logonWebView.getSettings().setUseWideViewPort(true);
+
         //是否使用预览模式加载界面
         logonWebView.getSettings().setLoadWithOverviewMode(true);
+
         //是否开启网页缓存
         logonWebView.getSettings().setAppCacheEnabled(false);
+
         //缩放至屏幕的大小
         logonWebView.getSettings().setLoadWithOverviewMode(true);
+
         //是否开启DOMStorage
         logonWebView.getSettings().setDomStorageEnabled(false);
         logonWebView.getProgress();
@@ -149,17 +153,19 @@ public class Login extends AppCompatActivity {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
-                Log.d(TAG,"WebView : newProgress - >"+newProgress);
+                Log.d(TAG, "WebView : newProgress - >" + newProgress);
                 logonWebProgress.setVisibility(View.VISIBLE);
                 logonWebViewProgressBar.setVisibility(View.VISIBLE);
                 //显示加载中提示
                 logonWebProgress.setText("正在前往Github：" + newProgress + "%");
                 logonWebViewProgressBar.setProgress(newProgress);
-                if ( 80 < newProgress ) {
-                    //加载中提示消失
+
+                //加载进度大于80时，提示消失
+                if (80 < newProgress) {
                     constraintLayout.removeView(logonWebProgress);
                     constraintLayout.removeView(logonWebViewProgressBar);
                 }
+
             }
 
         });
@@ -176,16 +182,19 @@ public class Login extends AppCompatActivity {
                 Log.d(TAG, githubCallbackUrl);
 
                 //如果加载的url为下面路径则拦截
-                if ( githubCallbackUrl.contains("http://incimo.xyz:8080/cimowebshop/GithubLogingCallBack") ) {
-                    //通过拦截的url获取token
+                if (githubCallbackUrl.contains("http://incimo.xyz:8080/cimowebshop/GithubLogingCallBack")) {
+
+                    //通过拦截的url，通过服务器请求次链接获取token
                     getGithubToken();
 
                     //隐藏webView
                     logonWebView.setVisibility(View.GONE);
                     loginBtn.setVisibility(View.VISIBLE);
                     clearWebView();
-                    //返回true则不加载这个链接
+
+                    //返回true表示web不加载这个链接
                     return true;
+
                 }
                 return false;
             }
@@ -197,9 +206,10 @@ public class Login extends AppCompatActivity {
 
 
     /**
-     * 获取code后，从服务器inicmo.xyz获取github的token
+     * 获取code后，从服务器 inicmo.xyz 获取 github 的 token
      */
     void getGithubToken() {
+
         new MaterialDialog.Builder(this)
                 .title("登录github成功")
                 .content("正在获取授权...")
@@ -207,6 +217,7 @@ public class Login extends AppCompatActivity {
                 .progress(true, 0)
                 .progressIndeterminateStyle(true)
                 .show();
+
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
                 githubCallbackUrl,
@@ -220,29 +231,30 @@ public class Login extends AppCompatActivity {
                         Log.d(TAG, "token：" + githubToken);
 
                         //将token存入Sharepreferences
-                        SharedPrefsTools.getInstance(getApplication()).saveToken("github",githubToken);
+                        SharedPrefsTools.getInstance(getApplication()).saveToken("github", githubToken);
                         Toast.makeText(getApplicationContext(), "github授权成功", Toast.LENGTH_SHORT).show();
 
                         //返回token到LogonActivity
                         Intent intent = new Intent();
-                        intent.putExtra("token",githubToken);
+                        intent.putExtra("token", githubToken);
                         setResult(2, intent);
                         finish();
+
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG,"error："+ error);
+                        Log.d(TAG, "error：" + error);
                         Toast.makeText(getApplicationContext(), "github授权失败", Toast.LENGTH_SHORT).show();
-                        VolleySingleton.errorMessage(error,getApplication().getApplicationContext());
+                        VolleySingleton.errorMessage(error, getApplication().getApplicationContext());
                     }
                 });
         VolleySingleton.getInstance(getApplication()).addToRequestQueue(stringRequest);
     }
 
     /**
-     * 清空webView为下次登录做准备
+     * 清空 webView 为下次登录做准备
      */
     private void clearWebView() {
 
@@ -271,11 +283,10 @@ public class Login extends AppCompatActivity {
         //数据是使用Intent返回
         Intent intent = new Intent();
         //把返回数据存入Intent
-        intent.putExtra("info","null");
+        intent.putExtra("info", "null");
         //设置返回数据
         setResult(1, intent);
         finish();
     }
-
 
 }

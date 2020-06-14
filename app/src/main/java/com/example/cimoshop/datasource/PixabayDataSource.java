@@ -19,6 +19,9 @@ import com.google.gson.Gson;
 import java.util.List;
 
 /**
+ * JetPack Paging 分页数据源 （此类已弃用） <br/>
+ * 数据源加载已合并到 GalleryViewModel 中
+ *
  * @author 谭海山
  */
 public class PixabayDataSource extends PageKeyedDataSource<Integer, Pixabay.HitsBean> {
@@ -37,17 +40,18 @@ public class PixabayDataSource extends PageKeyedDataSource<Integer, Pixabay.Hits
 
     private Context context;
 
-    PixabayDataSource(Context context){
+    PixabayDataSource(Context context) {
         this.context = context;
     }
 
-    private String[] queryKey = new String[]{"animals","natural","universe","Space","sea","flower"};
+    private String[] queryKey = new String[]{"animals", "natural", "universe", "Space", "sea", "flower"};
 
     private int index;
 
 
     /**
      * 第一次加载
+     *
      * @param params   页码
      * @param callback 回调
      */
@@ -57,10 +61,10 @@ public class PixabayDataSource extends PageKeyedDataSource<Integer, Pixabay.Hits
         this.index = index;
 
         //发生数据源广播：LOADING
-        loadingStatusIntent.putExtra("DATA_SOURCE_LOADING_STATUS","LOADING");
+        loadingStatusIntent.putExtra("DATA_SOURCE_LOADING_STATUS", "LOADING");
         LocalBroadcastManager.getInstance(context).sendBroadcast(loadingStatusIntent);
 
-        String url = "https://pixabay.com/api/?key=16322793-d4bcfe56af2f14816d6549dee&q="+queryKey[index]+"&per_page=50&page=1";
+        String url = "https://pixabay.com/api/?key=16322793-d4bcfe56af2f14816d6549dee&q=" + queryKey[index] + "&per_page=50&page=1";
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
                 url,
@@ -69,13 +73,13 @@ public class PixabayDataSource extends PageKeyedDataSource<Integer, Pixabay.Hits
                     public void onResponse(String response) {
 
                         //发生数据源广播：COMPLETED
-                        loadingStatusIntent.putExtra("DATA_SOURCE_LOADING_STATUS","COMPLETED");
+                        loadingStatusIntent.putExtra("DATA_SOURCE_LOADING_STATUS", "COMPLETED");
                         LocalBroadcastManager.getInstance(context).sendBroadcast(loadingStatusIntent);
 
                         context.sendBroadcast(loadingStatusIntent);
                         Gson gson = new Gson();
                         List<Pixabay.HitsBean> list = gson.fromJson(response, Pixabay.class).getHits();
-                        callback.onResult(list,null,2);
+                        callback.onResult(list, null, 2);
                     }
                 },
                 new Response.ErrorListener() {
@@ -83,10 +87,10 @@ public class PixabayDataSource extends PageKeyedDataSource<Integer, Pixabay.Hits
                     public void onErrorResponse(VolleyError error) {
 
                         //发生数据源广播：FAILED
-                        loadingStatusIntent.putExtra("DATA_SOURCE_LOADING_STATUS","FAILED");
+                        loadingStatusIntent.putExtra("DATA_SOURCE_LOADING_STATUS", "FAILED");
                         LocalBroadcastManager.getInstance(context).sendBroadcast(loadingStatusIntent);
 
-                        Log.d(TAG,"loadInitial: "+error);
+                        Log.d(TAG, "loadInitial: " + error);
                     }
                 }
         );
@@ -94,7 +98,8 @@ public class PixabayDataSource extends PageKeyedDataSource<Integer, Pixabay.Hits
     }
 
     /**
-     *数据不够时加载下一页
+     * 数据不够时加载下一页
+     *
      * @param params   页码
      * @param callback 回调
      */
@@ -102,10 +107,10 @@ public class PixabayDataSource extends PageKeyedDataSource<Integer, Pixabay.Hits
     public void loadAfter(@NonNull final LoadParams<Integer> params, @NonNull final LoadCallback<Integer, Pixabay.HitsBean> callback) {
 
         //发生数据源广播：LOADING
-        loadingStatusIntent.putExtra("DATA_SOURCE_LOADING_STATUS","LOADING");
+        loadingStatusIntent.putExtra("DATA_SOURCE_LOADING_STATUS", "LOADING");
         LocalBroadcastManager.getInstance(context).sendBroadcast(loadingStatusIntent);
 
-        String url = "https://pixabay.com/api/?key=16322793-d4bcfe56af2f14816d6549dee&q="+queryKey[this.index]+"&per_page=50&page="+params.key;
+        String url = "https://pixabay.com/api/?key=16322793-d4bcfe56af2f14816d6549dee&q=" + queryKey[this.index] + "&per_page=50&page=" + params.key;
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
                 url,
@@ -114,28 +119,28 @@ public class PixabayDataSource extends PageKeyedDataSource<Integer, Pixabay.Hits
                     public void onResponse(String response) {
 
                         //发生数据源广播：COMPLETED
-                        loadingStatusIntent.putExtra("DATA_SOURCE_LOADING_STATUS","COMPLETED");
+                        loadingStatusIntent.putExtra("DATA_SOURCE_LOADING_STATUS", "COMPLETED");
                         LocalBroadcastManager.getInstance(context).sendBroadcast(loadingStatusIntent);
 
                         Gson gson = new Gson();
                         List<Pixabay.HitsBean> list = gson.fromJson(response, Pixabay.class).getHits();
-                        callback.onResult(list,params.key+1);
+                        callback.onResult(list, params.key + 1);
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        if( error.toString().indexOf("com.android.volley.NoConnection") == 1 ){
+                        if (error.toString().indexOf("com.android.volley.NoConnection") == 1) {
                             //发出数据源广播：无网络
-                            loadingStatusIntent.putExtra("DATA_SOURCE_LOADING_STATUS","FAILED NO NET_WOKE");
+                            loadingStatusIntent.putExtra("DATA_SOURCE_LOADING_STATUS", "FAILED NO NET_WOKE");
                             LocalBroadcastManager.getInstance(context).sendBroadcast(loadingStatusIntent);
                         }
-                        if( error.toString().indexOf("com.android.volley.ClientError") == 1 ){
+                        if (error.toString().indexOf("com.android.volley.ClientError") == 1) {
                             //发出数据源广播：数据源见底
-                            loadingStatusIntent.putExtra("DATA_SOURCE_LOADING_STATUS","FAILED END ON DATA_SOURCE");
+                            loadingStatusIntent.putExtra("DATA_SOURCE_LOADING_STATUS", "FAILED END ON DATA_SOURCE");
                             LocalBroadcastManager.getInstance(context).sendBroadcast(loadingStatusIntent);
                         }
-                        Log.d(TAG,"loadAfter: "+error);
+                        Log.d(TAG, "loadAfter: " + error);
                     }
                 }
         );

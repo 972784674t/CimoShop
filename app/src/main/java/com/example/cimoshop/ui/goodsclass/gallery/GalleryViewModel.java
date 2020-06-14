@@ -1,4 +1,5 @@
 package com.example.cimoshop.ui.goodsclass.gallery;
+
 import android.app.Application;
 import android.content.Context;
 import android.util.Log;
@@ -24,7 +25,6 @@ import com.google.gson.Gson;
 
 import java.util.List;
 
-
 /**
  * @author 谭海山
  */
@@ -32,13 +32,18 @@ public class GalleryViewModel extends AndroidViewModel {
 
     private static final String TAG = "cimoGallery";
 
+    /**
+     * PIXABAY_KEY 授权码
+     */
+    private static final String PIXABAY_KEY = "16322793-d4bcfe56af2f14816d6549dee";
+
     //搜索关键字key
-    private String[] queryKey = new String[]{"animal","natural","universe","Space","sea","Scenery","city"};
+    private String[] queryKey = new String[]{"animal", "natural", "universe", "Space", "sea", "Scenery", "city"};
 
     //当前页数初始化
     private int currentPage = 1;
 
-    public int getCurrentPage(){
+    public int getCurrentPage() {
         return currentPage;
     }
 
@@ -49,7 +54,7 @@ public class GalleryViewModel extends AndroidViewModel {
     //总页数初始化
     private int totalPage = 1;
 
-    public int getTotalPage(){
+    public int getTotalPage() {
         return totalPage;
     }
 
@@ -69,41 +74,38 @@ public class GalleryViewModel extends AndroidViewModel {
     //是否已经没数据
     static boolean ISEND = false;
 
-    //加载结果
-    static String LOADING_RESULT = "s";
-
-    //数据源
+    /**
+     * 数据源
+     */
     MutableLiveData<List<Pixabay.HitsBean>> hitsBean = new MutableLiveData<>();
-
-    private MutableLiveData<String> Pageinit;
 
     public GalleryViewModel(@NonNull Application application) {
         super(application);
-        Pageinit = new MutableLiveData<>();
-        Pageinit.setValue("This is home fragment");
     }
 
     /**
      * 获取新的关键字
-     * @return  新的Key
+     *
+     * @return 新的Key
      */
-    public String getNewKey(){
+    public String getNewKey() {
         int index = (int) (Math.random() * queryKey.length);
         return queryKey[index];
     }
 
     /**
-     * 链接API
-     * @return 带有API的URL
+     * 拼接 API
+     *
+     * @return 带有 API的 URL
      */
-    private String getUrl(){
-        return "https://pixabay.com/api/?key=16322793-d4bcfe56af2f14816d6549dee&lang=zh&lang=en&q="+key+"&per_page="+perPage+"&page="+currentPage;
+    private String getUrl() {
+        return "https://pixabay.com/api/?key=16322793-d4bcfe56af2f14816d6549dee&lang=zh&lang=en&q=" + key + "&per_page=" + perPage + "&page=" + currentPage;
     }
 
     /**
      * 下拉刷新时，重置查询条件
      */
-    void resetQuery(){
+    void resetQuery() {
 
         currentPage = 1;
         totalPage = 1;
@@ -120,7 +122,7 @@ public class GalleryViewModel extends AndroidViewModel {
                         Gson gson = new Gson();
                         List<Pixabay.HitsBean> list = gson.fromJson(response, Pixabay.class).getHits();
                         totalPage = (gson.fromJson(response, Pixabay.class).getTotalHits()) / perPage + 1;
-                        Log.d(TAG,"下拉刷新 -> currentPage："+currentPage+"\ttotalPage："+totalPage+"\tkey："+key);
+                        Log.d(TAG, "下拉刷新 -> currentPage：" + currentPage + "\ttotalPage：" + totalPage + "\tkey：" + key);
                         //刷新的请求，用postValue()
                         hitsBean.postValue(list);
                     }

@@ -1,11 +1,8 @@
 package com.example.cimoshop.adapter;
+
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -15,9 +12,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.module.LoadMoreModule;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.example.cimoshop.R;
-
 import io.supercharge.shimmerlayout.ShimmerLayout;
-
 
 /**
  * @author 谭海山
@@ -63,4 +58,5 @@ public class FavoritesImageAdapter extends BaseQuickAdapter < String,BaseViewHol
                 //装载图片
                 .into(imageView);
     }
+
 }

@@ -9,6 +9,8 @@ import androidx.annotation.Nullable;
 import com.example.cimoshop.R;
 
 /**
+ * 初始化数据库操作
+ *
  * @author 谭海山
  */
 public class DataBaseHelper extends SQLiteOpenHelper {

@@ -14,11 +14,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -35,14 +33,15 @@ import com.example.cimoshop.account.GithubAccount;
 import com.example.cimoshop.api.VolleySingleton;
 import com.example.cimoshop.db.UserDAO;
 import com.example.cimoshop.entity.User;
-import com.example.cimoshop.utils.FakeX509TrustManager;
-import com.example.cimoshop.utils.UITools;
 import com.example.cimoshop.ui.login.Login;
 import com.example.cimoshop.ui.personalcenter.favorites.MyFavorites;
 import com.example.cimoshop.ui.personalcenter.mywarehouse.MyWareHouse;
 import com.example.cimoshop.ui.personalcenter.myworks.MyWorks;
+import com.example.cimoshop.ui.shopcat.ShopCatFragment;
+import com.example.cimoshop.utils.FakeX509TrustManager;
 import com.example.cimoshop.utils.PictureSelectorTools;
 import com.example.cimoshop.utils.SharedPrefsTools;
+import com.example.cimoshop.utils.UITools;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
@@ -63,13 +62,16 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class PersonalCenter extends Fragment {
 
     private static final String TAG = "cimoPersonalcenter";
+
     final ArrayList<Fragment> fragmentList = new ArrayList<>();
+
     private static final String[] TAB_LABEL = {"我的作品", "我的喜欢", "已经购买"};
 
     /**
-     * token存在则说明已经登录
+     * token 存在则说明已经登录
      */
     private String isToken;
+
     private MaterialButton logonbtn;
     private MaterialToolbar toolbar;
     private ViewPager2 viewPager2;
@@ -87,10 +89,15 @@ public class PersonalCenter extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         View root = LayoutInflater.from(getContext()).inflate(R.layout.personal_center_fragment, container, false);
         initView(root);
+        if (isToken.equals("null")){
+            toolbar.getMenu().clear();
+        }
 
         return root;
+
     }
 
     @Override
@@ -116,6 +123,7 @@ public class PersonalCenter extends Fragment {
                 Log.d(TAG, "PersonalCenter token -> " + token);
                 //登录成功后执行保存token操作
                 saveGithubUserInfoByToken(getContext(), token);
+
                 break;
             default:
                 break;
@@ -139,8 +147,10 @@ public class PersonalCenter extends Fragment {
         pcuserFollowing = root.findViewById(R.id.pcuserfollowing);
         pcuserPictures = root.findViewById(R.id.pcuserpictures);
         pcuserSourceText = root.findViewById(R.id.pcusersource);
+
         //状态栏文字透明
         UITools.makeStatusBarTransparent(getActivity());
+
         //修复标题栏与状态栏重叠
         UITools.fitTitleBar(getActivity(), toolbar);
 
@@ -151,6 +161,9 @@ public class PersonalCenter extends Fragment {
             logonbtn.setVisibility(View.GONE);
         }
 
+        /**
+         * toobar 菜单点击事件
+         */
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -194,6 +207,10 @@ public class PersonalCenter extends Fragment {
                         pcuseravatar.setImageResource(R.drawable.empty_icon);
                         logonbtn.setVisibility(View.VISIBLE);
                         initViewpage2();
+
+                        //找到父节点后通过位置找到 ShopCatFragment 子节点，并更新购物车数据
+                        getParentFragmentManager().getFragments().get(1).onResume();
+
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -280,7 +297,11 @@ public class PersonalCenter extends Fragment {
     }
 
     /**
-     * 将token加入请求头Authorization中，获取github用户信息，并保存到本地shp文件和数据库中
+     * 将token加入请求头Authorization中，<br/>
+     * 获取github用户信息，<br/>
+     * 并保存到本地shp文件和数据库中<br/>
+     * 同时更新当前界面 UI 和 购物车 UI
+     *
      * @param context context
      */
     public void saveGithubUserInfoByToken(final Context context, final String token) {
@@ -312,8 +333,11 @@ public class PersonalCenter extends Fragment {
                         GithubAccount githubAccount = gson.fromJson(response, GithubAccount.class);
                         Log.d(TAG, "用户信息(githubAccount)：" + githubAccount);
                         SharedPrefsTools.getInstance(getActivity().getApplication()).saveUserInfo(githubAccount);
+
+                        //更新本界面 UI
                         initUserAccountUI();
                         initViewpage2();
+
                         //将用户信息保存到数据库
                         User user = new User();
                         user.setUserName(githubAccount.getLogin());
@@ -322,6 +346,9 @@ public class PersonalCenter extends Fragment {
                         } else {
                             Log.d(TAG, "将用户" + user.getUserName() + "加入数据库失败");
                         }
+
+                        //找到父节点后通过位置找到 ShopCatFragment 子节点，并更新购物车数据
+                        getParentFragmentManager().getFragments().get(1).onResume();
                     }
                 },
                 new Response.ErrorListener() {

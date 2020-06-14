@@ -35,6 +35,7 @@ import com.example.cimoshop.R;
 import com.example.cimoshop.adapter.ShopCarAdapter;
 import com.example.cimoshop.alipay.AlipayOfSandbox;
 import com.example.cimoshop.db.UserDAO;
+import com.example.cimoshop.entity.User;
 import com.example.cimoshop.entity.UserShopCar;
 import com.example.cimoshop.ui.home.HomeFragment;
 import com.example.cimoshop.utils.SharedPrefsTools;
@@ -78,14 +79,18 @@ public class ShopCatFragment extends Fragment {
     private static String USER_NAME = null;
 
     /**
-     * 关联 checkbox 和 item
+     * 如果 token 不为空,则用户已经登录
      */
+    private String isToken;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         View root = inflater.inflate(R.layout.fragment_shopcat, container, false);
+        isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
         initViewAndDataSource(root);
         return root;
+
     }
 
     @Override
@@ -103,10 +108,17 @@ public class ShopCatFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        getShopCarList();
-        Log.d(TAG, "onResume: DATASOUCE -> "+SHOP_CAR_ITEM_LIST.size());
-        shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
-        toolbar.setTitle("购物车：( "+SHOP_CAR_ITEM_LIST.size()+" )");
+        isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
+        if ( !isToken.equals("null") ){
+            getShopCarList();
+            shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
+            toolbar.setTitle("购物车：( "+SHOP_CAR_ITEM_LIST.size()+" )");
+        } else {
+            SHOP_CAR_ITEM_LIST.clear();
+            ShopCarAdapter.SHOPPING_BAG.clear();
+            toolbar.setTitle("购物车");
+            shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
+        }
     }
 
     @Override
@@ -155,8 +167,14 @@ public class ShopCatFragment extends Fragment {
 
         //修复标题栏与状态栏重叠
         UITools.fitTitleBar(getActivity(),toolbar);
+
         getShopCarList();
-        toolbar.setTitle("购物车：( "+SHOP_CAR_ITEM_LIST.size()+" )");
+
+        if ( SHOP_CAR_ITEM_LIST.size() != 0 ){
+            toolbar.setTitle("购物车：( "+SHOP_CAR_ITEM_LIST.size()+" )");
+        } else {
+            toolbar.setTitle("购物车");
+        }
 
         //全选操作
         selectAllShopCarItemCheakBox.setOnClickListener(new View.OnClickListener() {
@@ -174,9 +192,13 @@ public class ShopCatFragment extends Fragment {
         SettlementButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if( isToken.equals("null") ){
+                    Toast.makeText(getContext(),"请先登录哦",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 String tp = tatolPrice.getText().toString();
                 String imageNumber = selectedImageNumber.getText().toString();
-                if(tp.equals("0")){
+                if( tp.equals("0") ){
                     Toast.makeText(getContext(),"请先选择要结算的图片哦",Toast.LENGTH_SHORT).show();
                 } else {
                     new MaterialAlertDialogBuilder(getContext())
@@ -223,7 +245,20 @@ public class ShopCatFragment extends Fragment {
         shopCarRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         shopCarAdapter = new ShopCarAdapter();
         shopCarAdapter.setDiffCallback(new MyDiffCallback());
-        shopCarAdapter.setEmptyView(initEmptyView());
+
+        //设置空视图
+        if ( !isToken.equals("null") ){
+            shopCarAdapter.setEmptyView(initEmptyView("Oops！购物车空空如野"));
+        } else {
+            shopCarAdapter.setEmptyView(initEmptyView("请先登录哦"));
+        }
+
+        //设置没有登录时的 toolbar
+        if ( SHOP_CAR_ITEM_LIST.size() != 0 ){
+            toolbar.setTitle("购物车：( "+SHOP_CAR_ITEM_LIST.size()+" )");
+        } else {
+            toolbar.setTitle("购物车");
+        }
 
         //允许拖拽并设置拖拽监听
         shopCarAdapter.getDraggableModule().setDragEnabled(true);
@@ -234,14 +269,17 @@ public class ShopCatFragment extends Fragment {
 
         //开启动画
         shopCarAdapter.setAnimationEnable(true);
+
         //动画只执行一次
         shopCarAdapter.setAnimationFirstOnly(false);
+
         //item从左边进入
         shopCarAdapter.setAnimationWithDefault(BaseQuickAdapter.AnimationType.SlideInLeft);
 
-        //只允许从左侧滑动删除
+        //设置拖拽与滑动，并且只允许从左侧滑动删除
         shopCarAdapter.getDraggableModule().getItemTouchHelperCallback().setSwipeMoveFlags(ItemTouchHelper.START);
         shopCarAdapter.getDraggableModule().setOnItemSwipeListener(initOnItemSwipeListener());
+
         shopCarRecyclerView.setAdapter(shopCarAdapter);
 
         shopCarAdapter.connectionAdapterAndSettlementUI(selectAllShopCarItemCheakBox,selectedImageNumber,tatolPrice);
@@ -305,18 +343,6 @@ public class ShopCatFragment extends Fragment {
     }
 
     /**
-     * 更新 底部导航栏 UI
-     */
-    private void updataBottomNavgationView() {
-        int t = SHOP_CAR_ITEM_LIST.size()-1;
-        toolbar.setTitle("购物车：( "+t+" )");
-        bottomNavigationView = (BottomNavigationView) getParentFragment().getView().findViewById(R.id.bv);
-        BadgeDrawable shopCat = bottomNavigationView.getOrCreateBadge(R.id.navigation_shopCat);
-        shopCat.setNumber(t);
-        shopCat.setVisible(false);
-    }
-
-    /**
      * 拖拽事件监听处理
      * @return OnItemDragListener
      */
@@ -376,13 +402,25 @@ public class ShopCatFragment extends Fragment {
     }
 
     /**
+     * 更新底部导航栏 UI
+     */
+    private void updataBottomNavgationView() {
+        int t = SHOP_CAR_ITEM_LIST.size()-1;
+        toolbar.setTitle("购物车：( "+t+" )");
+        bottomNavigationView = (BottomNavigationView) getParentFragment().getView().findViewById(R.id.bv);
+        BadgeDrawable shopCat = bottomNavigationView.getOrCreateBadge(R.id.navigation_shopCat);
+        shopCat.setNumber(t);
+        shopCat.setVisible(false);
+    }
+
+    /**
      * 初始化空列表视图
      * @return 空列表视图 view
      */
-    private View initEmptyView() {
+    private View initEmptyView(String tip) {
         View emptyView = getLayoutInflater().inflate(R.layout.emptyview, null);
         TextView emptyTextView = emptyView.findViewById(R.id.emptytextView);
-        emptyTextView.setText("Oops！购物车空空如野");
+        emptyTextView.setText(tip);
         return emptyView;
     }
 

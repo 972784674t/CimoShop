@@ -39,7 +39,7 @@ import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.chad.library.adapter.base.listener.OnLoadMoreListener;
 import com.chad.library.adapter.base.module.BaseLoadMoreModule;
 import com.example.cimoshop.R;
-import com.example.cimoshop.adapter.GalleryAdapter_BRVAH;
+import com.example.cimoshop.adapter.GalleryAdapter;
 import com.example.cimoshop.api.VolleySingleton;
 import com.example.cimoshop.entity.Pixabay;
 import com.example.cimoshop.utils.SharedPrefsTools;
@@ -49,23 +49,28 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 
+import java.util.IllegalFormatCodePointException;
 import java.util.List;
 
 /**
- * 图库展示类
+ * 图库展示
  * @author 谭海山
  */
 public class Gallery extends Fragment {
 
     private static final String TAG = "cimoGallery";
 
+    /**
+     * 数据源
+     */
     private GalleryViewModel mViewModel;
+
     private RecyclerView recyclerViewGallery;
     private SwipeRefreshLayout swipeRefreshLayout;
     private MaterialToolbar toolbar;
     private SearchView searchView;
     private AppBarLayout appBarLayout;
-    private GalleryAdapter_BRVAH galleryAdapter;
+    private GalleryAdapter galleryAdapter;
     private FloatingActionButton toTheTopBtn;
 
     /**
@@ -108,14 +113,17 @@ public class Gallery extends Fragment {
         mViewModel = new ViewModelProvider(this,new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())).get(GalleryViewModel.class);
 
         //recyclerView Adapter初始化 使用 BRVAH 框架
-        galleryAdapter = new GalleryAdapter_BRVAH();
+        galleryAdapter = new GalleryAdapter();
         galleryAdapter.setDiffCallback(new MyDiffCallback());
+
         //开启滑动动画
         galleryAdapter.setAnimationEnable(true);
+
         //动画只执行一次
         galleryAdapter.setAnimationFirstOnly(false);
 
-        galleryAdapter.setEmptyView(initEmptyView());
+        //设置空视图
+        galleryAdapter.setEmptyView(initEmptyView("正在初始化资源哦..."));
 
         //加载更多对象，来自于BRVAH
         loadMore = galleryAdapter.getLoadMoreModule();
@@ -127,7 +135,7 @@ public class Gallery extends Fragment {
         //定制ScrollListener
         recyclerViewGallery.addOnScrollListener(new MyRecyclerViewScrollListener());
 
-        //_hitsBean观察者，如果_hitsBean发生变化则更新recycleView
+        //数据源：hitsBean观察者，如果hitsBean发生变化则更新recycleView
         mViewModel.hitsBean.observe(getViewLifecycleOwner(), new Observer<List<Pixabay.HitsBean>>() {
             @Override
             public void onChanged(List<Pixabay.HitsBean> hitsBeans) {
@@ -174,7 +182,10 @@ public class Gallery extends Fragment {
 
         //当数据不满一页不自动加载更多
         loadMore.setEnableLoadMoreIfNotFullPage(false);
-        //当recycleView滑动到底部时执行此监听
+
+        /**
+         * 当recycleView滑动到底部时执行此监听
+         */
         loadMore.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
@@ -189,6 +200,7 @@ public class Gallery extends Fragment {
      * @param root
      */
     private void initView(View root){
+
         isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
         swipeRefreshLayout = root.findViewById(R.id.swipeGallery);
         recyclerViewGallery = root.findViewById(R.id.recyclerview_gallery);
@@ -205,12 +217,15 @@ public class Gallery extends Fragment {
         UITools.fitTitleBar(getActivity(),toolbar);
         UITools.setMIUI(getActivity(),true);
 
-        //搜索操作
+        /**
+         * 搜索操作
+         */
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Toast.makeText(getContext(),"搜索"+query,Toast.LENGTH_SHORT).show();
-                return false;
+                searchGallery(query);
+                searchView.clearFocus();
+                return true;
             }
 
             @Override
@@ -219,7 +234,9 @@ public class Gallery extends Fragment {
             }
         });
 
-        //点击返回顶部按钮时滑动到顶部
+        /**
+         * 点击返回顶部按钮时滑动到顶部
+         */
         toTheTopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -227,7 +244,9 @@ public class Gallery extends Fragment {
             }
         });
 
-        //监听appBarLayout是否在顶部，如果在，则swipeRefreshLayout可用
+        /**
+         * 监听appBarLayout是否在顶部，如果在，则swipeRefreshLayout可用
+         */
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
@@ -244,12 +263,13 @@ public class Gallery extends Fragment {
 
     /**
      * 初始化空列表视图
+     * @param tip 空视图提示信息
      * @return 空列表视图 view
      */
-    private View initEmptyView() {
+    private View initEmptyView(String tip) {
         View emptyView = getLayoutInflater().inflate(R.layout.emptyview, null);
         TextView emptyTextView = emptyView.findViewById(R.id.emptytextView);
-        emptyTextView.setText("正在初始化资源哦...");
+        emptyTextView.setText(tip);
         return emptyView;
     }
 
@@ -294,6 +314,61 @@ public class Gallery extends Fragment {
     }
 
     /**
+     * 搜索操作
+     */
+    private void searchGallery(String query){
+
+        MaterialDialog materialDialog = new MaterialDialog.Builder(getContext())
+                .content("正在搜索"+query+"...")
+                .theme(Theme.LIGHT)
+                .progress(true, 0)
+                .progressIndeterminateStyle(true)
+                .show();
+
+        String key = query;
+        Log.d(TAG,"搜索结果： -> currentPage："+ currentPage+"\ttotalPage："+totalPage +"\tkey："+key);
+        if( currentPage > totalPage ){
+            loadMore.loadMoreEnd();
+            return;
+        }
+        StringRequest stringRequest = new StringRequest(
+                Request.Method.GET,
+                "https://pixabay.com/api/?key=16322793-d4bcfe56af2f14816d6549dee&lang=zh&lang=en&q="+key+"&per_page="+perPage+"&page="+ currentPage,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        materialDialog.dismiss();
+                        Gson gson = new Gson();
+                        List<Pixabay.HitsBean> list = gson.fromJson(response, Pixabay.class).getHits();
+                        totalPage = (gson.fromJson(response, Pixabay.class).getTotalHits()) / perPage + 1;
+                        //新数据，postValue()
+                        mViewModel.hitsBean.postValue(list);
+                        //加载更多设置：完成
+                        loadMore.loadMoreComplete();
+                        //当前页+1
+                        currentPage++;
+                        int searchResultNumber = gson.fromJson(response, Pixabay.class).getTotalHits();
+                        Toast.makeText(getContext(),"为您搜索到 "+searchResultNumber+"张图片",Toast.LENGTH_SHORT).show();
+                        if( 0 == searchResultNumber ){
+                            galleryAdapter.setEmptyView(initEmptyView("搜索的是啥玩意..."));
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        materialDialog.dismiss();
+                        Log.d(TAG,"loadMore: "+error.getClass());
+                        VolleySingleton.errorMessage(error,getContext());
+                        //加载跟多设置：失败
+                        loadMore.loadMoreFail();
+                    }
+                }
+        );
+        VolleySingleton.getInstance(getContext()).addToRequestQueue(stringRequest);
+    }
+
+    /**
      * 指定DiffUtil类，判断item是否相同
      */
     static class MyDiffCallback extends DiffUtil.ItemCallback<Pixabay.HitsBean>{
@@ -312,8 +387,10 @@ public class Gallery extends Fragment {
     }
 
     /**
-     * 重写 OnScrollListener类
-     * 为回到顶部按钮添加补间动画，当页面在第一屏和滑动时，不显示返回顶部按钮
+     * 重写 OnScrollListener类 <br/>
+     * 1.为回到顶部按钮添加补间动画 <br/>
+     * 2.当页面在第一屏和滑动时 <br/>
+     * 3.不显示返回顶部按钮
      */
     private class MyRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
         @Override

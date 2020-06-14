@@ -12,6 +12,7 @@ import com.android.volley.toolbox.Volley;
 
 /**
  * 单例模式 Volley
+ *
  * @author 谭海山
  */
 public class VolleySingleton {
@@ -23,8 +24,8 @@ public class VolleySingleton {
      */
     @SuppressLint("StaticFieldLeak")
     private static VolleySingleton INSTANCE;
-    private RequestQueue requestQueue;
     private Context mContext;
+    private RequestQueue requestQueue;
 
     /**
      * 私有化构造方法
@@ -36,11 +37,12 @@ public class VolleySingleton {
 
     /**
      * VolleySingleton
+     *
      * @param context Context
-     * @return  一个volley实例
+     * @return volley实例
      */
-    public static synchronized VolleySingleton getInstance(Context context){
-        if( INSTANCE == null ){
+    public static synchronized VolleySingleton getInstance(Context context) {
+        if ( INSTANCE == null ) {
             INSTANCE = new VolleySingleton(context);
         }
         return INSTANCE;
@@ -48,30 +50,33 @@ public class VolleySingleton {
 
     /**
      * 提供获得请求队列的方法
+     *
      * @return 请求队列
      */
-    private RequestQueue getRequestQueue(){
-        if(requestQueue == null){
-            requestQueue= Volley.newRequestQueue(mContext);
+    private RequestQueue getRequestQueue() {
+        if ( requestQueue == null ) {
+            requestQueue = Volley.newRequestQueue(mContext);
         }
         return requestQueue;
     }
 
     /**
      * 加入请求队列
+     *
      * @param req request
      * @param <T> T
      */
-    public <T> void  addToRequestQueue(Request<T> req){
+    public <T> void addToRequestQueue(Request<T> req) {
         getRequestQueue().add(req);
     }
 
     /**
-     * Volley错误信息处理
+     * Volley 错误信息处理
+     *
      * @param error VolleyError error
      * @param context context
      */
-    public static void errorMessage(VolleyError error, Context context){
+    public static void errorMessage(VolleyError error, Context context) {
         switch (error.getClass().toString()) {
             case "class com.android.volley.NoConnectionError":
                 Log.d(TAG, "onErrorResponse: " + error);

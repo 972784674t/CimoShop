@@ -45,10 +45,25 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
 
     private static final String TAG = "CIMO galleryDetail";
 
+    /**
+     * 是否已登录
+     */
     private static boolean IS_LOGON = false;
 
-    //当前用户名
+    /**
+     * 数据源
+     */
+    private Pixabay.HitsBean hitsBean;
+
+    /**
+     * 当前用户名
+     */
     private static String USER_NAME;
+
+    /**
+     * 选择的图片尺寸
+     */
+    private String ImageSize = null;
 
     private ShimmerLayout shimmerLayout;
     private PhotoView photoView;
@@ -62,22 +77,15 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
     private MaterialButton buttonLike;
     private MaterialButton buttonFav;
     private BottomAppBar bottomAppBar;
-    private FloatingActionButton floatingActionButton;
+    private FloatingActionButton addToShopCarButton;
     private ChipGroup imageSizeChipGroup;
-    //数据源
-    private Pixabay.HitsBean hitsBean;
-    //选择的图片尺寸
-    private String ImageSize = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery_detail);
-
         setTheme(R.style.AppTheme);
-
         UITools.makeStatusBarTransparent(this);
-
         shimmerLayout = findViewById(R.id.shimerDetialIMG);
         photoView = findViewById(R.id.photoView);
         upserImg = findViewById(R.id.uperimg);
@@ -90,7 +98,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
         buttonFav = findViewById(R.id.buttonfav);
         imgAddress = findViewById(R.id.imgaddress);
         bottomAppBar = findViewById(R.id.bottombar);
-        floatingActionButton = findViewById(R.id.fab);
+        addToShopCarButton = findViewById(R.id.addToShopCarfab);
         imageSizeChipGroup = findViewById(R.id.imageSizeChipGroup);
 
     }
@@ -99,9 +107,9 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
     protected void onStart() {
         super.onStart();
 
-        IS_LOGON = (SharedPrefsTools.getInstance(getApplication()).getToken("github") == "null")?false:true;
+        IS_LOGON = (SharedPrefsTools.getInstance(getApplication()).getToken("github") == "null") ? false : true;
 
-        if (IS_LOGON == true){
+        if (IS_LOGON == true) {
             USER_NAME = SharedPrefsTools.getInstance(getApplication()).getUserInfo().getLogin();
         }
 
@@ -109,6 +117,23 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
         shimmerLayout.setShimmerColor(0X55FFFFFF);
         shimmerLayout.setShimmerAngle(0);
         shimmerLayout.startShimmerAnimation();
+
+        initGalleryDetailView();
+
+        //如果已经点赞，则图标为红色
+        if (UserDAO.getInstance(getApplicationContext()).isFavoriteImage(USER_NAME, hitsBean.getWebformatURL())) {
+            MenuItem item = bottomAppBar.getMenu().findItem(R.id.fav);
+            item.setIcon(R.drawable.ic_favorite);
+        }
+
+        initAllOnClick(hitsBean);
+
+    }
+
+    /**
+     * 初始化详情界面视图
+     */
+    private void initGalleryDetailView() {
 
         //从Parcelable获取图片数据
         hitsBean = getIntent().getExtras().getParcelable("CHECKED_PHOTO_ID");
@@ -136,7 +161,6 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
                 })
                 .into(photoView);    //装载图片
 
-        //upserImg.setImageResource(hitsBean.getUserImageURL());
         upserName.setText("" + hitsBean.getUser());
 
         Glide.with(this)
@@ -151,19 +175,11 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
         buttonLike.setText(hitsBean.getLikes() + "  likes");
         buttonFav.setText(hitsBean.getFavorites() + "  favorites");
         imgAddress.setText(Html.fromHtml("<u>" + "点击这里去详细地址" + "</u>"));
-
-        //如果已经点赞，则图标为红色
-        if (UserDAO.getInstance(getApplicationContext()).isFavoriteImage(USER_NAME, hitsBean.getWebformatURL())){
-            MenuItem item = bottomAppBar.getMenu().findItem(R.id.fav);
-            item.setIcon(R.drawable.ic_favorite);
-        }
-
-        initAllOnClick(hitsBean);
-
     }
 
     /**
      * 初始化所有页面相关点击事件
+     *
      * @param hitsBean 数据源
      */
     private void initAllOnClick(Pixabay.HitsBean hitsBean) {
@@ -187,13 +203,13 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
         });
 
         //加入购物车
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+        addToShopCarButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if( IS_LOGON ){
+                if ( IS_LOGON ) {
                     isAddtoCat();
                 } else {
-                    Toast.makeText(getApplicationContext(),"请先登录哦",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "请先登录哦", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -219,7 +235,8 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
         imageSizeChipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(ChipGroup group, int checkedId) {
-                switch (imageSizeChipGroup.getCheckedChipId()){
+
+                switch ( imageSizeChipGroup.getCheckedChipId() ) {
                     case R.id.size1:
                         ImageSize = hitsBean.getPreviewWidth() + " × " + hitsBean.getPreviewHeight();
                         break;
@@ -229,6 +246,10 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
                     case R.id.size3:
                         ImageSize = hitsBean.getImageWidth() + " × " + hitsBean.getImageHeight();
                         break;
+                    default:
+                        ImageSize = null;
+                        break;
+
                 }
             }
         });
@@ -237,29 +258,30 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
 
     /**
      * 初始化收藏图片操作
-     * @param item MenuItem
+     *
+     * @param item     MenuItem
      * @param hitsBean hitsBean
      */
     private void initFavoriteImage(MenuItem item, Pixabay.HitsBean hitsBean) {
-        if (IS_LOGON == false){
-            Toast.makeText(getApplicationContext(),"您还没有登录哦",Toast.LENGTH_SHORT).show();
+        if (IS_LOGON == false) {
+            Toast.makeText(getApplicationContext(), "您还没有登录哦", Toast.LENGTH_SHORT).show();
         } else {
-                //根据图标状态判断是否点赞
-                if (item.getIcon().getConstantState() == getDrawable(R.drawable.ic_favorite).getConstantState()) {
-                    item.setIcon(R.drawable.ic_favorite_border_black_24dp);
-                    if ( UserDAO.getInstance(getApplicationContext()).delUserFavoriteImage(hitsBean.getWebformatURL()) ){
-                        Toast.makeText(getApplicationContext(),"取消收藏成功",Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getApplicationContext(),"取消收藏失败",Toast.LENGTH_SHORT).show();
-                    }
+            //根据图标状态判断是否点赞
+            if (item.getIcon().getConstantState() == getDrawable(R.drawable.ic_favorite).getConstantState()) {
+                item.setIcon(R.drawable.ic_favorite_border_black_24dp);
+                if (UserDAO.getInstance(getApplicationContext()).delUserFavoriteImage(hitsBean.getWebformatURL())) {
+                    Toast.makeText(getApplicationContext(), "取消收藏成功", Toast.LENGTH_SHORT).show();
                 } else {
-                    item.setIcon(R.drawable.ic_favorite);
-                    if( UserDAO.getInstance(getApplicationContext()).insertUserFavoriteImage(USER_NAME,hitsBean.getWebformatURL()) ){
-                        Toast.makeText(getApplicationContext(),"收藏成功",Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getApplicationContext(),"收藏失败",Toast.LENGTH_SHORT).show();
-                    }
+                    Toast.makeText(getApplicationContext(), "取消收藏失败", Toast.LENGTH_SHORT).show();
                 }
+            } else {
+                item.setIcon(R.drawable.ic_favorite);
+                if (UserDAO.getInstance(getApplicationContext()).insertUserFavoriteImage(USER_NAME, hitsBean.getWebformatURL())) {
+                    Toast.makeText(getApplicationContext(), "收藏成功", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "收藏失败", Toast.LENGTH_SHORT).show();
+                }
+            }
 
         }
     }
@@ -272,18 +294,18 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
         UserShopCar userShopCar = new UserShopCar();
         userShopCar.setUserName(USER_NAME);
         userShopCar.setShopCarItemUrl(hitsBean.getWebformatURL());
-        if ( ImageSize == null ){
-            Toast.makeText(getApplicationContext(),"请先选择图片尺寸",Toast.LENGTH_SHORT).show();
+        if (ImageSize == null) {
+            Toast.makeText(getApplicationContext(), "请先选择图片尺寸", Toast.LENGTH_SHORT).show();
             return;
         }
         userShopCar.setSize(ImageSize);
-        userShopCar.setPrice(""+hitsBean.getPreviewHeight());
+        userShopCar.setPrice("" + hitsBean.getPreviewHeight());
 
         new MaterialAlertDialogBuilder(this)
                 .setTitle("确认将该图片加入购物车吗")
-                .setMessage("购买者："+ userShopCar.getUserName()+"\n"
-                        +"图片尺寸："+ userShopCar.getSize()+"\n"
-                +"图片价格：¥ "+userShopCar.getPrice())
+                .setMessage("购买者：" + userShopCar.getUserName() + "\n"
+                        + "图片尺寸：" + userShopCar.getSize() + "\n"
+                        + "图片价格：¥ " + userShopCar.getPrice())
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -293,7 +315,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if ( UserDAO.getInstance(getApplicationContext()).addImageToShopCar(userShopCar) ){
+                        if (UserDAO.getInstance(getApplicationContext()).addImageToShopCar(userShopCar)) {
                             Toast.makeText(getApplication(), "加入购物车成功", Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(getApplication(), "加入购物车失败", Toast.LENGTH_SHORT).show();
@@ -345,11 +367,12 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
     }
 
     /**
-     *重写onBackPressed，配对进入动画
+     * 重写onBackPressed，用于配对进入动画
      */
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         ActivityCompat.finishAfterTransition(this);
     }
+
 }

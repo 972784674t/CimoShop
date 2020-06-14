@@ -1,8 +1,8 @@
 package com.example.cimoshop.entity;
 
-import androidx.annotation.NonNull;
-
 /**
+ * 用户收藏信息实体
+ *
  * @author 谭海山
  */
 public class UserFavorites {
@@ -27,7 +27,6 @@ public class UserFavorites {
         this.userFavoriteUrl = userFavoriteUrl;
     }
 
-    @NonNull
     @Override
     public String toString() {
         return "UserFavorites{" +
@@ -35,4 +34,5 @@ public class UserFavorites {
                 ", userFavoriteUrl='" + userFavoriteUrl + '\'' +
                 '}';
     }
+
 }

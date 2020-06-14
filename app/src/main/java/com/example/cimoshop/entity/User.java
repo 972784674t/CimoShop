@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 
 /**
+ * 用户实体
+ *
  * @author 谭海山
  */
 public class User {

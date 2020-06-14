@@ -1,8 +1,8 @@
 package com.example.cimoshop.entity;
 
-import androidx.annotation.NonNull;
-
 /**
+ * 用户仓库信息实体
+ *
  * @author 谭海山
  */
 public class UserWareHouses {
@@ -27,7 +27,6 @@ public class UserWareHouses {
         this.wareHouseItemUrl = wareHouseItemUrl;
     }
 
-    @NonNull
     @Override
     public String toString() {
         return "UserWareHouses{" +
@@ -35,5 +34,6 @@ public class UserWareHouses {
                 ", wareHouseItemUrl='" + wareHouseItemUrl + '\'' +
                 '}';
     }
+
 
 }

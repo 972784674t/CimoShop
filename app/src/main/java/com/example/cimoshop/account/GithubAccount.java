@@ -1,12 +1,15 @@
 package com.example.cimoshop.account;
 
 /**
- * 根据返回的json生成的Github账户
+ * 根据 Githuub 返回的 json信息生成的 Github 账户
+ *
  * @author 谭海山
  */
 public class GithubAccount {
 
     /**
+     * 属性名 ：属性示例
+     *
      * login : 972784674t
      * id : 40430727
      * node_id :
@@ -356,4 +359,5 @@ public class GithubAccount {
                 ", updated_at='" + updated_at + '\'' +
                 '}';
     }
+
 }

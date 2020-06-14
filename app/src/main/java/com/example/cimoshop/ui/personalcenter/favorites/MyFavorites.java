@@ -1,30 +1,22 @@
 package com.example.cimoshop.ui.personalcenter.favorites;
 
-import androidx.lifecycle.ViewModelProviders;
-
-import android.annotation.SuppressLint;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.cimoshop.R;
 import com.example.cimoshop.adapter.FavoritesImageAdapter;
 import com.example.cimoshop.db.UserDAO;
-import com.example.cimoshop.entity.Pixabay;
 import com.example.cimoshop.utils.SharedPrefsTools;
 
 import java.util.ArrayList;
@@ -63,9 +55,9 @@ public class MyFavorites extends Fragment {
         View root = inflater.inflate(R.layout.my_favorites_fragment, container, false);
         recyclerView = root.findViewById(R.id.favoriteimgrecycleview);
         isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
-        Log.d(TAG, "onCreateView: "+isToken);
+        Log.d(TAG, "onCreateView: " + isToken);
         if (!"null".equals(isToken)) {
-            USER_NAME =  SharedPrefsTools.getInstance(getActivity().getApplication()).getUserInfo().getLogin();
+            USER_NAME = SharedPrefsTools.getInstance(getActivity().getApplication()).getUserInfo().getLogin();
             favoriteImgList = UserDAO.getInstance(getContext()).getUserFavoriteImageList(UserDAO.getInstance(getContext()).findUserByUserName(USER_NAME).getUserId());
         } else {
             favoriteImgList = null;
@@ -76,9 +68,8 @@ public class MyFavorites extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(TAG,"onActivityCreated");
-        Log.d(TAG,"我的收藏list："+favoriteImgList);
-        if (!isToken.equals("null")){
+        Log.d(TAG, "onActivityCreated");
+        if (!isToken.equals("null")) {
             initFavoriteRecyclerView(favoriteImgList);
         } else {
             initFavoriteRecyclerView(null);
@@ -89,7 +80,7 @@ public class MyFavorites extends Fragment {
     public void onResume() {
         super.onResume();
         if (!"null".equals(isToken)) {
-            USER_NAME =  SharedPrefsTools.getInstance(getActivity().getApplication()).getUserInfo().getLogin();
+            USER_NAME = SharedPrefsTools.getInstance(getActivity().getApplication()).getUserInfo().getLogin();
             favoriteImgList = UserDAO.getInstance(getContext()).getUserFavoriteImageList(UserDAO.getInstance(getContext()).findUserByUserName(USER_NAME).getUserId());
         }
         favoritesImageAdapter.setDiffNewData(favoriteImgList);
@@ -97,11 +88,12 @@ public class MyFavorites extends Fragment {
 
     /**
      * 初始化本页面的RecyclerView
+     *
      * @param favoriteImgList 数据源
      */
     private void initFavoriteRecyclerView(ArrayList<String> favoriteImgList) {
         Log.d(TAG, "initFavoriteRecyclerView: ");
-        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         favoritesImageAdapter = new FavoritesImageAdapter();
         favoritesImageAdapter.setEmptyView(initEmptyView());
         favoritesImageAdapter.setDiffCallback(new MyDiffCallback());
@@ -111,6 +103,7 @@ public class MyFavorites extends Fragment {
 
     /**
      * 初始化空列表视图
+     *
      * @return 空列表视图 view
      */
     private View initEmptyView() {
@@ -127,7 +120,7 @@ public class MyFavorites extends Fragment {
     /**
      * 指定DiffUtil类，判断item是否相同
      */
-    static class MyDiffCallback extends DiffUtil.ItemCallback<String>{
+    static class MyDiffCallback extends DiffUtil.ItemCallback<String> {
 
 
         @Override
@@ -140,6 +133,5 @@ public class MyFavorites extends Fragment {
             return oldItem.equals(newItem);
         }
     }
-
 
 }
