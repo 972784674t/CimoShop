@@ -123,7 +123,7 @@ public class Gallery extends Fragment {
         galleryAdapter.setAnimationFirstOnly(false);
 
         //设置空视图
-        galleryAdapter.setEmptyView(initEmptyView("正在初始化资源哦..."));
+        galleryAdapter.setEmptyView(initEmptyView("正在初始化资源哦...\n也可以下拉刷新试试"));
 
         //加载更多对象，来自于BRVAH
         loadMore = galleryAdapter.getLoadMoreModule();

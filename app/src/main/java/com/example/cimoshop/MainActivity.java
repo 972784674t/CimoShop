@@ -1,6 +1,7 @@
 package com.example.cimoshop;
 
 import android.Manifest;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,7 +11,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 /**
- * 因为最初打算使用 JetPack 架构，所以系统主页请移步至 HomeFragment
+ * 因为最初打算使用 JetPack 架构，所以系统主页请移步至 ui/home/HomeFragment
  *
  * @author 谭海山
  */
@@ -21,11 +22,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         checkPermission();
     }
 
     /**
-     * 获取权限
+     * 读写权限为危险权限，在Manifest中注册后，还需要获取权限
      */
     public void checkPermission() {
         boolean isGranted = true;

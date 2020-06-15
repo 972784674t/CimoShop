@@ -22,16 +22,23 @@ import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.chad.library.adapter.base.module.DraggableModule;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.example.cimoshop.R;
+import com.example.cimoshop.db.UserDAO;
 import com.example.cimoshop.entity.UserShopCar;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 import io.supercharge.shimmerlayout.ShimmerLayout;
 
 /**
  * @author 谭海山
+ *
  * 购物车 recycleView 适配器
  */
 public class ShopCarAdapter extends BaseQuickAdapter<UserShopCar, BaseViewHolder> implements DraggableModule, OnItemClickListener, OnItemChildClickListener {
@@ -44,9 +51,14 @@ public class ShopCarAdapter extends BaseQuickAdapter<UserShopCar, BaseViewHolder
     private static List<UserShopCar> SHOP_CAR_ITEM_LIST = new ArrayList<>();
 
     /**
-     * 购物袋 : HashMap
+     * 购物袋 : LinkedHashMap
      */
-    public static HashMap<Integer, UserShopCar> SHOPPING_BAG = new HashMap<>();
+    public static LinkedHashMap<Integer, UserShopCar> SHOPPING_BAG = new LinkedHashMap<>();
+
+    /**
+     * 存储购物袋索引
+     */
+    public static ArrayList<Integer> SHOPPING_BAG_INDEX = new ArrayList<>();
 
     private CheckBox selectAllCheckBox;
     private TextView selectedImageNumber;
@@ -58,7 +70,7 @@ public class ShopCarAdapter extends BaseQuickAdapter<UserShopCar, BaseViewHolder
         addChildClickViewIds(R.id.shopCarItemcheckBox);
     }
 
-    public HashMap<Integer, UserShopCar> getShoppingBag() {
+    public LinkedHashMap<Integer, UserShopCar> getShoppingBag() {
         return SHOPPING_BAG;
     }
 
@@ -115,6 +127,7 @@ public class ShopCarAdapter extends BaseQuickAdapter<UserShopCar, BaseViewHolder
         for (int i = 0; i < SHOP_CAR_ITEM_LIST.size(); i++) {
             SHOPPING_BAG.put(i, SHOP_CAR_ITEM_LIST.get(i));
         }
+        createShopBagIndex();
     }
 
     @Override
@@ -125,6 +138,19 @@ public class ShopCarAdapter extends BaseQuickAdapter<UserShopCar, BaseViewHolder
     @Override
     public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
 
+    }
+
+    /**
+     * 构建购物袋索引
+     */
+    private void createShopBagIndex(){
+        Iterator<Map.Entry<Integer,UserShopCar>> iterator = SHOPPING_BAG.entrySet().iterator();
+        while ( iterator.hasNext() ) {
+            Map.Entry<Integer, UserShopCar> entry = iterator.next();
+            SHOPPING_BAG_INDEX.add(entry.getKey());
+        }
+        SHOPPING_BAG_INDEX = new ArrayList( new TreeSet(SHOPPING_BAG_INDEX) );
+        Log.d(TAG, "购物袋索引 - > "+SHOPPING_BAG_INDEX.toString());
     }
 
     /**
@@ -147,7 +173,7 @@ public class ShopCarAdapter extends BaseQuickAdapter<UserShopCar, BaseViewHolder
      * @param position
      */
     public void selectItem(Integer position) {
-        SHOPPING_BAG.get(position).setCheck(true);
+        SHOPPING_BAG.get(SHOPPING_BAG_INDEX.get(position)).setCheck(true);
         updataSettlementUI(position, 1);
     }
 
@@ -157,8 +183,13 @@ public class ShopCarAdapter extends BaseQuickAdapter<UserShopCar, BaseViewHolder
      * @param position
      */
     public void unSelectIem(Integer position) {
-        SHOPPING_BAG.get(position).setCheck(false);
-        updataSettlementUI(position, -1);
+        SHOPPING_BAG.get(SHOPPING_BAG_INDEX.get(position)).setCheck(false);
+        int totalPrice = Integer.parseInt(this.totalPrice.getText().toString());
+        totalPrice = totalPrice - Integer.parseInt(SHOPPING_BAG.get(SHOPPING_BAG_INDEX.get(position)).getPrice());
+        this.totalPrice.setText("" + totalPrice);
+        int selectedImageNumber = Integer.parseInt(this.selectedImageNumber.getText().toString()) - 1;
+        this.selectedImageNumber.setText("" + selectedImageNumber);
+        isCheckAll();
     }
 
     /**
@@ -170,14 +201,20 @@ public class ShopCarAdapter extends BaseQuickAdapter<UserShopCar, BaseViewHolder
     private void updataSettlementUI(Integer position, int Minus) {
         isCheckAll();
         int totalPrice = Integer.parseInt(this.totalPrice.getText().toString());
-        if (Minus > 0) {
-            totalPrice = totalPrice + Integer.parseInt(SHOPPING_BAG.get(position).getPrice());
+        //如果删除的是已经勾选的图片，则更新 UI
+        if ( SHOPPING_BAG.get(SHOPPING_BAG_INDEX.get(position)).isCheck() ){
+            if (Minus > 0) {
+                totalPrice = totalPrice + Integer.parseInt(SHOPPING_BAG.get(SHOPPING_BAG_INDEX.get(position)).getPrice());
+            } else {
+                Log.d(TAG, "删除位置: "+SHOPPING_BAG_INDEX.get(position));
+                totalPrice = totalPrice - Integer.parseInt(SHOPPING_BAG.get(SHOPPING_BAG_INDEX.get(position)).getPrice());
+            }
+            this.totalPrice.setText("" + totalPrice);
+            int selectedImageNumber = Integer.parseInt(this.selectedImageNumber.getText().toString()) + Minus;
+            this.selectedImageNumber.setText("" + selectedImageNumber);
         } else {
-            totalPrice = totalPrice - Integer.parseInt(SHOPPING_BAG.get(position).getPrice());
+
         }
-        this.totalPrice.setText("" + totalPrice);
-        int selectedImageNumber = Integer.parseInt(this.selectedImageNumber.getText().toString()) + Minus;
-        this.selectedImageNumber.setText("" + selectedImageNumber);
     }
 
     /**
@@ -185,8 +222,10 @@ public class ShopCarAdapter extends BaseQuickAdapter<UserShopCar, BaseViewHolder
      */
     private void isCheckAll() {
         int t = 0;
-        for (int i = 0; i < SHOPPING_BAG.size(); i++) {
-            if (SHOPPING_BAG.get(i).isCheck()) {
+        Iterator<Map.Entry<Integer,UserShopCar>> iterator = SHOPPING_BAG.entrySet().iterator();
+        while ( iterator.hasNext() ){
+            Map.Entry<Integer, UserShopCar> entry = iterator.next();
+            if (entry.getValue().isCheck()){
                 t++;
             }
         }
@@ -205,8 +244,8 @@ public class ShopCarAdapter extends BaseQuickAdapter<UserShopCar, BaseViewHolder
         int totalPrice = 0;
         Log.d(TAG, "selectAllItem: "+SHOPPING_BAG.toString());
         for (int i = 0; i < SHOPPING_BAG.size(); i++) {
-            SHOPPING_BAG.get(i).setCheck(true);
-            SHOP_CAR_ITEM_LIST.add(SHOPPING_BAG.get(i));
+            SHOPPING_BAG.get(SHOPPING_BAG_INDEX.get(i)).setCheck(true);
+            SHOP_CAR_ITEM_LIST.add(SHOPPING_BAG.get(SHOPPING_BAG_INDEX.get(i)));
             totalPrice += Integer.parseInt(SHOP_CAR_ITEM_LIST.get(i).getPrice());
             setData(i, SHOP_CAR_ITEM_LIST.get(i));
             notifyItemChanged(i);
@@ -221,8 +260,8 @@ public class ShopCarAdapter extends BaseQuickAdapter<UserShopCar, BaseViewHolder
     public void unSelectAllItem() {
         SHOP_CAR_ITEM_LIST.clear();
         for (int i = 0; i < SHOPPING_BAG.size(); i++) {
-            SHOPPING_BAG.get(i).setCheck(false);
-            SHOP_CAR_ITEM_LIST.add(SHOPPING_BAG.get(i));
+            SHOPPING_BAG.get(SHOPPING_BAG_INDEX.get(i)).setCheck(false);
+            SHOP_CAR_ITEM_LIST.add(SHOPPING_BAG.get(SHOPPING_BAG_INDEX.get(i)));
             setData(i, SHOP_CAR_ITEM_LIST.get(i));
             notifyItemChanged(i);
         }
@@ -235,7 +274,11 @@ public class ShopCarAdapter extends BaseQuickAdapter<UserShopCar, BaseViewHolder
      * @param position
      */
     public void delItemFormShopBag(int position){
-        SHOPPING_BAG.remove(position);
+        updataSettlementUI(position,-1);
+        //通过外部索引删除购物袋中的商品
+        SHOPPING_BAG.remove(SHOPPING_BAG_INDEX.get(position));
+        SHOPPING_BAG_INDEX.remove(position);
+        Log.d(TAG, "删除后购物袋索引: "+SHOPPING_BAG_INDEX.toString());
     }
 
     /**

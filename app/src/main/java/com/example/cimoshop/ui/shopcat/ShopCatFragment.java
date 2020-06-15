@@ -60,7 +60,6 @@ public class ShopCatFragment extends Fragment {
     private static final int RESULT_CODE_ALIPAY = 10086;
     private static final int CANCEL_CODE_ALIPAY = 10001;
 
-
     private MaterialToolbar toolbar;
     private RecyclerView shopCarRecyclerView;
     private ShopCarAdapter shopCarAdapter;
@@ -117,12 +116,24 @@ public class ShopCatFragment extends Fragment {
             ShopCarAdapter.SHOPPING_BAG.clear();
             shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
             toolbar.setTitle("购物车：( "+SHOP_CAR_ITEM_LIST.size()+" )");
+            shopCarAdapter.cancelPay();
+            shopCarAdapter.setEmptyView(initEmptyView("Oops！购物车空空如野"));
         } else {
             SHOP_CAR_ITEM_LIST.clear();
             ShopCarAdapter.SHOPPING_BAG.clear();
             toolbar.setTitle("购物车");
             shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
+            shopCarAdapter.cancelPay();
+            shopCarAdapter.setEmptyView(initEmptyView("请先登录哦"));
         }
+
+        //设置没有登录时的 toolbar
+        if ( SHOP_CAR_ITEM_LIST.size() != 0 ){
+            toolbar.setTitle("购物车：( "+SHOP_CAR_ITEM_LIST.size()+" )");
+        } else {
+            toolbar.setTitle("购物车");
+        }
+
     }
 
     @Override
@@ -190,6 +201,10 @@ public class ShopCatFragment extends Fragment {
         selectAllShopCarItemCheakBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if ( isToken.equals("null") ){
+                    selectAllShopCarItemCheakBox.setChecked(false);
+                    return;
+                }
                 if ( selectAllShopCarItemCheakBox.isChecked() ){
                     shopCarAdapter.selectAllItem();
                 } else {
@@ -256,24 +271,6 @@ public class ShopCatFragment extends Fragment {
         shopCarAdapter = new ShopCarAdapter();
         shopCarAdapter.setDiffCallback(new MyDiffCallback());
 
-        //设置空视图
-        if ( !isToken.equals("null") ){
-            shopCarAdapter.setEmptyView(initEmptyView("Oops！购物车空空如野"));
-        } else {
-            shopCarAdapter.setEmptyView(initEmptyView("请先登录哦"));
-        }
-
-        //设置没有登录时的 toolbar
-        if ( SHOP_CAR_ITEM_LIST.size() != 0 ){
-            toolbar.setTitle("购物车：( "+SHOP_CAR_ITEM_LIST.size()+" )");
-        } else {
-            toolbar.setTitle("购物车");
-        }
-
-        //允许拖拽并设置拖拽监听
-        shopCarAdapter.getDraggableModule().setDragEnabled(true);
-        shopCarAdapter.getDraggableModule().setOnItemDragListener(initOnItemDragListener());
-
         //允许侧滑
         shopCarAdapter.getDraggableModule().setSwipeEnabled(true);
 
@@ -293,9 +290,6 @@ public class ShopCatFragment extends Fragment {
         shopCarRecyclerView.setAdapter(shopCarAdapter);
 
         shopCarAdapter.connectionAdapterAndSettlementUI(selectAllShopCarItemCheakBox,selectedImageNumber,tatolPrice);
-
-        //设置数据源
-        shopCarAdapter.setDiffNewData(SHOP_CAR_ITEM_LIST);
 
         //ItemChild点击事件
         shopCarAdapter.setOnItemChildClickListener(new OnItemChildClickListener() {
@@ -350,65 +344,7 @@ public class ShopCatFragment extends Fragment {
             public void onItemSwipeMoving(Canvas canvas, RecyclerView.ViewHolder viewHolder, float dX, float dY, boolean isCurrentlyActive) {
                 Log.d(TAG, "侧滑中->   X:" + dX +"   Y:"+ dY);
                 canvas.drawColor(ContextCompat.getColor(getContext(), R.color.warning));
-            }
-        };
-    }
 
-    /**
-     * 拖拽事件监听处理
-     * @return OnItemDragListener
-     */
-    private OnItemDragListener initOnItemDragListener() {
-
-        return new OnItemDragListener() {
-            @Override
-            public void onItemDragStart(RecyclerView.ViewHolder viewHolder, int pos) {
-                Log.d(TAG, "开始拖拽");
-                final BaseViewHolder holder = ((BaseViewHolder) viewHolder);
-
-                // 开始拖砖时，item背景色变化，使得自然拖拽更自然
-                int startColor = Color.WHITE;
-                int endColor = Color.rgb(245, 245, 245);
-                //如果当前版本大于5.0则可以执行动画
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                    ValueAnimator v = ValueAnimator.ofArgb(startColor, endColor);
-                    v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animation) {
-                            holder.itemView.setBackgroundColor((int)animation.getAnimatedValue());
-                        }
-                    });
-                    //动画持续时间
-                    v.setDuration(300);
-                    v.start();
-                }
-            }
-
-            @Override
-            public void onItemDragMoving(RecyclerView.ViewHolder source, int from, RecyclerView.ViewHolder target, int to) {
-
-            }
-
-            @Override
-            public void onItemDragEnd(RecyclerView.ViewHolder viewHolder, int pos) {
-                Log.d(TAG, "结束拖拽");
-                final BaseViewHolder holder = ((BaseViewHolder) viewHolder);
-                // 结束拖砖时，item背景色变化，demo这里使用了一个动画渐变，使得自然
-                int startColor = Color.rgb(245, 245, 245);
-                int endColor = Color.WHITE;
-                //如果当前版本大于5.0则可以执行动画
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                    ValueAnimator v = ValueAnimator.ofArgb(startColor, endColor);
-                    v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animation) {
-                            holder.itemView.setBackgroundColor((int)animation.getAnimatedValue());
-                        }
-                    });
-                    //动画持续时间
-                    v.setDuration(300);
-                    v.start();
-                }
             }
         };
     }
