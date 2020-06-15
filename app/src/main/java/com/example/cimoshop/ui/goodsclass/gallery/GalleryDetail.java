@@ -46,11 +46,6 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
     private static final String TAG = "CIMO galleryDetail";
 
     /**
-     * 是否已登录
-     */
-    private static boolean IS_LOGON = false;
-
-    /**
      * 数据源
      */
     private Pixabay.HitsBean hitsBean;
@@ -59,6 +54,11 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
      * 当前用户名
      */
     private static String USER_NAME;
+
+    /**
+     * 如果 token 不为空,则用户已经登录
+     */
+    private String isToken;
 
     /**
      * 选择的图片尺寸
@@ -83,9 +83,11 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_gallery_detail);
         setTheme(R.style.AppTheme);
         UITools.makeStatusBarTransparent(this);
+        isToken = SharedPrefsTools.getInstance(getApplication()).getToken("github");
         shimmerLayout = findViewById(R.id.shimerDetialIMG);
         photoView = findViewById(R.id.photoView);
         upserImg = findViewById(R.id.uperimg);
@@ -107,10 +109,11 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
     protected void onStart() {
         super.onStart();
 
-        IS_LOGON = (SharedPrefsTools.getInstance(getApplication()).getToken("github") == "null") ? false : true;
-
-        if (IS_LOGON == true) {
+        isToken = SharedPrefsTools.getInstance(getApplication()).getToken("github");
+        if (!"null".equals(isToken)) {
             USER_NAME = SharedPrefsTools.getInstance(getApplication()).getUserInfo().getLogin();
+        } else {
+            USER_NAME = null;
         }
 
         //shimmerLayout动画初始化
@@ -121,13 +124,21 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
         initGalleryDetailView();
 
         //如果已经点赞，则图标为红色
-        if (UserDAO.getInstance(getApplicationContext()).isFavoriteImage(USER_NAME, hitsBean.getWebformatURL())) {
-            MenuItem item = bottomAppBar.getMenu().findItem(R.id.fav);
-            item.setIcon(R.drawable.ic_favorite);
+        if ( USER_NAME != null){
+            if (UserDAO.getInstance(getApplicationContext()).isFavoriteImage(USER_NAME, hitsBean.getWebformatURL())) {
+                MenuItem item = bottomAppBar.getMenu().findItem(R.id.fav);
+                item.setIcon(R.drawable.ic_favorite);
+            }
         }
 
         initAllOnClick(hitsBean);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isToken = SharedPrefsTools.getInstance(getApplication()).getToken("github");
     }
 
     /**
@@ -206,7 +217,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
         addToShopCarButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if ( IS_LOGON ) {
+                if ( !"null".equals(isToken) ) {
                     isAddtoCat();
                 } else {
                     Toast.makeText(getApplicationContext(), "请先登录哦", Toast.LENGTH_SHORT).show();
@@ -263,7 +274,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
      * @param hitsBean hitsBean
      */
     private void initFavoriteImage(MenuItem item, Pixabay.HitsBean hitsBean) {
-        if (IS_LOGON == false) {
+        if ( "null".equals(isToken) ) {
             Toast.makeText(getApplicationContext(), "您还没有登录哦", Toast.LENGTH_SHORT).show();
         } else {
             //根据图标状态判断是否点赞

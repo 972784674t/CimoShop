@@ -10,6 +10,7 @@ import android.util.Log;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+
 /**
  * 因为最初打算使用 JetPack 架构，所以系统主页请移步至 ui/home/HomeFragment
  *
