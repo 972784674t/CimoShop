@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-
 import androidx.viewpager.widget.ViewPager;
 
 import java.lang.reflect.Field;
@@ -19,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 工具类
+ * UI适配工具类 <br/>
  * 用于对状态栏和标题栏的一些适应性操作
  * @author 谭海山
  */
@@ -110,7 +109,7 @@ public class UITools {
     }
 
     /**
-     * 获取toolbar高度
+     * 获取 toolbar 高度
      * @return  toolbar高度
      */
     private static int getStatusBarHeight() {
@@ -120,7 +119,7 @@ public class UITools {
     }
 
     /**
-     * 根据toolbar高度动态修复重叠问题
+     * 根据 toolbar 高度，动态修复状态栏和 toobar 重叠问题
      * @param activity this
      * @param titleBar toolbar
      */
@@ -152,12 +151,10 @@ public class UITools {
         }
     }
 
-
     /**
      * viewpager切换动画 1
      */
-    public static class ZoomOutPageTransformer implements ViewPager.PageTransformer
-    {
+    public static class ZoomOutPageTransformer implements ViewPager.PageTransformer {
         private static final float MIN_SCALE = 0.85f;
         private static final float MIN_ALPHA = 0.5f;
 

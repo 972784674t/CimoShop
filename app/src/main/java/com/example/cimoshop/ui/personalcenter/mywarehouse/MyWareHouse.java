@@ -52,7 +52,7 @@ public class MyWareHouse extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View root = inflater.inflate(R.layout.my_ware_house_fragment, container, false);
+        View root = inflater.inflate(R.layout.fragment_my_ware_house, container, false);
         myWareHouseRecycleView = root.findViewById(R.id.myWareHouseRecycleView);
         isToken = SharedPrefsTools.getInstance(getActivity().getApplication()).getToken("github");
         Log.d(TAG, "onCreateView: " + isToken);
@@ -100,7 +100,7 @@ public class MyWareHouse extends Fragment {
      * @return 空列表视图 view
      */
     private View initEmptyView() {
-        View emptyView = getLayoutInflater().inflate(R.layout.emptyview, null);
+        View emptyView = getLayoutInflater().inflate(R.layout.view_empty, null);
         TextView emptyTextView = emptyView.findViewById(R.id.emptytextView);
         if ("null".equals(isToken)) {
             emptyTextView.setText("您还没有登录哦");

@@ -11,7 +11,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 
 /**
- * 单例模式 Volley
+ * 单例 Volley
  *
  * @author 谭海山
  */

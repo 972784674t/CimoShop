@@ -12,7 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 /**
- * 因为最初打算使用 JetPack 架构，所以系统主页请移步至 ui/home/HomeFragment
+ * 因为最初打算使用 JetPack 架构，后来因为学艺不精放弃了 ...
+ * 所以系统主页请移步至 ui/home/HomeFragment
  *
  * @author 谭海山
  */
@@ -28,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 读写权限为危险权限，在Manifest中注册后，还需要获取权限
+     * 读写权限为危险权限，在Manifest中注册后，还需要动态获取权限
      */
     public void checkPermission() {
         boolean isGranted = true;

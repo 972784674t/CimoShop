@@ -1,12 +1,9 @@
 package com.example.cimoshop.ui.shopcat;
 
-import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.BitmapRegionDecoder;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,17 +24,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemChildClickListener;
-import com.chad.library.adapter.base.listener.OnItemClickListener;
-import com.chad.library.adapter.base.listener.OnItemDragListener;
 import com.chad.library.adapter.base.listener.OnItemSwipeListener;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.example.cimoshop.R;
 import com.example.cimoshop.adapter.ShopCarAdapter;
 import com.example.cimoshop.alipay.AlipayOfSandbox;
 import com.example.cimoshop.db.UserDAO;
-import com.example.cimoshop.entity.User;
 import com.example.cimoshop.entity.UserShopCar;
-import com.example.cimoshop.ui.home.HomeFragment;
 import com.example.cimoshop.utils.SharedPrefsTools;
 import com.example.cimoshop.utils.UITools;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -45,7 +38,6 @@ import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.dialog.MaterialDialogs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -366,7 +358,7 @@ public class ShopCatFragment extends Fragment {
      * @return 空列表视图 view
      */
     private View initEmptyView(String tip) {
-        View emptyView = getLayoutInflater().inflate(R.layout.emptyview, null);
+        View emptyView = getLayoutInflater().inflate(R.layout.view_empty, null);
         TextView emptyTextView = emptyView.findViewById(R.id.emptytextView);
         emptyTextView.setText(tip);
         return emptyView;

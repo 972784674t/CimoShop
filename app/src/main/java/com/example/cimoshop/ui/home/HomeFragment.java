@@ -143,7 +143,6 @@ public class HomeFragment extends Fragment {
      * 底部导航栏初始化
      */
     private void initBottomNav() {
-
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {

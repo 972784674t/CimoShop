@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.example.cimoshop.R;
 import com.example.cimoshop.adapter.MyWorksAdapter;
-import com.example.cimoshop.db.UserDAO;
 import com.example.cimoshop.utils.SharedPrefsTools;
 
 /**
@@ -40,7 +39,7 @@ public class MyWorks extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View root =  inflater.inflate(R.layout.my_works_fragment, container, false);
+        View root =  inflater.inflate(R.layout.fragment_my_works, container, false);
         myWorksRecyclerView = root.findViewById(R.id.myWorksRecyclerView);
         return root;
 
@@ -61,7 +60,7 @@ public class MyWorks extends Fragment {
      * @return 空列表视图 view
      */
     private View initEmptyView() {
-        View emptyView = getLayoutInflater().inflate(R.layout.emptyview, null);
+        View emptyView = getLayoutInflater().inflate(R.layout.view_empty, null);
         TextView emptyTextView = emptyView.findViewById(R.id.emptytextView);
         Log.d(TAG, "initEmptyView: "+isToken);
         if ("null".equals(isToken)) {

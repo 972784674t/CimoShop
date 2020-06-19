@@ -20,7 +20,7 @@ import io.supercharge.shimmerlayout.ShimmerLayout;
 public class FavoritesImageAdapter extends BaseQuickAdapter < String,BaseViewHolder > implements LoadMoreModule {
 
     public FavoritesImageAdapter() {
-        super(R.layout.myfavorite_item);
+        super(R.layout.item_myfavorite);
     }
 
     @Override

@@ -7,6 +7,9 @@ import android.content.SharedPreferences;
 import com.example.cimoshop.account.GithubAccount;
 
 /**
+ * SharedPreferences工具类 <br/>
+ * 用于对本APP内的SharedPreferences文件进行操作
+ *
  * @author 谭海山
  */
 public class SharedPrefsTools {
@@ -69,6 +72,7 @@ public class SharedPrefsTools {
 
     /**
      * 从sharepreferences获取用户信息
+     *
      * @return GithubAccount UserInfo
      */
     public GithubAccount getUserInfo(){

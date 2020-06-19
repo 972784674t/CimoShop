@@ -12,10 +12,9 @@ import javax.net.ssl.X509TrustManager;
 
 /**
  *
- * Volley 处理 HTTPS 请求时的证书问题
+ * 解决 Volley 处理 HTTPS 请求时的证书问题
  *
  * @author Administrator
- * @date 2016/2/17
  */
 public class FakeX509TrustManager implements X509TrustManager {
 

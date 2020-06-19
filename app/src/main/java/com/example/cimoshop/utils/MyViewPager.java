@@ -8,7 +8,8 @@ import androidx.viewpager.widget.ViewPager;
 
 /**
  * @author 谭海山
- * 自定义ViewPager,控制左右滑动切屏
+ *
+ * 自定义ViewPager,禁止左右滑动切屏
  */
 public class MyViewPager extends ViewPager {
 

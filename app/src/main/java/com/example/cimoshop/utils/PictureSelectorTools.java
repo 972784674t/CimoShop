@@ -1,18 +1,11 @@
 
 package com.example.cimoshop.utils;
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.Application;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.ImageView;
 
-import androidx.fragment.app.Fragment;
-
-import com.example.cimoshop.MainActivity;
 import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.config.PictureConfig;
 import com.luck.picture.lib.config.PictureMimeType;
@@ -46,7 +39,8 @@ public class PictureSelectorTools {
 
     /**
      * 从图库中选择图片
-     * @param activity activity
+     *
+     * @param activity  activity
      * @param imageView imageView 被选中的图片将会显示在这个imageView
      */
     public void getImageFormGallery(Activity activity, ImageView imageView) {
@@ -119,10 +113,11 @@ public class PictureSelectorTools {
 
     /**
      * 通过相加拍摄选择图片
-     * @param activity activity
+     *
+     * @param activity  activity
      * @param imageView imageView 被选中的图片将会显示在这个imageView
      */
-    public void getImageFromTakePic(Activity activity,ImageView imageView) {
+    public void getImageFromTakePic(Activity activity, ImageView imageView) {
         //单独拍照
         PictureSelector.create(activity)
                 .openCamera(PictureMimeType.ofImage())
@@ -149,9 +144,10 @@ public class PictureSelectorTools {
                             Log.i(TAG, "原图路径:" + media.getOriginalPath());
                             Log.i(TAG, "Android Q 特有Path:" + media.getAndroidQToPath());
                         }
-                        getImageFormGallery(activity,imageView);
+                        getImageFormGallery(activity, imageView);
                         // logo.setImageURI(Uri.fromFile(new File(logourl)));
                     }
+
                     @Override
                     public void onCancel() {
                         Log.i(TAG, "PictureSelector Cancel");
@@ -159,7 +155,6 @@ public class PictureSelectorTools {
 
                 });//结果回调onActivityResult code
     }
-
 
 
 }

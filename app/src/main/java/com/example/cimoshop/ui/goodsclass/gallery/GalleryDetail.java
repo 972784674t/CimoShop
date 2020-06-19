@@ -341,7 +341,7 @@ public class GalleryDetail extends AppCompatActivity implements View.OnClickList
      */
     void share() {
 
-        View view = LayoutInflater.from(this).inflate(R.layout.sharegallery, null);
+        View view = LayoutInflater.from(this).inflate(R.layout.share_gallery, null);
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
 
         bottomSheetDialog.setContentView(view);

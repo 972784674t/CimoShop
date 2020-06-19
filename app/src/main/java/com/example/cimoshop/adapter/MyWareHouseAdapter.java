@@ -22,7 +22,7 @@ import io.supercharge.shimmerlayout.ShimmerLayout;
 public class MyWareHouseAdapter extends BaseQuickAdapter<String, BaseViewHolder> {
 
     public MyWareHouseAdapter() {
-        super(R.layout.myfavorite_item);
+        super(R.layout.item_myfavorite);
     }
 
     @Override

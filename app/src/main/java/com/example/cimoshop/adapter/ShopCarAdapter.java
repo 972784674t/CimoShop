@@ -1,7 +1,6 @@
 package com.example.cimoshop.adapter;
 
 import android.graphics.drawable.Drawable;
-import android.net.VpnService;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -22,12 +21,9 @@ import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.chad.library.adapter.base.module.DraggableModule;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.example.cimoshop.R;
-import com.example.cimoshop.db.UserDAO;
 import com.example.cimoshop.entity.UserShopCar;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -65,7 +61,7 @@ public class ShopCarAdapter extends BaseQuickAdapter<UserShopCar, BaseViewHolder
     private TextView totalPrice;
 
     public ShopCarAdapter() {
-        super(R.layout.shopcaritem);
+        super(R.layout.item_shopcar);
         //为复选框注册点击事件
         addChildClickViewIds(R.id.shopCarItemcheckBox);
     }

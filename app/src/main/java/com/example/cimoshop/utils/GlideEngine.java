@@ -24,6 +24,10 @@ import com.luck.picture.lib.widget.longimage.ImageViewState;
 import com.luck.picture.lib.widget.longimage.SubsamplingScaleImageView;
 
 /**
+ * 图片加载引擎，用于适配 PictureSelector
+ *
+ * https://github.com/LuckSiege/PictureSelector
+ *
  * @author luck
  * 2019-11-13 17:02
  * Glide加载引擎

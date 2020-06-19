@@ -26,7 +26,7 @@ public class GalleryAdapter extends BaseQuickAdapter<Pixabay.HitsBean, BaseViewH
     private static final String TAG = "cimoBRVAH";
 
     public GalleryAdapter() {
-        super(R.layout.gallery_item);
+        super(R.layout.item_gallery);
     }
 
     @Override

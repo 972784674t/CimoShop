@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public class MyWorksAdapter extends BaseQuickAdapter<UserShopCar, BaseViewHolder> {
 
     public MyWorksAdapter() {
-        super(R.layout.my_works_fragment);
+        super(R.layout.fragment_my_works);
     }
 
     @Override

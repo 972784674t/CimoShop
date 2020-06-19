@@ -49,7 +49,6 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 
-import java.util.IllegalFormatCodePointException;
 import java.util.List;
 
 /**
@@ -93,7 +92,7 @@ public class Gallery extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG,"onCreateView");
-        View root = inflater.inflate(R.layout.gallery_fragment, container, false);
+        View root = inflater.inflate(R.layout.fragment_gallery, container, false);
         initView(root);
         return root;
     }
@@ -267,7 +266,7 @@ public class Gallery extends Fragment {
      * @return 空列表视图 view
      */
     private View initEmptyView(String tip) {
-        View emptyView = getLayoutInflater().inflate(R.layout.emptyview, null);
+        View emptyView = getLayoutInflater().inflate(R.layout.view_empty, null);
         TextView emptyTextView = emptyView.findViewById(R.id.emptytextView);
         emptyTextView.setText(tip);
         return emptyView;

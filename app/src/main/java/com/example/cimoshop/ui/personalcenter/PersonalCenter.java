@@ -37,7 +37,6 @@ import com.example.cimoshop.ui.login.Login;
 import com.example.cimoshop.ui.personalcenter.favorites.MyFavorites;
 import com.example.cimoshop.ui.personalcenter.mywarehouse.MyWareHouse;
 import com.example.cimoshop.ui.personalcenter.myworks.MyWorks;
-import com.example.cimoshop.ui.shopcat.ShopCatFragment;
 import com.example.cimoshop.utils.FakeX509TrustManager;
 import com.example.cimoshop.utils.PictureSelectorTools;
 import com.example.cimoshop.utils.SharedPrefsTools;
@@ -90,7 +89,7 @@ public class PersonalCenter extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View root = LayoutInflater.from(getContext()).inflate(R.layout.personal_center_fragment, container, false);
+        View root = LayoutInflater.from(getContext()).inflate(R.layout.fragment_personal_center, container, false);
         initView(root);
         if (isToken.equals("null")){
             toolbar.getMenu().clear();
@@ -268,7 +267,7 @@ public class PersonalCenter extends Fragment {
             pcuseravatar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    View view = LayoutInflater.from(getContext()).inflate(R.layout.selectpicturebottomdialog, null);
+                    View view = LayoutInflater.from(getContext()).inflate(R.layout.select_picture_bottom_dialog, null);
                     BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
                     bottomSheetDialog.setContentView(view);
                     bottomSheetDialog.show();
