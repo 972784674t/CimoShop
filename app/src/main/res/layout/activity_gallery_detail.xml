@@ -317,7 +317,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             app:fabCradleRoundedCornerRadius="20dp"
-            app:menu="@menu/menu_bottom"
+            app:menu="@menu/bottom_menu_gallery_detail"
             app:navigationIcon="@drawable/ic_arrow_back_black_24dp" />
 
         <LinearLayout

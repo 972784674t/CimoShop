@@ -326,7 +326,7 @@ public class PersonalCenter extends Fragment {
 
                         Toast.makeText(context, "用户信息获取成功", Toast.LENGTH_SHORT).show();
                         logonbtn.setVisibility(View.GONE);
-                        toolbar.inflateMenu(R.menu.personalcentermenu);
+                        toolbar.inflateMenu(R.menu.menu_personalcenter);
                         //将返回的用户信息保存到shp文件
                         Gson gson = new Gson();
                         GithubAccount githubAccount = gson.fromJson(response, GithubAccount.class);

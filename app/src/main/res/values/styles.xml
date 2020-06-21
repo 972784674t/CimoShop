@@ -1,14 +1,12 @@
 <resources>
 
-    <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <!-- Customize your theme here. -->
+
+    <!-- 在线主题色配置工具：https://material.io/resources/color/#!/?view.left=0&view.right=0 -->
 
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-
         <item name="colorPrimary">#212121</item>
-
         <item name="android:textColorPrimary">#FFFFFF</item>
         <item name="colorPrimaryVariant">#000000</item>
         <item name="colorOnPrimary">#FFFFFF</item>
@@ -24,13 +22,9 @@
 
     </style>
 
+    <!-- 自定义 toobar 主题：下拉菜单不覆盖 toobar -->
     <style name="myToobarTheme" parent="Theme.MaterialComponents">
         <item name="overlapAnchor">false</item>
     </style>
-
-
-
-
-
 
 </resources>
