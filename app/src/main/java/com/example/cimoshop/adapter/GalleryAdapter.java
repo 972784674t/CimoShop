@@ -19,6 +19,8 @@ import com.example.cimoshop.entity.Pixabay;
 import io.supercharge.shimmerlayout.ShimmerLayout;
 
 /**
+ * Gallery列表适配器
+ *
  * @author 谭海山
  */
 public class GalleryAdapter extends BaseQuickAdapter<Pixabay.HitsBean, BaseViewHolder> implements LoadMoreModule {

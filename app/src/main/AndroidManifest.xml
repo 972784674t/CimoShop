@@ -19,7 +19,7 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
-        <activity android:name=".alipay.AlipayOfSandbox"></activity>
+        <activity android:name=".alipay.AlipayOfSandbox"/>
         <activity android:name=".ui.splash.Splash" />
         <activity android:name=".ui.login.Login" />
         <activity android:name=".ui.goodsclass.gallery.GalleryDetail" />

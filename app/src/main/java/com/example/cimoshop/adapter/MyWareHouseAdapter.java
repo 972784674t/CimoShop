@@ -17,6 +17,8 @@ import org.jetbrains.annotations.NotNull;
 import io.supercharge.shimmerlayout.ShimmerLayout;
 
 /**
+ * 我的仓库适配器
+ *
  * @author 谭海山
  */
 public class MyWareHouseAdapter extends BaseQuickAdapter<String, BaseViewHolder> {

@@ -1,7 +1,5 @@
 package com.example.cimoshop.alipay;
 
-import com.example.cimoshop.alipay.SignUtils;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;

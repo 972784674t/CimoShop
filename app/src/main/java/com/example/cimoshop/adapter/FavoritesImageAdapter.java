@@ -15,6 +15,8 @@ import com.example.cimoshop.R;
 import io.supercharge.shimmerlayout.ShimmerLayout;
 
 /**
+ * 收藏列表适配器
+ *
  * @author 谭海山
  */
 public class FavoritesImageAdapter extends BaseQuickAdapter < String,BaseViewHolder > implements LoadMoreModule {
