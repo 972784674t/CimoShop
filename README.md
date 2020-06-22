@@ -1,4 +1,4 @@
-# CimoShop
+# CimoGallery
 作者：incimo  
 时间：2020/06/14
 ### Cimo画廊 v1.0.1 beta 版本
