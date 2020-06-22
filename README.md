@@ -27,6 +27,10 @@
 - Github OAuth授权登录
 - 支付宝沙箱环境支付
 
+> #### 服务端(长期在线)
+
+- Node.js 14
+
 > #### 使用到的框架
 
 - photoView 图片操作 ：[PhotoView](https://github.com/chrisbanes/PhotoView)
