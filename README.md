@@ -11,6 +11,8 @@
 
 - 底部导航栏毛玻璃效果的实现思路已经有了，不过经过研究可能需要修改ViewPage中3个相关Fragment的布局，比较耗时，只能等有时间再做了
 
+- 2020/07/07 Node服务端端口更改为 9530
+
 > #### UI设计标准
 
 - Material Design 谷歌官方材质设计语言 [Material Design](https://www.material.io/)
