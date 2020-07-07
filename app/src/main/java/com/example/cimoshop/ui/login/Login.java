@@ -182,7 +182,7 @@ public class Login extends AppCompatActivity {
                 Log.d(TAG, githubCallbackUrl);
 
                 //如果加载的url为下面路径则拦截
-                if (githubCallbackUrl.contains("http://incimo.xyz:8080/cimowebshop/GithubLogingCallBack")) {
+                if (githubCallbackUrl.contains("http://incimo.xyz:9530/cimowebshop/GithubLogingCallBack")) {
 
                     //通过拦截的url，通过服务器请求次链接获取token
                     getGithubToken();

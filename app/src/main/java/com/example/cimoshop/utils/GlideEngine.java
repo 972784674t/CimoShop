@@ -28,9 +28,8 @@ import com.luck.picture.lib.widget.longimage.SubsamplingScaleImageView;
  *
  * https://github.com/LuckSiege/PictureSelector
  *
- * @author luck
- * 2019-11-13 17:02
  * Glide加载引擎
+ * @author 谭海山
  */
 public class GlideEngine implements ImageEngine {
 
